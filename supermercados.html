@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supermercados · Plan de comidas Buenos Aires</title>
+<meta name="description" content="Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥘</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html"><span class="brand-ico">🥘</span><span>Plan de comidas <em>Buenos Aires</em></span></a>
+  <nav class="nav">
+    <a href="plan.html" data-nav="plan">Plan</a>
+    <a href="recetas.html" data-nav="recetas">Recetas</a>
+    <a href="compras.html" data-nav="compras">Compras</a>
+    <a href="supermercados.html" data-nav="supermercados">Súper</a>
+  </nav>
+  <div class="money-ctl" title="Moneda en la que se muestran todos los precios del sitio">
+    <div class="seg" id="curSeg">
+      <button data-cur="ARS" class="on">ARS</button>
+      <button data-cur="USD">USD</button>
+      <button data-cur="EUR">EUR</button>
+    </div>
+  </div>
+</header>
+
+<main data-page="supermercados">
+<section class="page-head">
+  <p class="kicker">Supermercados con envío a domicilio</p>
+  <h1>Dónde conviene pedir</h1>
+  <p class="lead">Comparamos siete cadenas que entregan en CABA y GBA. Primero la respuesta corta; después las condiciones de envío de cada una, por tipo de tienda; y al final, para quien quiera el detalle, el precio producto por producto.</p>
+</section>
+
+<div class="rates-row card">
+  <div><h3>Cotización usada para convertir</h3><p class="muted small" id="ratesNote">Cargando…</p></div>
+  <div class="seg" id="modeSeg"><button data-mode="blue" class="on">Blue</button><button data-mode="oficial">Oficial</button></div>
+  <dl><div><dt>1 USD</dt><dd id="rUsd">—</dd></div><div><dt>1 EUR</dt><dd id="rEur">—</dd></div></dl>
+</div>
+
+<section class="sec">
+  <h2><span class="num">1</span>La respuesta corta</h2>
+  <div class="two">
+    <div class="ranking card" id="ranking"></div>
+    <div class="verdict card" id="verdict"></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2><span class="num">2</span>Condiciones de envío, por tipo de tienda</h2>
+  <p class="muted">Lo que publica cada cadena. El costo exacto se confirma siempre en el checkout con tu dirección.</p>
+  <div id="storeGroups"></div>
+  <h3 class="sub">Apps de delivery</h3>
+  <p class="muted small">Para compras chicas o urgentes: llegan en menos de una hora, pero cobran envío y los precios son algo más altos.</p>
+  <div class="apps" id="apps"></div>
+</section>
+
+<section class="sec">
+  <h2><span class="num">3</span>El changuito, producto por producto</h2>
+  <p class="muted">Veinte productos básicos del plan, en la cantidad de una semana, agrupados por góndola. Precio normalizado a la misma unidad (por kg, por paquete o por 170 g). Verde = el más barato de la fila. Tocá un precio para abrir el producto en el sitio de la cadena.</p>
+  <details class="card det">
+    <summary>Ver la tabla completa (20 productos × 7 cadenas)</summary>
+    <div class="basket-wrap"><table class="basket" id="basketTable"></table></div>
+    <p class="muted small">Un asterisco indica que la búsqueda no encontró el producto en esa cadena y se usa el promedio de las otras. Precios leídos el <b id="basketDate"></b>.</p>
+  </details>
+</section>
+
+<section class="sec sources">
+  <h3 class="sub">Fuentes y método</h3>
+  <ul id="sources"></ul>
+</section>
+</main>
+
+<footer class="foot">
+  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a></nav>
+  <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a></p>
+</footer>
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close></div>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-x" data-close aria-label="Cerrar">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

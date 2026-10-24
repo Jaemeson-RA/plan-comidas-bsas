@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plan de comidas · Buenos Aires</title>
-<meta name="description" content="Plan de comidas de 5 semanas para Buenos Aires: recetas fáciles con productos de acá, lista de compras semanal y comparativa de supermercados con envío a domicilio en ARS, USD y EUR.">
+<meta name="description" content="Plan de comidas de 5 semanas para Buenos Aires: recetas fáciles, lista de compras y comparativa de supermercados con envío a domicilio.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥘</text></svg>">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="top">
-  <a class="brand" href="#inicio"><span class="brand-ico">🥘</span><span>Plan de comidas <em>Buenos Aires</em></span></a>
+  <a class="brand" href="index.html"><span class="brand-ico">🥘</span><span>Plan de comidas <em>Buenos Aires</em></span></a>
   <nav class="nav">
-    <a href="#plan">Plan semanal</a>
-    <a href="#recetas">Recetas</a>
-    <a href="#compras">Compras</a>
-    <a href="#supermercados">Supermercados</a>
+    <a href="plan.html" data-nav="plan">Plan</a>
+    <a href="recetas.html" data-nav="recetas">Recetas</a>
+    <a href="compras.html" data-nav="compras">Compras</a>
+    <a href="supermercados.html" data-nav="supermercados">Súper</a>
   </nav>
-  <div class="money-ctl" title="Moneda en la que se muestran los precios">
+  <div class="money-ctl" title="Moneda en la que se muestran todos los precios del sitio">
     <div class="seg" id="curSeg">
       <button data-cur="ARS" class="on">ARS</button>
       <button data-cur="USD">USD</button>
@@ -26,106 +26,45 @@
   </div>
 </header>
 
-<main>
-<section id="inicio" class="hero">
+<main data-page="inicio">
+<section class="hero hero-home">
   <div class="hero-txt">
     <p class="kicker">Buenos Aires · <span id="periodLabel"></span></p>
-    <h1>Comer bien, simple y con lo que hay en el barrio.</h1>
-    <p class="lead">Cinco semanas de desayunos, almuerzos y cenas con productos argentinos de todos los días. Cada receta tiene foto, video, ingredientes para 2 personas y costo aproximado por porción. Al final, qué supermercado conviene para pedir a domicilio.</p>
-    <div class="hero-cta">
-      <a class="btn" href="#plan">Ver el plan</a>
-      <a class="btn ghost" href="#supermercados">Comparar supermercados</a>
-    </div>
+    <h1>Qué comemos hoy, qué compramos y dónde.</h1>
+    <p class="lead">Un plan de comidas de cinco semanas para dos personas, con recetas fáciles y productos de acá. Cada tema tiene su página; esta es solo la puerta de entrada.</p>
   </div>
-  <aside class="rates card" id="ratesCard">
-    <h3>Cotización del día</h3>
-    <div class="rate-mode seg" id="modeSeg">
-      <button data-mode="blue" class="on">Blue</button>
-      <button data-mode="oficial">Oficial</button>
-    </div>
-    <dl>
-      <div><dt>1 USD</dt><dd id="rUsd">—</dd></div>
-      <div><dt>1 EUR</dt><dd id="rEur">—</dd></div>
-    </dl>
-    <p class="muted small" id="ratesNote">Cargando…</p>
-  </aside>
+  <aside class="card today" id="today"></aside>
 </section>
 
-<section id="plan" class="sec">
-  <div class="sec-head">
-    <h2>Plan semanal</h2>
-    <p class="muted">Tocá un plato para ver la receta. Los fines de semana quedan los platos que llevan más tiempo (empanadas, pastel de papa). Las porciones son para 2.</p>
-  </div>
-  <div class="tabs" id="weekTabs"></div>
-  <div class="plan-wrap">
-    <table class="plan" id="planTable">
-      <thead><tr><th>Día</th><th>Desayuno</th><th>Almuerzo</th><th>Merienda</th><th>Cena</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <div class="plan-cards" id="planCards"></div>
-</section>
-
-<section id="recetas" class="sec">
-  <div class="sec-head">
-    <h2>Recetas</h2>
-    <p class="muted">18 recetas, todas para 2 porciones. El costo por porción se calcula con los precios actuales del supermercado más barato y se muestra en la moneda que elijas arriba.</p>
-  </div>
-  <div class="chips" id="recChips">
-    <button data-f="all" class="on">Todas</button>
-    <button data-f="desayuno">Desayunos</button>
-    <button data-f="plato">Almuerzos y cenas</button>
-    <button data-f="rápido">Rápidas (≤ 20 min)</button>
-    <button data-f="económico">Económicas</button>
-  </div>
-  <div class="grid" id="recGrid"></div>
-</section>
-
-<section id="compras" class="sec">
-  <div class="sec-head">
-    <h2>Lista de compras</h2>
-    <p class="muted">Generada a partir de las recetas de cada semana (más yogur, fruta y pan para las meriendas). Tildá lo que ya tenés: se guarda en este dispositivo.</p>
-  </div>
-  <div class="tabs" id="shopTabs"></div>
-  <div class="shop-grid" id="shopGrid"></div>
-  <details class="pantry card">
-    <summary>Despensa: revisar que haya antes de pedir</summary>
-    <ul id="pantryList"></ul>
-  </details>
-</section>
-
-<section id="supermercados" class="sec">
-  <div class="sec-head">
-    <h2>Supermercados con envío a domicilio</h2>
-    <p class="muted">Siete cadenas que entregan en CABA y GBA. Primero las condiciones de envío (lo que publica cada una); después, cuánto sale en cada una el mismo changuito semanal de 20 productos básicos del plan, con precios tomados de sus catálogos online el <strong id="basketDate"></strong>.</p>
-  </div>
-
-  <div class="ranking card" id="ranking"></div>
-
-  <h3 class="sub">Condiciones de envío</h3>
-  <div class="stores" id="stores"></div>
-
-  <h3 class="sub">Apps de delivery (para compras chicas o urgentes)</h3>
-  <div class="apps" id="apps"></div>
-
-  <h3 class="sub">El changuito semanal, producto por producto</h3>
-  <p class="muted small">Precio normalizado a la misma unidad (por kg, por paquete o por 170 g) para que sean comparables. Tocá el precio para ver el producto en el sitio de la cadena. Verde = el más barato de la fila. Un asterisco indica que la búsqueda no encontró el producto y se usa el promedio de las otras cadenas.</p>
-  <div class="basket-wrap">
-    <table class="basket" id="basketTable"></table>
+<section class="sec">
+  <h2 class="center">Cuatro páginas, una por cosa</h2>
+  <div class="entry-grid">
+    <a class="entry" href="plan.html"><span class="e-ico">📅</span><h3>Calendario</h3><p>El mes entero de un vistazo: pasá el mouse por un plato y aparece la foto; hacé clic y se abre la receta.</p><span class="e-go">Ver el calendario →</span></a>
+    <a class="entry" href="recetas.html"><span class="e-ico">🍳</span><h3>Recetas</h3><p>18 recetas en cinco categorías, con foto, video, ingredientes para 2 y costo por porción.</p><span class="e-go">Ver las recetas →</span></a>
+    <a class="entry" href="compras.html"><span class="e-ico">🛒</span><h3>Lista de compras</h3><p>La lista de cada semana ya armada por góndola. Tildás lo que tenés y pedís el resto.</p><span class="e-go">Ver la lista →</span></a>
+    <a class="entry" href="supermercados.html"><span class="e-ico">🚚</span><h3>Supermercados</h3><p>Siete cadenas con envío a domicilio comparadas: cuál conviene, condiciones y precios.</p><span class="e-go">Comparar →</span></a>
   </div>
 </section>
 
-<section class="sec sources">
-  <h3 class="sub">Fuentes y método</h3>
-  <ul id="sources"></ul>
-  <p class="muted small">Los precios de supermercados cambian todos los días en Argentina y pueden diferir por sucursal y zona de entrega: usá la comparativa como orden de magnitud, no como lista de precios. Las conversiones usan la cotización blue por defecto porque es la que se obtiene al cambiar euros o dólares en efectivo; podés pasar a oficial arriba.</p>
+<section class="sec how">
+  <h2 class="center">Cómo se usa</h2>
+  <ol class="steps">
+    <li><b>Domingo a la noche</b><span>Abrí el <a href="plan.html">calendario</a> y mirá la semana que empieza. Si un plato no te convence, buscá otro en <a href="recetas.html">recetas</a>.</span></li>
+    <li><b>Lunes temprano</b><span>Entrá a la <a href="compras.html">lista de compras</a> de esa semana, tildá lo que ya hay en casa y pedí el resto en el <a href="supermercados.html">súper que más conviene</a>.</span></li>
+    <li><b>Cada día</b><span>Volvé acá: el menú de hoy está arriba a la derecha. Tocá un plato y tenés ingredientes, pasos y video.</span></li>
+  </ol>
+</section>
+
+<section class="sec explain card">
+  <h3>Sobre los precios y la moneda</h3>
+  <p>Todos los precios están en pesos y se pueden ver en dólares o euros con el botón <b>ARS / USD / EUR</b> de arriba. La conversión usa la cotización <b>blue</b> (la que se obtiene cambiando efectivo) y se actualiza sola desde dolarapi.com; en <a href="supermercados.html">supermercados</a> podés pasar a la oficial. Los precios de los súper se leyeron de sus catálogos online el <b id="basketDate"></b> y cambian seguido: tomalos como orden de magnitud.</p>
 </section>
 </main>
 
 <footer class="foot">
+  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a></nav>
   <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a></p>
 </footer>
-
 <div class="modal" id="modal" hidden>
   <div class="modal-bg" data-close></div>
   <div class="modal-box" role="dialog" aria-modal="true">
@@ -133,7 +72,6 @@
     <div id="modalContent"></div>
   </div>
 </div>
-
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>

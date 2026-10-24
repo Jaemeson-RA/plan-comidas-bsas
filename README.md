@@ -8,7 +8,8 @@ Sitio estático (HTML + CSS + JS, sin dependencias) con un plan de comidas de 5 
 
 | Archivo | Qué es |
 |---|---|
-| `index.html`, `style.css`, `app.js` | la página |
+| `index.html`, `plan.html`, `recetas.html`, `compras.html`, `supermercados.html` | las cinco páginas (generadas con `tools/build_pages.py` a partir de `_head.html`, `_foot.html` y `tools/pages/*.body.html`) |
+| `style.css`, `app.js` | estilos y lógica compartidos (calendario con popover, recetas por categoría, lista de compras, comparativa) |
 | `data.js` | datos generados: plan, recetas, listas, supermercados, cotizaciones de respaldo |
 | `img/` | fotos de las recetas (Wikimedia Commons, licencias CC indicadas en cada receta) |
 | `fonts/` | DM Sans y Playfair Display en woff2 (sin llamadas a Google Fonts) |

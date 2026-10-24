@@ -1,0 +1,23 @@
+<main data-page="plan">
+<section class="page-head">
+  <p class="kicker">Calendario · <span id="periodLabel"></span></p>
+  <h1>Qué se come cada día</h1>
+  <p class="lead">Pasá el mouse por un plato para ver la foto y el costo; hacé clic para abrir la receta completa. Cada semana tiene su botón hacia la lista de compras. De lunes a viernes van los platos rápidos; el fin de semana, los que llevan más tiempo.</p>
+</section>
+<div class="plan-tools">
+  <div class="seg" id="viewSeg"><button data-view="cal" class="on">Calendario del mes</button><button data-view="week">Una semana</button></div>
+  <div class="legend"><span>🌅 desayuno</span><span>☀️ almuerzo</span><span>🧉 merienda</span><span>🌙 cena</span></div>
+</div>
+<div id="calendar" class="calendar"></div>
+<div id="weekView" hidden>
+  <div class="tabs" id="weekTabs"></div>
+  <div class="plan-wrap">
+    <table class="plan" id="planTable">
+      <thead><tr><th>Día</th><th>Desayuno</th><th>Almuerzo</th><th>Merienda</th><th>Cena</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="plan-cards" id="planCards"></div>
+</div>
+<div class="popover" id="pop" hidden></div>
+</main>

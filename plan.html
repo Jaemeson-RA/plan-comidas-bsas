@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendario · Plan de comidas Buenos Aires</title>
+<meta name="description" content="Qué se come cada día, en un calendario del 27 de octubre al 30 de noviembre de 2026.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥘</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html"><span class="brand-ico">🥘</span><span>Plan de comidas <em>Buenos Aires</em></span></a>
+  <nav class="nav">
+    <a href="plan.html" data-nav="plan">Plan</a>
+    <a href="recetas.html" data-nav="recetas">Recetas</a>
+    <a href="compras.html" data-nav="compras">Compras</a>
+    <a href="supermercados.html" data-nav="supermercados">Súper</a>
+  </nav>
+  <div class="money-ctl" title="Moneda en la que se muestran todos los precios del sitio">
+    <div class="seg" id="curSeg">
+      <button data-cur="ARS" class="on">ARS</button>
+      <button data-cur="USD">USD</button>
+      <button data-cur="EUR">EUR</button>
+    </div>
+  </div>
+</header>
+
+<main data-page="plan">
+<section class="page-head">
+  <p class="kicker">Calendario · <span id="periodLabel"></span></p>
+  <h1>Qué se come cada día</h1>
+  <p class="lead">Pasá el mouse por un plato para ver la foto y el costo; hacé clic para abrir la receta completa. Cada semana tiene su botón hacia la lista de compras. De lunes a viernes van los platos rápidos; el fin de semana, los que llevan más tiempo.</p>
+</section>
+<div class="plan-tools">
+  <div class="seg" id="viewSeg"><button data-view="cal" class="on">Calendario del mes</button><button data-view="week">Una semana</button></div>
+  <div class="legend"><span>🌅 desayuno</span><span>☀️ almuerzo</span><span>🧉 merienda</span><span>🌙 cena</span></div>
+</div>
+<div id="calendar" class="calendar"></div>
+<div id="weekView" hidden>
+  <div class="tabs" id="weekTabs"></div>
+  <div class="plan-wrap">
+    <table class="plan" id="planTable">
+      <thead><tr><th>Día</th><th>Desayuno</th><th>Almuerzo</th><th>Merienda</th><th>Cena</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="plan-cards" id="planCards"></div>
+</div>
+<div class="popover" id="pop" hidden></div>
+</main>
+
+<footer class="foot">
+  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a></nav>
+  <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a></p>
+</footer>
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close></div>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-x" data-close aria-label="Cerrar">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
