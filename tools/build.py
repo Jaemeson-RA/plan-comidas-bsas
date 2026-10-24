@@ -14,7 +14,21 @@ YT = {  # video elegido por receta
  "pastel":"2dK_dtOMbyg","empanadas":"T8NWbcdnbQ4",
  "noquis":"YvwiyErV6dg","tortilla":"i35SFOnFimQ","albondigas":"ZzQhLPEl7lQ","curry":"qaoKiH_2Fzo","hamburguesas":"rgmUL1g_j6M",
  "garbanzos":"gRvgUZrW6DU","berenjenas":"fmKqVDaKHuA","arrozpollo":"4vEcK1X6VcA","wrap":"H8P6Lcy1cPE","gramajo":"hloFV5P7yMQ",
- "pescadohorno":"rjofAbF4rlo","carbonara":"2ivPPqeaidY"}
+ "pescadohorno":"rjofAbF4rlo","carbonara":"2ivPPqeaidY",
+ "avenamanzana":"WXx3dFfK1zM",
+ "chipa":"FNGDishTqA4",
+ "tostadafrancesa":"7zbiGqEkbWM",
+ "polenta":"MnnENd7rHPc",
+ "hamblentejas":"whXi6p7tVQM",
+ "pastabrocoli":"q3uUEJ9lTic",
+ "garbanzosespinaca":"QG5p3mGzAfQ",
+ "revueltozapallitos":"yURAGpCzJu0",
+ "bunuelosacelga":"kjipKpITZw0",
+ "pizzacasera":"YtFFWpmqaT4",
+ "cerdobatata":"kdxjSteQ7NE",
+ "pollodisco":"-lSEUaUdKdE",
+ "guisofideos":"bslIDRKAosw",
+ "bifecriolla":"989XjP0mSyw"}
 # valores nutricionales aproximados por porción: kcal, proteínas g, carbohidratos g, grasas g, fibra g, sal g
 NUT = {
  "tostadas":(380,14,40,17,7,1.1),"yogur":(350,14,55,7,6,0.3),"revueltos":(420,24,22,26,3,1.3),"panqueques":(390,14,55,11,6,0.3),
@@ -24,7 +38,21 @@ NUT = {
  "pastel":(520,36,48,20,6,1.5),"empanadas":(540,28,50,26,4,1.8),"noquis":(520,16,90,10,7,1.0),"tortilla":(480,20,42,26,5,1.1),
  "albondigas":(580,42,62,18,6,1.6),"curry":(560,46,55,18,4,1.4),"hamburguesas":(620,44,58,24,7,1.7),"garbanzos":(450,18,55,17,13,0.9),
  "berenjenas":(420,24,22,26,8,1.6),"arrozpollo":(560,44,65,14,5,1.8),"wrap":(480,40,38,19,7,1.3),"gramajo":(500,28,42,24,5,1.9),
- "pescadohorno":(480,46,40,15,5,1.0),"carbonara":(650,32,70,27,3,2.1)}
+ "pescadohorno":(480,46,40,15,5,1.0),"carbonara":(650,32,70,27,3,2.1),
+ "avenamanzana":(337,14,59,7,8,1.0),
+ "chipa":(447,20,47,20,0,1.8),
+ "tostadafrancesa":(339,14,45,11,6,0.9),
+ "polenta":(484,14,85,12,9,1.4),
+ "hamblentejas":(450,25,76,7,14,0.9),
+ "pastabrocoli":(563,18,90,16,8,0.9),
+ "garbanzosespinaca":(552,23,91,13,18,2.4),
+ "revueltozapallitos":(430,25,42,19,7,1.4),
+ "bunuelosacelga":(512,25,60,21,8,3.1),
+ "pizzacasera":(692,29,87,25,5,2.5),
+ "cerdobatata":(617,45,54,25,9,1.5),
+ "pollodisco":(538,50,51,14,9,1.3),
+ "guisofideos":(615,38,77,18,8,2.8),
+ "bifecriolla":(586,49,54,19,9,1.1)}
 MERIENDA_NUT = (200,8,28,6,2,0.4)
 
 # ---------- BASE DE INGREDIENTES (por 100 g: kcal, prot, carb, azúcar, grasa, saturada, fibra, sal) ----------
@@ -32,6 +60,19 @@ MERIENDA_NUT = (200,8,28,6,2,0.4)
 def ING(n, cat, kcal, prot, carb, sug, fat, sat, fib, sal, u=None, alias=()):
     return {"n":n,"cat":cat,"por100":{"kcal":kcal,"prot":prot,"carb":carb,"sug":sug,"fat":fat,"sat":sat,"fib":fib,"sal":sal},"u":u,"alias":list(alias)}
 ING_DB = [
+ ING("bebida de soja","lact",45,3.3,4,2.5,2,0.3,0.5,0.1),
+ ING("manzana","verd",52,0.3,14,10,0.2,0,2.4,0,u=180),
+ ING("pasas de uva","alm",299,3.1,79,59,0.5,0.1,3.7,0.03),
+ ING("fécula de mandioca","alm",358,0.2,88,3.4,0,0,0.9,0),
+ ING("harina de maíz (polenta)","alm",362,8.1,77,0.6,1.8,0.3,4,0),
+ ING("fideos secos cortos (mostachol o tirabuzón)","alm",371,13,75,2.7,1.5,0.3,3.2,0.01),
+ ING("brócoli","verd",34,2.8,6.6,1.7,0.4,0,2.6,0.08,u=400),
+ ING("polvo de hornear","pantry",53,0,28,0,0,0,0.2,26.5),
+ ING("levadura seca","alm",325,40,41,0,7.6,1,27,0.13,u=10),
+ ING("queso mozzarella","lact",280,22,2.2,1,20,12,0,1.2),
+ ING("costeletas de cerdo","carne",172,20,0,0,10,3.5,0,0.15),
+ ING("pata muslo de pollo","carne",121,19.7,0,0,4.1,1,0,0.2,u=220),
+ ING("carne para guiso (paleta o roast beef)","carne",160,20,0,0,9,3.6,0,0.15),
  ING("pan integral","pan",250,9,43,4,3.5,0.7,7,1.1,u=30,alias=["pan integral (rodajas)"]),
  ING("palta","verd",160,2,8.5,0.7,15,2.1,6.7,0.02,u=170),
  ING("queso untable light","lact",150,8,5,4,11,7,0,1.0),
@@ -142,8 +183,16 @@ def _nut(id, ing, porc=2):
     est.update({"sug": None, "sat": None, "source": "estimado"}); return est
 # Las recetas se escribieron para 2 personas (o 3-4 en los platos de olla). El plan es para UNA persona:
 # los platos de olla quedan en 2 porciones (una para hoy, otra para congelar o la vianda), el resto en 1.
-OLD_PORC = {"lentejas":4,"empanadas":4,"pastel":4,"noquis":4,"albondigas":3,"arrozpollo":3,"tortilla":3,"curry":3}
-PORCIONES = {"lentejas":2,"empanadas":2,"pastel":2,"noquis":2,"albondigas":2,"arrozpollo":2,"tortilla":2,"curry":2}
+OLD_PORC = {"lentejas":4,"empanadas":4,"pastel":4,"noquis":4,"albondigas":3,"arrozpollo":3,"tortilla":3,"curry":3,
+ "hamblentejas":2,
+ "garbanzosespinaca":2,
+ "pollodisco":2,
+ "guisofideos":2}
+PORCIONES = {"lentejas":2,"empanadas":2,"pastel":2,"noquis":2,"albondigas":2,"arrozpollo":2,"tortilla":2,"curry":2,
+ "hamblentejas":2,
+ "garbanzosespinaca":2,
+ "pollodisco":2,
+ "guisofideos":2}
 HALVES = {"palta","cebolla","cebolla morada","morrón rojo","limón","tomate","zapallito","berenjena","lechuga","banana","pepino","brócoli o zapallito","puerro","zanahoria","acelga (atado)","espinaca fresca (atado)","garbanzos cocidos (lata)","tomate triturado (lata)","caldo de verduras (cubo)","atún al natural (lata 170 g)"}
 def _scale(id, ing):
     f = PORCIONES.get(id,1) / OLD_PORC.get(id,2)
@@ -310,6 +359,64 @@ rec("carbonara","Carbonara cremosa","plato",25,650,3000,["pasta","finde"],
 start = datetime.date(2026,10,27)
 DOW = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
 MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]
+# ---------- RECETAS NUEVAS (tools/add_recipes.py) ----------
+rec("avenamanzana","Avena cocida con manzana y canela","desayuno",10,337,1300,["rápido", "vegano", "vegetariano", "sin lactosa", "económico"],
+ [I("avena",80,"g","alm"),I("bebida de soja",400,"ml","lact"),I("manzana",1,"u","verd"),I("pasas de uva",30,"g","alm"),I("canela",1,"pizca","pantry"),I("sal",1,"pizca","pantry")],
+ ["Cortá la manzana en cubitos chicos (con cáscara, si querés).", "Poné en una olla la avena, la bebida de soja, la manzana, las pasas, la canela y una pizca de sal.", "Cociná a fuego bajo 5-6 minutos, revolviendo, hasta que espese y la manzana esté tierna.", "Serví caliente con un poco más de canela por arriba."],
+ "Hacé el doble y guardalo en la heladera: al otro día lo recalentás con un chorrito de bebida de soja y queda cremoso igual.")
+rec("chipa","Chipá casero","desayuno",35,447,1900,["horno", "vegetariano", "sin gluten"],
+ [I("fécula de mandioca",100,"g","alm"),I("queso port salut light",80,"g","lact"),I("queso rallado",30,"g","lact"),I("huevos",1,"u","lact"),I("leche",40,"ml","lact"),I("manteca",15,"g","lact"),I("sal",1,"pizca","pantry")],
+ ["Prendé el horno a 200 °C. Rallá o cortá bien chiquito el queso port salut.", "En un bowl mezclá la fécula, los quesos, la sal y la manteca blanda.", "Sumá el huevo y la leche de a poco y amasá hasta tener una masa suave que no se pegue en las manos.", "Armá bolitas del tamaño de una nuez y ponelas en una placa aceitada, separadas.", "Horneá 15-18 minutos, hasta que estén apenas doradas abajo. Comelos tibios."],
+ "Si son para alguien celíaco, comprá fécula y quesos con el logo «sin TACC». Crudos se congelan en bolitas y van directo al horno.")
+rec("tostadafrancesa","Tostadas francesas con fruta","desayuno",15,339,1300,["rápido", "vegetariano", "económico"],
+ [I("pan integral (rodajas)",4,"u","pan"),I("huevos",2,"u","lact"),I("leche",100,"ml","lact"),I("manteca",1,"cdita","lact"),I("miel",2,"cdita","pantry"),I("fruta de estación",1,"u","verd"),I("canela",1,"pizca","pantry")],
+ ["Batí los huevos con la leche y la canela en un plato hondo.", "Mojá las rodajas de pan de los dos lados, sin que se desarmen.", "Cocinalas en sartén con apenas de manteca a fuego medio, 2 minutos por lado, hasta que doren.", "Serví con la fruta en rodajas y un hilo de miel."],
+ "Es ideal para el pan que quedó un poco duro: absorbe mejor el huevo y no se rompe.")
+rec("polenta","Polenta con salsa de tomate y champiñones","plato",25,484,1800,["rápido", "olla", "vegano", "vegetariano", "sin gluten", "sin lactosa", "económico"],
+ [I("harina de maíz (polenta)",150,"g","alm"),I("champiñones",250,"g","verd"),I("tomate triturado (lata)",1,"u","alm"),I("cebolla",1,"u","verd"),I("morrón rojo",0.5,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite de oliva",2,"cda","pantry"),I("orégano, laurel, sal, pimienta",1,"pizca","pantry")],
+ ["Picá la cebolla, el morrón y el ajo y rehogalos en una cucharada de aceite 5 minutos.", "Sumá los champiñones en láminas y cociná a fuego fuerte hasta que doren.", "Agregá el tomate, orégano, laurel y sal; dejá 10 minutos a fuego bajo.", "Mientras, hervé 750 ml de agua con sal, echá la polenta en lluvia batiendo y cociná según el paquete (1-5 minutos) hasta que espese. Terminá con la otra cucharada de aceite.", "Serví la polenta con la salsa bien caliente arriba."],
+ "La polenta que sobra se enfría en una fuente, se corta en bastones y al otro día va a la plancha o al horno hasta dorarse.")
+rec("hamblentejas","Hamburguesas de lentejas con ensalada","plato",40,450,1500,["vegano", "vegetariano", "sin lactosa", "proteico", "económico"],
+ [I("lentejas secas",150,"g","alm"),I("avena",40,"g","alm"),I("zanahoria",1,"u","verd"),I("cebolla",1,"u","verd"),I("ajo (dientes)",1,"u","verd"),I("aceite",1,"cda","pantry"),I("comino, pimentón, sal, pimienta",1,"pizca","pantry"),I("lechuga",0.5,"u","verd"),I("tomate",1,"u","verd")],
+ ["Hervé las lentejas 20-25 minutos hasta que estén tiernas y colalas muy bien.", "Rehogá la cebolla picada, el ajo y la zanahoria rallada 5 minutos.", "Pisá las lentejas con el rehogado, la avena, comino, pimentón y sal hasta tener una pasta que se pueda moldear.", "Formá 4 medallones y cocinalos en sartén con apenas de aceite, 4 minutos por lado (o al horno a 200 °C unos 20 minutos).", "Serví con ensalada de lechuga y tomate."],
+ "Si la mezcla queda húmeda, sumá una cucharada más de avena. Se congelan crudas, separadas con papel.")
+rec("pastabrocoli","Fideos con brócoli, ajo y limón","plato",20,563,1700,["rápido", "vegano", "vegetariano", "sin lactosa", "económico"],
+ [I("fideos secos cortos (mostachol o tirabuzón)",200,"g","alm"),I("brócoli",350,"g","verd"),I("ajo (dientes)",3,"u","verd"),I("aceite de oliva",3,"cda","pantry"),I("limón",0.5,"u","verd"),I("ají molido, sal, pimienta",1,"pizca","pantry")],
+ ["Poné a hervir agua con sal. Separá el brócoli en arbolitos chicos y pelá y cortá el tronco en cubitos.", "Echá los fideos y, 4 minutos antes de que estén, sumá el brócoli a la misma olla.", "En una sartén dorá apenas el ajo en láminas con el aceite y el ají molido, a fuego bajo.", "Colá guardando medio vaso del agua, pasá todo a la sartén y salteá 1 minuto con un chorrito de esa agua.", "Terminá con ralladura y jugo de limón."],
+ "Un poco del agua de cocción hace que el aceite se pegue a los fideos y quede una salsa cremosa sin crema ni queso.")
+rec("garbanzosespinaca","Guiso de garbanzos con espinaca y arroz","plato",30,552,2000,["olla", "vegano", "vegetariano", "sin gluten", "sin lactosa", "económico"],
+ [I("garbanzos cocidos (lata)",1.5,"u","alm"),I("espinaca",1,"u","verd"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("tomate triturado (lata)",0.5,"u","alm"),I("arroz",80,"g","alm"),I("aceite de oliva",1.5,"cda","pantry"),I("pimentón, comino, sal, pimienta",1,"pizca","pantry")],
+ ["Cociná el arroz en agua con sal y reservá.", "Rehogá la cebolla y el ajo picados en el aceite 5 minutos; sumá pimentón y comino 30 segundos.", "Agregá el tomate y los garbanzos enjuagados con medio vaso de agua; cociná 10 minutos a fuego bajo.", "Sumá la espinaca lavada y picada y revolvé hasta que se achique (2-3 minutos). Ajustá la sal.", "Serví el guiso con el arroz al lado."],
+ "Con garbanzos secos sale más barato: remojalos la noche anterior y hervilos 1 hora; congelá lo que sobre en porciones.")
+rec("revueltozapallitos","Revuelto de zapallitos con papas","plato",25,430,1900,["rápido", "vegetariano", "sin gluten", "económico"],
+ [I("zapallito",3,"u","verd"),I("cebolla",1,"u","verd"),I("huevos",4,"u","lact"),I("papa",300,"g","verd"),I("queso rallado",20,"g","lact"),I("aceite",1,"cda","pantry"),I("sal y pimienta",1,"pizca","pantry")],
+ ["Hervé las papas en cubos 12 minutos y colalas.", "Cortá los zapallitos en bastoncitos o cubos y la cebolla en pluma.", "Rehogá la cebolla en el aceite, sumá los zapallitos y cociná 8-10 minutos hasta que estén tiernos y se evapore el agua.", "Agregá las papas, salpimentá y volcá los huevos batidos con el queso.", "Revolvé a fuego bajo 1-2 minutos, hasta que el huevo quede cremoso."],
+ "Sin el queso rallado queda sin lactosa y sigue rico: sumale perejil o cebolla de verdeo.")
+rec("bunuelosacelga","Buñuelos de acelga con ensalada de tomate","plato",35,512,1600,["vegetariano", "económico"],
+ [I("acelga (atado)",1,"u","verd"),I("huevos",2,"u","lact"),I("harina 0000",100,"g","alm"),I("leche",60,"ml","lact"),I("queso rallado",30,"g","lact"),I("cebolla",0.5,"u","verd"),I("ajo (dientes)",1,"u","verd"),I("aceite",2,"cda","pantry"),I("tomate",2,"u","verd"),I("polvo de hornear",1,"cdita","pantry"),I("nuez moscada, sal, pimienta",1,"pizca","pantry")],
+ ["Lavá la acelga, hervila 3 minutos, escurrila apretando bien y picala fina.", "Mezclá la acelga con la cebolla y el ajo picados, los huevos, el queso, la leche, sal, pimienta y nuez moscada.", "Sumá la harina y el polvo de hornear hasta tener una pasta espesa.", "Cociná cucharadas de la mezcla en sartén con un poco de aceite, 2-3 minutos por lado, aplastándolas un poco (o al horno a 200 °C unos 20 minutos en placa aceitada).", "Serví con ensalada de tomate."],
+ "Escurrí muy bien la acelga: si queda agua, los buñuelos se desarman y absorben más aceite.")
+rec("pizzacasera","Pizza casera de muzzarella","plato",90,692,2600,["horno", "vegetariano"],
+ [I("harina 0000",200,"g","alm"),I("levadura seca",5,"g","alm"),I("aceite de oliva",1.5,"cda","pantry"),I("tomate triturado (lata)",0.5,"u","alm"),I("queso mozzarella",150,"g","lact"),I("aceitunas verdes",8,"u","alm"),I("orégano, sal",1,"pizca","pantry")],
+ ["Mezclá la harina, la levadura, una cucharadita de sal, una cucharada de aceite y unos 130 ml de agua tibia; amasá 5 minutos.", "Dejá levar tapada en un lugar tibio 1 hora, hasta que duplique.", "Estirá en una pizzera aceitada, cubrí con el tomate condimentado con sal y orégano y horneá 10 minutos a 220 °C.", "Sumá la muzzarella en cubos y las aceitunas; volvé al horno 8-10 minutos, hasta que se derrita.", "Terminá con orégano y un hilo de aceite."],
+ "Hacé el doble de masa y congelá un bollo: lo sacás a la mañana y a la noche tenés pizza.")
+rec("cerdobatata","Costeletas de cerdo con puré de batata","plato",35,617,3800,["sin gluten", "sin lactosa", "proteico"],
+ [I("costeletas de cerdo",400,"g","carne"),I("batata",500,"g","verd"),I("aceite de oliva",1,"cda","pantry"),I("ajo (dientes)",1,"u","verd"),I("limón",0.5,"u","verd"),I("lechuga",0.5,"u","verd"),I("romero, nuez moscada, sal, pimienta",1,"pizca","pantry")],
+ ["Pelá las batatas, cortalas en cubos y hervilas 15 minutos.", "Colalas y pisalas con media cucharada de aceite, nuez moscada y sal.", "Condimentá las costeletas con ajo picado, romero, sal, pimienta y jugo de limón.", "Cocinalas en plancha o sartén bien caliente con el resto del aceite, 4-5 minutos por lado, hasta que no queden rosadas en el centro.", "Serví con el puré y la lechuga."],
+ "Las costeletas finas en bandeja suelen estar en oferta; también va con bondiola en bifes.")
+rec("pollodisco","Pollo al disco con papas y morrones (en olla)","plato",50,538,3000,["olla", "sin gluten", "sin lactosa", "proteico"],
+ [I("pata muslo de pollo",2,"u","carne"),I("papa",400,"g","verd"),I("cebolla",1,"u","verd"),I("morrón rojo",1.5,"u","verd"),I("tomate",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite",1,"cda","pantry"),I("pimentón, orégano, laurel, sal, pimienta",1,"pizca","pantry")],
+ ["Sacale la piel al pollo y separá pata y muslo. Dorá las presas en una olla o sartén grande con el aceite y reservá.", "En la misma olla rehogá la cebolla, el morrón en tiras y el ajo 5 minutos.", "Sumá el tomate en cubos, el pimentón, el orégano y el laurel, y volvé el pollo.", "Agregá las papas en cubos y un vaso de agua; tapá y cociná 30 minutos a fuego bajo, revolviendo cada tanto.", "Destapá los últimos 5 minutos para que espese el jugo y ajustá la sal."],
+ "Sin disco no pasa nada: una olla de hierro o una sartén honda con tapa hace lo mismo en la hornalla.")
+rec("guisofideos","Guiso de fideos con carne","plato",50,615,3200,["olla", "sin lactosa", "económico"],
+ [I("carne para guiso (paleta o roast beef)",250,"g","carne"),I("fideos secos cortos (mostachol o tirabuzón)",120,"g","alm"),I("papa",150,"g","verd"),I("zanahoria",1,"u","verd"),I("cebolla",1,"u","verd"),I("morrón rojo",0.5,"u","verd"),I("tomate triturado (lata)",0.5,"u","alm"),I("caldo de verduras (cubo)",1,"u","pantry"),I("aceite",1,"cda","pantry"),I("pimentón, laurel, pimienta",1,"pizca","pantry")],
+ ["Cortá la carne en cubos chicos y dorala en la olla con el aceite.", "Sumá la cebolla, el morrón y la zanahoria picados y rehogá 5 minutos.", "Agregá el tomate, el pimentón, el laurel, el caldo disuelto en 600 ml de agua caliente y cociná tapado 20 minutos a fuego bajo.", "Sumá la papa en cubos y los fideos; cociná 12-15 minutos más, revolviendo y agregando agua caliente si hace falta.", "Apagá cuando los fideos estén a punto y dejá reposar 5 minutos."],
+ "Tiene que quedar caldoso: los fideos siguen chupando líquido en el plato.")
+rec("bifecriolla","Bifes a la criolla","plato",40,586,4200,["olla", "sin gluten", "sin lactosa", "proteico"],
+ [I("nalga / bife magro",400,"g","carne"),I("papa",400,"g","verd"),I("cebolla",1.5,"u","verd"),I("morrón rojo",1,"u","verd"),I("tomate",2,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite",1,"cda","pantry"),I("pimentón, orégano, laurel, sal, pimienta",1,"pizca","pantry")],
+ ["Cortá las papas en rodajas de 1 cm, la cebolla y el morrón en aros y el tomate en rodajas.", "En una olla o sartén honda con el aceite, armá capas: papa, cebolla, morrón, tomate y los bifes salpimentados; repetí.", "Espolvoreá pimentón, orégano, ajo picado y laurel entre capas.", "Sumá medio vaso de agua, tapá y cociná a fuego bajo 30-35 minutos, sin revolver, hasta que las papas estén tiernas."],
+ "Pedí los bifes finitos de nalga o cuadrada: con la cocción lenta quedan tiernos aunque sean cortes económicos.")
+
 BREAK = ["tostadas","yogur","revueltos","yogur","tostadas","panqueques","revueltos"]
 LUNCH = ["pollohorno","merluza","wok","lentejas","milanesas","curry","arrozpollo","pescadohorno","albondigas","tortilla","noquis"]
 DINNER = ["sopa","tarta","omelette","atun","zapallitos","garbanzos","wrap","gramajo","hamburguesas"]

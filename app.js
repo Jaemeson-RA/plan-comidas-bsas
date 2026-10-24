@@ -431,11 +431,12 @@
 
   // ---------- recetas por categoría ----------
   const CATS = [
-    { id: "desayunos", t: "Desayunos", d: "Cuatro opciones que rotan toda la semana: dos sin cocción, dos con sartén. Entre 5 y 15 minutos.", ids: ["tostadas", "yogur", "revueltos", "panqueques"] },
-    { id: "rapidas", t: "Rápidas para la semana", d: "Listas en 25 minutos o menos, con una sartén o sin cocinar. Las cenas de lunes a viernes.", ids: ["merluza", "atun", "omelette", "wok", "wrap", "garbanzos", "gramajo"] },
-    { id: "horno", t: "Al horno, una sola fuente", d: "Se arman en 10 minutos y el horno hace el resto. Conviene hacer el doble: lo que sobra es la vianda del día siguiente.", ids: ["pollohorno", "milanesas", "tarta", "salmon", "pescadohorno", "berenjenas", "hamburguesas"] },
-    { id: "ollas", t: "Ollas, guisos y arroces", d: "Las más económicas, las que mejor rinden y las que mejor se congelan en porciones.", ids: ["sopa", "lentejas", "curry", "arrozpollo", "albondigas"] },
-    { id: "clasicos", t: "Clásicos argentinos y pastas del finde", d: "Llevan más tiempo y más mesa: quedan para sábado y domingo (y los ñoquis, para el 29).", ids: ["empanadas", "bife", "zapallitos", "pastel", "noquis", "tortilla", "carbonara"] },
+    { id: "desayunos", t: "Desayunos", d: "Siete opciones entre 5 y 25 minutos: sin cocción, con sartén, una vegana con avena y el chipá sin TACC.", ids: ["tostadas", "yogur", "revueltos", "panqueques", "avenamanzana", "tostadafrancesa", "chipa"] },
+    { id: "rapidas", t: "Rápidas para la semana", d: "Listas en 25 minutos o menos, con una sartén o sin cocinar. Las cenas de lunes a viernes.", ids: ["merluza", "atun", "omelette", "wok", "wrap", "garbanzos", "gramajo", "revueltozapallitos"] },
+    { id: "horno", t: "Al horno, una sola fuente", d: "Se arman en 10 minutos y el horno hace el resto. Conviene hacer el doble: lo que sobra es la vianda del día siguiente.", ids: ["pollohorno", "milanesas", "tarta", "salmon", "pescadohorno", "berenjenas", "hamburguesas", "pizzacasera", "cerdobatata"] },
+    { id: "ollas", t: "Ollas, guisos y arroces", d: "Las más económicas, las que mejor rinden y las que mejor se congelan en porciones.", ids: ["sopa", "lentejas", "curry", "arrozpollo", "albondigas", "guisofideos", "pollodisco"] },
+    { id: "clasicos", t: "Clásicos argentinos y pastas del finde", d: "Llevan más tiempo y más mesa: quedan para sábado y domingo (y los ñoquis, para el 29).", ids: ["empanadas", "bife", "zapallitos", "pastel", "noquis", "tortilla", "carbonara", "bifecriolla"] },
+    { id: "verdes", t: "Verdes y de legumbres", d: "Sin carne y con legumbres, verduras o polenta: veganas o vegetarianas, económicas y que llenan.", ids: ["polenta", "hamblentejas", "garbanzosespinaca", "pastabrocoli", "bunuelosacelga"] },
   ];
   function card(r) {
     return `<button class="rc" data-rec="${r.id}"><img src="${r.img}"${srcs(r)} alt="${esc(r.name)}" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4>
@@ -443,7 +444,7 @@
       <div>${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div></div></button>`;
   }
   if (page === "recetas") {
-    const h1 = $(".page-head h1"); if (h1) h1.innerHTML = `${Object.keys(R).length} recetas, <mark>cinco categorías</mark>`;
+    const h1 = $(".page-head h1"); if (h1) h1.innerHTML = `${Object.values(R).filter((r) => !r.custom).length} recetas, <mark>${CATS.length === 6 ? "seis" : CATS.length} categorías</mark>`;
     $("#catNav").innerHTML = CATS.map((c) => `<a href="#${c.id}">${esc(c.t)} <small>${c.ids.length}</small></a>`).join("");
     // ---------- «¿qué hay en tu heladera?»: recetas que aprovechan lo que tenés ----------
     const normH = (s) => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\(.*?\)/g, " ").replace(/[,.]/g, " ").replace(/\s+/g, " ").trim();

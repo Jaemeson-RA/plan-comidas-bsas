@@ -1318,5 +1318,285 @@
     "len": "9:44"
    }
   ]
+ },
+ "avenamanzana": {
+  "title": "Avena cocida con manzana y canela",
+  "img": {
+   "file": "img/avenamanzana.jpg",
+   "title": "File:Apple cinnamon oatmeal.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Apple_cinnamon_oatmeal.jpg",
+   "license": "CC BY 4.0",
+   "artist": "Shisma",
+   "q": "Avena cocida con manzana y canela",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "WXx3dFfK1zM",
+    "title": "Cremosa avena con manzana para el desayuno",
+    "channel": "Mi Vida Jugosa"
+   }
+  ]
+ },
+ "chipa": {
+  "title": "Chipá casero",
+  "img": {
+   "file": "img/chipa.jpg",
+   "title": "File:Chipa Paraguay.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Chipa_Paraguay.jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Ekem at English Wikipedia",
+   "q": "Chipá casero",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "FNGDishTqA4",
+    "title": "CÓMO HACER CHIPA (receta con trucos)",
+    "channel": "Paulina Cocina"
+   }
+  ]
+ },
+ "tostadafrancesa": {
+  "title": "Tostadas francesas con fruta",
+  "img": {
+   "file": "img/tostadafrancesa.jpg",
+   "title": "File:French toast 001.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:French_toast_001.jpg",
+   "license": "CC0",
+   "artist": "Ocdp",
+   "q": "Tostadas francesas con fruta",
+   "w": 1600,
+   "h": 1063
+  },
+  "yt": [
+   {
+    "id": "7zbiGqEkbWM",
+    "title": "TOSTADA FRANCESA (común y NIVEL DIOS)",
+    "channel": "Paulina Cocina"
+   }
+  ]
+ },
+ "polenta": {
+  "title": "Polenta con salsa de tomate y champiñones",
+  "img": {
+   "file": "img/polenta.jpg",
+   "title": "File:Polenta con champiñones al vino blanco - Polenta with mushrooms and white wine (4708451937).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Polenta_con_champi%C3%B1ones_al_vino_blanco_-_Polenta_with_mushrooms_and_white_wine_(4708451937).jpg",
+   "license": "CC BY 2.0",
+   "artist": "Lablascovegmenu from London",
+   "q": "Polenta con salsa de tomate y champiñones",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "MnnENd7rHPc",
+    "title": "POLENTA CON SALSA DE TOMATES Y HONGOS",
+    "channel": "La Cocina de Sarita"
+   }
+  ]
+ },
+ "hamblentejas": {
+  "title": "Hamburguesas de lentejas con ensalada",
+  "img": {
+   "file": "img/hamblentejas.jpg",
+   "title": "File:Vegan lentil burgers - Hamburguesas de lentejas (6210688693).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Vegan_lentil_burgers_-_Hamburguesas_de_lentejas_(6210688693).jpg",
+   "license": "CC BY 2.0",
+   "artist": "Lablascovegmenu from London",
+   "q": "Hamburguesas de lentejas con ensalada",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "whXi6p7tVQM",
+    "title": "💚 INCREÍBLE HAMBURGUESA DE LENTEJAS FÁCIL y VEGANA 😋 TORTAS o MEDALLONES DE LENTEJAS SIN HUEVO",
+    "channel": "Belén Ru y sus Tiramisús"
+   }
+  ]
+ },
+ "pastabrocoli": {
+  "title": "Fideos con brócoli, ajo y limón",
+  "img": {
+   "file": "img/pastabrocoli.jpg",
+   "title": "File:BroccoliPasta.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:BroccoliPasta.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "AnticoMu90",
+   "q": "Fideos con brócoli, ajo y limón",
+   "w": 1600,
+   "h": 1539
+  },
+  "yt": [
+   {
+    "id": "q3uUEJ9lTic",
+    "title": "Pasta con Brocoli",
+    "channel": "Cocineros Argentinos"
+   }
+  ]
+ },
+ "garbanzosespinaca": {
+  "title": "Guiso de garbanzos con espinaca y arroz",
+  "img": {
+   "file": "img/garbanzosespinaca.jpg",
+   "title": "File:Nohutlu Ispanak.JPG",
+   "page": "https://commons.wikimedia.org/wiki/File:Nohutlu_Ispanak.JPG",
+   "license": "CC0",
+   "artist": "Miansari66",
+   "q": "Guiso de garbanzos con espinaca y arroz",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "QG5p3mGzAfQ",
+    "title": "⭐ Cómo hacer garbanzos con espinacas | Receta vegana ⭐",
+    "channel": "MeHueleAQuemao"
+   }
+  ]
+ },
+ "revueltozapallitos": {
+  "title": "Revuelto de zapallitos con papas",
+  "img": {
+   "file": "img/revueltozapallitos.jpg",
+   "title": "File:Revuelto de verduras.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Revuelto_de_verduras.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Juan Emilio Prades Bel",
+   "q": "Revuelto de zapallitos con papas",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "yURAGpCzJu0",
+    "title": "🥚ZAPALLITOS Revueltos. ¡muy fácil!",
+    "channel": "Ceci Duca"
+   }
+  ]
+ },
+ "bunuelosacelga": {
+  "title": "Buñuelos de acelga con ensalada de tomate",
+  "img": {
+   "file": "img/bunuelosacelga.jpg",
+   "title": "File:Actual spinach fritters.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Actual_spinach_fritters.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Red-back spider",
+   "q": "Buñuelos de acelga con ensalada de tomate",
+   "w": 1600,
+   "h": 1313
+  },
+  "yt": [
+   {
+    "id": "kjipKpITZw0",
+    "title": "BUÑUELOS DE ACELGA",
+    "channel": "Cocineros Argentinos"
+   }
+  ]
+ },
+ "pizzacasera": {
+  "title": "Pizza casera de muzzarella",
+  "img": {
+   "file": "img/pizzacasera.jpg",
+   "title": "File:Tradicional pizza casera estilo argentino.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Tradicional_pizza_casera_estilo_argentino.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Carlosdisogra",
+   "q": "Pizza casera de muzzarella",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "YtFFWpmqaT4",
+    "title": "Pizza casera: masa para pizza PASO A PASO con tips y trucos - Cómo hacer pizza E01",
+    "channel": "Paulina Cocina"
+   }
+  ]
+ },
+ "cerdobatata": {
+  "title": "Costeletas de cerdo con puré de batata",
+  "img": {
+   "file": "img/cerdobatata.jpg",
+   "title": "File:Pork Chop with sweet potato mash and mushrooms in a demerara sauce. (36249946845).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pork_Chop_with_sweet_potato_mash_and_mushrooms_in_a_demerara_sauce._(36249946845).jpg",
+   "license": "CC BY 2.0",
+   "artist": "CharmaineZoe's Marvelous Melange from England",
+   "q": "Costeletas de cerdo con puré de batata",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "kdxjSteQ7NE",
+    "title": "Costeletas de cerdo con puré de batatas",
+    "channel": "Cocineros Argentinos"
+   }
+  ]
+ },
+ "pollodisco": {
+  "title": "Pollo al disco con papas y morrones (en olla)",
+  "img": {
+   "file": "img/pollodisco.jpg",
+   "title": "File:Pollo al disco. - panoramio.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pollo_al_disco._-_panoramio.jpg",
+   "license": "CC BY 3.0",
+   "artist": "gorowin",
+   "q": "Pollo al disco con papas y morrones (en olla)",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "-lSEUaUdKdE",
+    "title": "Mi receta de Pollo al disco con Papas (solo tenía pollo, papas y fuego)  - Paulina On Fire",
+    "channel": "Paulina Cocina"
+   }
+  ]
+ },
+ "guisofideos": {
+  "title": "Guiso de fideos con carne",
+  "img": {
+   "file": "img/guisofideos.jpg",
+   "title": "File:Guiso de fideos moños argentinos (plato).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Guiso_de_fideos_mo%C3%B1os_argentinos_(plato).jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Horacio Cambeiro",
+   "q": "Guiso de fideos con carne",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "bslIDRKAosw",
+    "title": "Cómo hacer Guiso de Fideos",
+    "channel": "Estefi Colombo"
+   }
+  ]
+ },
+ "bifecriolla": {
+  "title": "Bifes a la criolla",
+  "img": {
+   "file": "img/bifecriolla.jpg",
+   "title": "File:Bife argentino a la criolla.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Bife_argentino_a_la_criolla.jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Carlosdisogra",
+   "q": "Bifes a la criolla",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "989XjP0mSyw",
+    "title": "BIFES A LA CRIOLLA: cena rápida, fácil... ¡y sin ensuciar!!!",
+    "channel": "Paulina Cocina"
+   }
+  ]
  }
 }
