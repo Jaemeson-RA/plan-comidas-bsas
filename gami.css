@@ -10,9 +10,21 @@
 span.av.ini{display:inline-flex;align-items:center;justify-content:center;background:var(--verde2);color:var(--verde3);font-weight:700}
 .lad-user{display:inline-flex;align-items:center}
 .xp{margin-top:.35rem}
-.xp-bar{height:12px;border-radius:999px;background:var(--paper2);overflow:hidden;border:1px solid var(--border)}
-.xp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--verde),#5BB37F);border-radius:999px;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
-.xp-bar.big{height:18px}
+/* barra de XP estilo RPG: marco de metal miel, remaches, muescas, relleno albahaca con brillo que recorre, chispas y vibración al subir */
+.xp-bar{position:relative;height:16px;border-radius:999px;background:linear-gradient(180deg,#EADFC9,#F6EFE1);border:2px solid #A6752B;box-shadow:inset 0 2px 4px rgba(31,45,42,.28),inset 0 0 0 1px rgba(255,255,255,.6),0 1px 0 #fff,0 2px 6px rgba(31,45,42,.12)}
+.xp-bar::before{content:"";position:absolute;inset:0;border-radius:999px;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),rgba(31,45,42,.14) calc(10% - 1px) 10%);pointer-events:none;z-index:2;opacity:.8}
+.xp-bar::after{content:"";position:absolute;left:3px;right:3px;top:50%;height:4px;margin-top:-2px;pointer-events:none;z-index:3;background:radial-gradient(circle at 2px 2px,#FBE4A8 0 1px,#8C5A1E 1.4px,transparent 2.2px) left center/4px 4px no-repeat,radial-gradient(circle at 2px 2px,#FBE4A8 0 1px,#8C5A1E 1.4px,transparent 2.2px) right center/4px 4px no-repeat}
+.xp-bar i{position:relative;display:block;height:100%;width:0;border-radius:999px;overflow:hidden;background:linear-gradient(180deg,#7CC79A 0%,#2F8F5B 48%,#23704A 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(0,0,0,.2),0 0 6px rgba(47,143,91,.35);transition:width 1.1s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.xp-bar i::after{content:"";position:absolute;top:0;bottom:0;width:38%;left:-45%;background:linear-gradient(100deg,transparent 0,rgba(255,255,255,.55) 50%,transparent 100%);animation:xpsheen 3.2s ease-in-out infinite}
+@keyframes xpsheen{0%,55%{left:-45%}100%{left:120%}}
+.xp-bar.gaining{animation:xpshake .55s cubic-bezier(.36,.07,.19,.97) both}
+.xp-bar.gaining i{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 10px rgba(242,181,68,.75),0 0 18px rgba(47,143,91,.5);filter:brightness(1.12)}
+@keyframes xpshake{10%,90%{transform:translate(-1px,0)}20%,80%{transform:translate(2px,0)}30%,50%,70%{transform:translate(-3px,.5px)}40%,60%{transform:translate(3px,-.5px)}}
+.xp-bar .spark{position:absolute;top:50%;width:var(--s,4px);height:var(--s,4px);margin:calc(var(--s,4px) / -2) 0 0 calc(var(--s,4px) / -2);border-radius:50%;background:#F2B544;box-shadow:0 0 6px #F2B544;pointer-events:none;z-index:4;animation:spark .6s ease-out forwards}
+@keyframes spark{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx,0),var(--dy,-20px)) scale(.2)}}
+.xp-bar.big{height:22px}
+.avatar .lvl.pop{animation:lvlpop2 1.1s cubic-bezier(.2,.8,.2,1)}
+@keyframes lvlpop2{0%{transform:scale(1)}30%{transform:scale(1.6);background:var(--oro);color:var(--ink)}100%{transform:scale(1)}}
 .xp small{display:block;color:var(--muted);font-size:.78rem;margin-top:.25rem}
 .agua{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.7rem;border-top:1px dashed var(--line)}
 .agua-btn{display:inline-flex;align-items:center;gap:.4rem;border:1.5px solid var(--cielo);background:var(--cielo2);color:#1F5F8A;border-radius:999px;padding:.45rem .9rem;font:inherit;font-weight:700;cursor:pointer;transition:transform .15s}
@@ -67,3 +79,16 @@ span.av.ini{display:inline-flex;align-items:center;justify-content:center;backgr
 .f-badges{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.3rem}
 .f-badges .chip{font-size:.7rem;padding:.1rem .5rem}
 @media (max-width:720px){.who-top{gap:.6rem}.avatar{width:54px;height:54px;font-size:1.3rem}.badges{grid-template-columns:repeat(2,1fr)}.perfil-head .av{width:56px;height:56px}}
+
+/* medallas (img/medals/*.svg) */
+.medal{position:relative;display:block;margin:0 auto .2rem;filter:drop-shadow(0 6px 10px rgba(31,45,42,.16));transition:transform .25s}
+.medal img{width:100%;height:100%;display:block}
+.badge.on:hover .medal{transform:translateY(-3px) rotate(-2deg)}
+.medal.locked{filter:grayscale(1) opacity(.45) drop-shadow(0 2px 4px rgba(31,45,42,.08))}
+.medal.locked .lock{position:absolute;left:50%;top:60%;width:26px;height:26px;transform:translate(-50%,-50%);color:var(--ink);background:var(--crema);border-radius:50%;padding:5px;box-shadow:0 2px 6px rgba(31,45,42,.2)}
+.badge{opacity:1;filter:none;padding:.9rem .7rem .7rem}
+.badge:not(.on){opacity:.75}
+.badge .tier{display:inline-block;font-style:normal;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;border-radius:999px;padding:.1rem .5rem;margin-top:.15rem}
+.badge .tier.t1{background:#F3E2CF;color:#8C5A1E}.badge .tier.t2{background:#E8ECEF;color:#5F6B76}.badge .tier.t3{background:#FBEFD3;color:#8a6410}.badge .tier.t4{background:#E3F1F8;color:#2A6E92}.badge .tier.t5{background:#EEE8FA;color:#6B48B0}
+.f-medal{display:inline-block;line-height:0}.f-medal .medal{margin:0;filter:drop-shadow(0 2px 3px rgba(31,45,42,.18))}
+.seg button.off{opacity:.5}

@@ -489,8 +489,8 @@ function renderNut() {
   if (p) { $("#pSexo").value = p.sexo; $("#pEdad").value = p.edad; $("#pAltura").value = p.altura; $("#pPeso").value = p.peso; $("#pAct").value = p.act; }
   const hasMine = !!(user && cal?.days && Object.values(cal.days).some((d) => SLOTS.some((s) => d[s])));
   if (!hasMine) nut.src = "casa";
-  $$("#srcSeg button").forEach((b) => { b.classList.toggle("on", b.dataset.src === nut.src); b.disabled = b.dataset.src === "mio" && !hasMine; });
-  $("#srcNote").textContent = !user ? "Ingresá en «Mi plan» para analizar tu propio calendario. Mientras tanto se analiza el plan de la casa." : !hasMine ? "Todavía no tenés platos en tu calendario: se analiza el plan de la casa." : nut.src === "mio" ? "Se analizan los platos que elegiste en tu calendario." : "Se analiza el plan de la casa (27 oct → 30 nov).";
+  $$("#srcSeg button").forEach((b) => { b.classList.toggle("on", b.dataset.src === nut.src); b.classList.toggle("off", b.dataset.src === "mio" && !hasMine); b.title = b.dataset.src === "mio" && !hasMine ? (user ? "Tu calendario todavía no tiene platos" : "Ingresá en Mi plan para usar tu calendario") : ""; });
+  $("#srcNote").innerHTML = !user ? `Para analizar <b>tu</b> calendario tenés que <a href="mi-plan.html">ingresar en Mi plan</a> (mismo correo y contraseña). Mientras tanto se analiza el plan de la casa.` : !hasMine ? `Tu calendario todavía no tiene platos: <a href="mi-plan.html">armá tu semana en Mi plan</a> y volvé. Mientras tanto se analiza el plan de la casa.` : nut.src === "mio" ? "Se analizan los platos que elegiste en tu calendario." : "Se analiza el plan de la casa (27 oct → 30 nov).";
   const weeks = nut.src === "casa" ? D.weeks.map((w) => ({ start: w.start, label: w.label })) : weekList();
   if (!nut.week || !weeks.some((w) => w.start === nut.week)) nut.week = weeks[0].start;
   $("#nutWeekTabs").hidden = nut.per !== "semana";
@@ -530,7 +530,7 @@ if (page === "nutricion") {
     if (user) update(ref(db, `calendars/${user.uid}/profile`), { nut: p }).catch(() => {});
     renderNut(); toast("Listo: análisis actualizado.");
   });
-  $("#srcSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && !b.disabled) { nut.src = b.dataset.src; nut.week = null; renderNut(); } });
+  $("#srcSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; if (b.classList.contains("off")) { toast(user ? "Tu calendario todavía no tiene platos: armalos en Mi plan." : "Ingresá en Mi plan para analizar tu calendario."); if (!user) setTimeout(() => { location.href = "mi-plan.html"; }, 1400); return; } nut.src = b.dataset.src; nut.week = null; renderNut(); });
   $("#perSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { nut.per = b.dataset.per; $$("#perSeg button").forEach((x) => x.classList.toggle("on", x === b)); renderNut(); } });
   $("#nutWeekTabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { nut.week = b.dataset.w; renderNut(); } });
   renderNut();
@@ -561,8 +561,11 @@ const sfxWater = () => { if (!soundOn()) return; tone(900, 0, 0.08, "sine", 0.1)
 
 // ---- XP y niveles ----
 const xpDay = (streak) => (streak >= 7 ? 100 : streak >= 3 ? 75 : 50);
-const levelOf = (xp) => Math.max(1, Math.floor(Math.sqrt(Math.max(0, xp) / 100)) + 1);   // nivel L se alcanza con 100·(L−1)²
-const xpForLevel = (L) => 100 * (L - 1) * (L - 1);
+// Curva de niveles en crescendo: pasar del nivel k al k+1 cuesta 100 + 60·(k−1) + 10·(k−1)² XP
+// (100, 170, 260, 370, 500, 650, 820, 1010, 1220, 1450…). xpForLevel(L) = XP acumulada para llegar al nivel L.
+const needFor = (k) => 100 + 60 * (k - 1) + 10 * (k - 1) * (k - 1);
+const xpForLevel = (L) => { let t = 0; for (let k = 1; k < L; k++) t += needFor(k); return t; };
+const levelOf = (xp) => { let L = 1; while (xp >= xpForLevel(L + 1) && L < 99) L++; return L; };
 function myCounts() {
   const recipes = Object.values(community).filter((c) => c.owner === user?.uid).length;
   const ings = Object.values(ingDB).filter((c) => c.owner === user?.uid).length;
@@ -599,19 +602,39 @@ function gainXP(delta, reason, snap) {
   el.innerHTML = `<div class="xt-row"><span class="xt-plus">+${delta} XP</span><span class="xt-why">${esc(reason || "")}</span></div><div class="xp-bar big"><i style="width:${pct(before.xp, before.level)}%"></i></div><small>Nivel ${before.level}</small>`;
   el.classList.add("show"); sfxXP();
   requestAnimationFrame(() => setTimeout(() => {
-    const bar = el.querySelector(".xp-bar i");
+    const bar = el.querySelector(".xp-bar");
     if (toLevel > before.level) {
-      bar.style.width = "100%";
+      fillBar(bar, 100, 900);
       setTimeout(() => {
         el.innerHTML = `<div class="xt-level">${ic("trophy")} ¡Nivel ${toLevel}!</div><div class="xt-why">Ganaste una ficha: podés usar un día libre sin perder el combo.</div><div class="xp-bar big"><i style="width:0%"></i></div><small>Nivel ${toLevel}</small>`;
-        el.classList.add("level"); sfxLevel(); burst();
-        setTimeout(() => { const b2 = el.querySelector(".xp-bar i"); if (b2) b2.style.width = pct(toXp, toLevel) + "%"; }, 150);
-      }, 700);
-    } else bar.style.width = pct(toXp, toLevel) + "%";
+        el.classList.add("level"); sfxLevel(); burst(); $("#whoLevel")?.classList.add("pop"); setTimeout(() => $("#whoLevel")?.classList.remove("pop"), 1200);
+        setTimeout(() => { const b2 = el.querySelector(".xp-bar"); if (b2) fillBar(b2, pct(toXp, toLevel), 900); }, 150);
+      }, 1050);
+    } else fillBar(bar, pct(toXp, toLevel), 1100);
   }, 40));
   clearTimeout(el._h); el._h = setTimeout(() => { el.classList.remove("show", "level"); }, toLevel > before.level ? 4200 : 2600);
   lastXP = { xp: toXp, level: toLevel };
   checkBadges(after.level, toLevel);
+}
+// Llena una .xp-bar hasta pct % con brillo, vibración y chispas en la punta (solo cuando sube)
+function fillBar(bar, pct, dur = 1100) {
+  if (!bar) return; const fill = bar.querySelector("i"); if (!fill) return;
+  const from = parseFloat(fill.style.width) || 0;
+  if (pct <= from + 0.5 || matchMedia("(prefers-reduced-motion: reduce)").matches) { fill.style.transitionDuration = pct < from ? "0s" : ""; fill.style.width = pct + "%"; return; }
+  fill.style.transitionDuration = dur + "ms"; bar.classList.add("gaining"); void fill.offsetWidth; fill.style.width = pct + "%";
+  const t0 = performance.now(); const w = bar.clientWidth;
+  const tick = () => {
+    const t = performance.now() - t0; if (t > dur + 80) { bar.classList.remove("gaining"); return; }
+    const x = fill.getBoundingClientRect().width;
+    for (let i = 0; i < 2; i++) {
+      const sp = document.createElement("s"); sp.className = "spark"; sp.style.left = Math.min(w - 2, x + (Math.random() * 6 - 3)) + "px";
+      sp.style.setProperty("--dx", ((Math.random() - 0.5) * 34).toFixed(0) + "px"); sp.style.setProperty("--dy", (-(8 + Math.random() * 26)).toFixed(0) + "px");
+      sp.style.setProperty("--s", (3 + Math.random() * 4).toFixed(1) + "px"); sp.style.background = Math.random() < 0.6 ? "#F2B544" : "#FFFDF9"; sp.style.animationDuration = (380 + Math.random() * 320).toFixed(0) + "ms";
+      bar.appendChild(sp); setTimeout(() => sp.remove(), 800);
+    }
+    setTimeout(tick, 55);
+  };
+  tick();
 }
 function burst() {
   const c = document.createElement("div"); c.className = "burst"; document.body.appendChild(c);
@@ -626,7 +649,7 @@ function renderWho() {
   const x = myXP(); lastXP = { xp: x.xp, level: x.level };
   $("#whoLevel").textContent = x.level;
   const pct = Math.min(100, Math.round((x.xp - x.base) / (x.next - x.base) * 100));
-  $("#xpFill").style.width = pct + "%"; $("#xpText").textContent = `${x.xp.toLocaleString("es-AR")} XP · nivel ${x.level} · faltan ${(x.next - x.xp).toLocaleString("es-AR")} para el ${x.level + 1} · ${fichasDisponibles()} ${fichasDisponibles() === 1 ? "ficha" : "fichas"}`;
+  fillBar($("#xpFill").parentElement, pct); $("#xpText").textContent = `${x.xp.toLocaleString("es-AR")} XP · nivel ${x.level} · faltan ${(x.next - x.xp).toLocaleString("es-AR")} para el ${x.level + 1} · ${fichasDisponibles()} ${fichasDisponibles() === 1 ? "ficha" : "fichas"}`;
   const photo = cal?.profile?.photo; const img = $("#avatarImg"), ini = $("#avatarInit");
   if (photo) { img.src = photo; img.hidden = false; ini.hidden = true; } else { img.hidden = true; ini.hidden = false; ini.textContent = (myName() || "?")[0].toUpperCase(); }
   const n = Math.min(3, cal?.agua?.[todayISO] || 0);
@@ -648,30 +671,36 @@ $("#myCal")?.addEventListener("click", async (e) => {
 });
 
 // ---- insignias ----
+// medallas: SVG estáticos generados por tools/build_medals.py (paleta del sitio); palier bronce 1 · plata 2 · oro 3 · platino 4 · diamante 5
+const TIER = { 1: "bronce", 2: "plata", 3: "oro", 4: "platino", 5: "diamante" };
+const medalSrc = (b) => `img/medals/${b.id}.svg`;
+function medalSvg(b, on, size = 84) {
+  return `<span class="medal${on ? "" : " locked"}" style="width:${size}px;height:${Math.round(size * 1.25)}px"><img src="${medalSrc(b)}" alt="${esc(b.t)} · ${TIER[b.tier || 1]}" loading="lazy">${on ? "" : `<svg class="ic lock"><use href="#i-lock"/></svg>`}</span>`;
+}
 const BADGES = [
-  { id: "racha3", t: "Tres seguidos", d: "3 días cumplidos seguidos", ic: "flame", test: (m) => m.st.best >= 3 },
-  { id: "racha7", t: "Una semana", d: "7 días seguidos", ic: "flame", test: (m) => m.st.best >= 7 },
-  { id: "racha15", t: "Quincena", d: "15 días seguidos", ic: "flame", test: (m) => m.st.best >= 15 },
-  { id: "racha30", t: "Un mes entero", d: "30 días seguidos", ic: "flame", test: (m) => m.st.best >= 30 },
-  { id: "racha60", t: "Inquebrantable", d: "60 días seguidos", ic: "flame", test: (m) => m.st.best >= 60 },
-  { id: "dias10", t: "Primeros diez", d: "10 días cumplidos", ic: "check", test: (m) => m.st.days >= 10 },
-  { id: "dias30", t: "Constante", d: "30 días cumplidos", ic: "check", test: (m) => m.st.days >= 30 },
-  { id: "dias100", t: "Centenario", d: "100 días cumplidos", ic: "check", test: (m) => m.st.days >= 100 },
-  { id: "semana1", t: "Semana perfecta", d: "7 de 7 en una semana", ic: "calendar", test: (m) => m.st.weeks >= 1 },
-  { id: "semana4", t: "Mes perfecto", d: "4 semanas perfectas", ic: "calendar", test: (m) => m.st.weeks >= 4 },
-  { id: "plan7", t: "Semana armada", d: "7 días con platos en tu calendario", ic: "calendar", test: (m) => m.c.planDays >= 7 },
-  { id: "receta1", t: "Primera receta", d: "Creaste una receta", ic: "recetas", test: (m) => m.c.recipes >= 1 },
-  { id: "receta5", t: "Cocinero/a", d: "5 recetas creadas", ic: "recetas", test: (m) => m.c.recipes >= 5 },
-  { id: "receta15", t: "Chef de la comunidad", d: "15 recetas creadas", ic: "recetas", test: (m) => m.c.recipes >= 15 },
-  { id: "ing1", t: "Primer ingrediente", d: "Cargaste un ingrediente", ic: "tag", test: (m) => m.c.ings >= 1 },
-  { id: "ing10", t: "Escáner", d: "10 ingredientes cargados", ic: "tag", test: (m) => m.c.ings >= 10 },
-  { id: "agua1", t: "Hidratado/a", d: "Un día con los 3 vasos", ic: "droplet", test: (m) => m.c.aguaFull >= 1 },
-  { id: "agua7", t: "Semana hidratada", d: "7 días seguidos con 3 vasos", ic: "droplet", test: (m) => m.c.aguaBest >= 7 },
-  { id: "agua30", t: "Fuente", d: "30 días seguidos hidratado/a", ic: "droplet", test: (m) => m.c.aguaBest >= 30 },
-  { id: "amigo1", t: "En buena compañía", d: "Tu primer amigo/a", ic: "users", test: (m) => m.c.friends >= 1 },
-  { id: "amigo5", t: "Mesa llena", d: "5 amigos", ic: "users", test: (m) => m.c.friends >= 5 },
-  { id: "nivel5", t: "Nivel 5", d: "Llegaste al nivel 5", ic: "trophy", test: (m) => m.level >= 5 },
-  { id: "nivel10", t: "Nivel 10", d: "Llegaste al nivel 10", ic: "trophy", test: (m) => m.level >= 10 },
+  { id: "racha3", tier: 1, t: "Tres seguidos", d: "3 días cumplidos seguidos", ic: "flame", test: (m) => m.st.best >= 3 },
+  { id: "racha7", tier: 2, t: "Una semana", d: "7 días seguidos", ic: "flame", test: (m) => m.st.best >= 7 },
+  { id: "racha15", tier: 3, t: "Quincena", d: "15 días seguidos", ic: "flame", test: (m) => m.st.best >= 15 },
+  { id: "racha30", tier: 4, t: "Un mes entero", d: "30 días seguidos", ic: "flame", test: (m) => m.st.best >= 30 },
+  { id: "racha60", tier: 5, t: "Inquebrantable", d: "60 días seguidos", ic: "flame", test: (m) => m.st.best >= 60 },
+  { id: "dias10", tier: 1, t: "Primeros diez", d: "10 días cumplidos", ic: "check", test: (m) => m.st.days >= 10 },
+  { id: "dias30", tier: 2, t: "Constante", d: "30 días cumplidos", ic: "check", test: (m) => m.st.days >= 30 },
+  { id: "dias100", tier: 4, t: "Centenario", d: "100 días cumplidos", ic: "check", test: (m) => m.st.days >= 100 },
+  { id: "semana1", tier: 2, t: "Semana perfecta", d: "7 de 7 en una semana", ic: "calendar", test: (m) => m.st.weeks >= 1 },
+  { id: "semana4", tier: 4, t: "Mes perfecto", d: "4 semanas perfectas", ic: "calendar", test: (m) => m.st.weeks >= 4 },
+  { id: "plan7", tier: 1, t: "Semana armada", d: "7 días con platos en tu calendario", ic: "calendar", test: (m) => m.c.planDays >= 7 },
+  { id: "receta1", tier: 1, t: "Primera receta", d: "Creaste una receta", ic: "recetas", test: (m) => m.c.recipes >= 1 },
+  { id: "receta5", tier: 2, t: "Cocinero/a", d: "5 recetas creadas", ic: "recetas", test: (m) => m.c.recipes >= 5 },
+  { id: "receta15", tier: 4, t: "Chef de la comunidad", d: "15 recetas creadas", ic: "recetas", test: (m) => m.c.recipes >= 15 },
+  { id: "ing1", tier: 1, t: "Primer ingrediente", d: "Cargaste un ingrediente", ic: "tag", test: (m) => m.c.ings >= 1 },
+  { id: "ing10", tier: 3, t: "Escáner", d: "10 ingredientes cargados", ic: "tag", test: (m) => m.c.ings >= 10 },
+  { id: "agua1", tier: 1, t: "Hidratado/a", d: "Un día con los 3 vasos", ic: "droplet", test: (m) => m.c.aguaFull >= 1 },
+  { id: "agua7", tier: 2, t: "Semana hidratada", d: "7 días seguidos con 3 vasos", ic: "droplet", test: (m) => m.c.aguaBest >= 7 },
+  { id: "agua30", tier: 4, t: "Fuente", d: "30 días seguidos hidratado/a", ic: "droplet", test: (m) => m.c.aguaBest >= 30 },
+  { id: "amigo1", tier: 1, t: "En buena compañía", d: "Tu primer amigo/a", ic: "users", test: (m) => m.c.friends >= 1 },
+  { id: "amigo5", tier: 3, t: "Mesa llena", d: "5 amigos", ic: "users", test: (m) => m.c.friends >= 5 },
+  { id: "nivel5", tier: 3, t: "Nivel 5", d: "Llegaste al nivel 5", ic: "trophy", test: (m) => m.level >= 5 },
+  { id: "nivel10", tier: 5, t: "Nivel 10", d: "Llegaste al nivel 10", ic: "trophy", test: (m) => m.level >= 10 },
 ];
 const earnedBadges = () => { if (!cal) return []; const m = myXP(); return BADGES.filter((b) => b.test(m)).map((b) => b.id); };
 function checkBadges() {
@@ -682,15 +711,19 @@ function checkBadges() {
   }
   localStorage.setItem("badges:" + (user?.uid || ""), JSON.stringify(now));
 }
-function badgeHtml(b, on, shareable) { return `<div class="badge${on ? " on" : ""}" title="${esc(b.d)}"><span class="b-ic"><svg class="ic"><use href="#i-${b.ic}"/></svg></span><b>${esc(b.t)}</b><small>${esc(b.d)}</small>${on && shareable ? `<button class="mini-btn share" data-share="${b.id}">${ic("share")} Compartir</button>` : ""}</div>`; }
+function badgeHtml(b, on, shareable) { return `<div class="badge${on ? " on" : ""}" title="${esc(b.d)}">${medalSvg(b, on)}<b>${esc(b.t)}</b><small>${esc(b.d)}</small><em class="tier t${b.tier || 1}">${TIER[b.tier || 1]}</em>${on && shareable ? `<button class="mini-btn share" data-share="${b.id}">${ic("share")} Compartir</button>` : ""}</div>`; }
 async function shareBadge(id) {
   const b = BADGES.find((x) => x.id === id); const url = "https://jaemeson-ra.github.io/plan-comidas-bsas/";
   const text = `Conseguí la insignia «${b.t}» (${b.d}) en Plan de comidas Buenos Aires. ${url}`;
   // tarjeta para compartir (canvas)
   const cv = document.createElement("canvas"); cv.width = 1080; cv.height = 1080; const g = cv.getContext("2d");
   g.fillStyle = "#FBF7F0"; g.fillRect(0, 0, 1080, 1080); g.strokeStyle = "rgba(31,45,42,.06)"; for (let i = 0; i < 1080; i += 40) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 1080); g.moveTo(0, i); g.lineTo(1080, i); g.stroke(); }
-  g.fillStyle = "#E3F2E9"; g.beginPath(); g.arc(540, 420, 230, 0, Math.PI * 2); g.fill(); g.fillStyle = "#2F8F5B"; g.beginPath(); g.arc(540, 420, 170, 0, Math.PI * 2); g.fill();
-  g.fillStyle = "#fff"; g.font = "700 150px Outfit, sans-serif"; g.textAlign = "center"; g.fillText({ flame: "🔥", check: "✔", calendar: "📅", recetas: "🍳", tag: "🏷", droplet: "💧", users: "👥", trophy: "🏆" }[b.ic] || "★", 540, 475);
+  g.textAlign = "center";
+  try {
+    const svg = await fetch(medalSrc(b)).then((r) => r.text());
+    const im = new Image(); await new Promise((res, rej) => { im.onload = res; im.onerror = rej; im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
+    g.drawImage(im, 300, 90, 480, 600);
+  } catch (e) { g.fillStyle = "#2F8F5B"; g.beginPath(); g.arc(540, 400, 170, 0, Math.PI * 2); g.fill(); }
   g.fillStyle = "#1F2D2A"; g.font = "400 76px 'Young Serif', Georgia, serif"; g.fillText(b.t, 540, 740);
   g.fillStyle = "#3C4A46"; g.font = "500 40px Outfit, sans-serif"; g.fillText(b.d, 540, 805); g.fillText(`${myName()} · Plan de comidas Buenos Aires`, 540, 900);
   g.fillStyle = "#2F8F5B"; g.font = "600 34px Outfit, sans-serif"; g.fillText("jaemeson-ra.github.io/plan-comidas-bsas", 540, 980);
@@ -751,7 +784,7 @@ async function sha256(s) { const b = new TextEncoder().encode(s.trim().toLowerCa
 function renderFriends() {
   if (page !== "miplan" || !user || !$("#friendsList")) return;
   const ids = Object.keys(cal?.friends || {});
-  $("#friendsList").innerHTML = ids.length ? ids.map((fid) => { const p = pub[fid] || {}; const bs = (p.badges || []).slice(0, 4); return `<div class="friend">${avatarHtml(p, p.name)}<div><b>${esc(p.name || cal.friends[fid]?.name || "amigo/a")}</b><small class="muted">nivel ${p.level || 1} · ${(p.xp || 0).toLocaleString("es-AR")} XP · racha ${p.streak || 0}</small><div class="f-badges">${bs.map((id) => { const b = BADGES.find((x) => x.id === id); return b ? `<span class="chip" title="${esc(b.d)}">${ic(b.ic)} ${esc(b.t)}</span>` : ""; }).join("")}${(p.badges || []).length > 4 ? `<span class="chip">+${p.badges.length - 4}</span>` : ""}</div></div><button class="mini-btn" data-unfriend="${fid}" title="Quitar">${ic("x")}</button></div>`; }).join("")
+  $("#friendsList").innerHTML = ids.length ? ids.map((fid) => { const p = pub[fid] || {}; const bs = (p.badges || []).slice(0, 6); return `<div class="friend">${avatarHtml(p, p.name)}<div><b>${esc(p.name || cal.friends[fid]?.name || "amigo/a")}</b><small class="muted">nivel ${p.level || 1} · ${(p.xp || 0).toLocaleString("es-AR")} XP · racha ${p.streak || 0}</small><div class="f-badges">${bs.map((id) => { const b = BADGES.find((x) => x.id === id); return b ? `<span class="f-medal" title="${esc(b.t)} · ${esc(b.d)}">${medalSvg(b, true, 34)}</span>` : ""; }).join("")}${(p.badges || []).length > 6 ? `<span class="chip">+${p.badges.length - 6}</span>` : ""}</div></div><button class="mini-btn" data-unfriend="${fid}" title="Quitar">${ic("x")}</button></div>`; }).join("")
     : `<p class="muted small">Todavía no tenés amigos agregados.</p>`;
 }
 $("#friendForm")?.addEventListener("submit", async (e) => {

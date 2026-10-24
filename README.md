@@ -36,8 +36,9 @@ Todo lo que un usuario crea (recetas e ingredientes) queda disponible para toda 
 
 ## Gamificación (Mi plan)
 
-- **XP y niveles**: día cumplido 50 XP (75 con racha ≥ 3, 100 con racha ≥ 7), semana perfecta +200, receta creada 80, ingrediente 40, vaso de agua 10 (3 por día) y +20 al completar el día. El nivel L se alcanza con 100·(L−1)² XP. Al subir de nivel aparece una animación con sonido (desactivable en Perfil) y se gana una **ficha**: permite marcar un **día libre** que no suma puntos pero no corta la racha.
-- **Insignias**: rachas (3/7/15/30/60), días cumplidos, semanas perfectas, recetas e ingredientes creados, hidratación (1 día, 7 y 30 seguidos), amigos, niveles. Se comparten como imagen desde Perfil.
+- **XP y niveles**: día cumplido 50 XP (75 con racha ≥ 3, 100 con racha ≥ 7), semana perfecta +200, receta creada 80, ingrediente 40, vaso de agua 10 (3 por día) y +20 al completar el día. Pasar al nivel siguiente cuesta cada vez más: 100 XP para el nivel 2, luego 170, 260, 370, 500, 650… (100 + 60·(k−1) + 10·(k−1)² por paso). Al subir de nivel aparece una animación con sonido (desactivable en Perfil) y se gana una **ficha**: permite marcar un **día libre** que no suma puntos pero no corta la racha.
+- **Insignias**: rachas (3/7/15/30/60), días cumplidos, semanas perfectas, recetas e ingredientes creados, hidratación (1 día, 7 y 30 seguidos), amigos, niveles. Cada una es una medalla colgante (`img/medals/*.svg`, generadas por `tools/build_medals.py` con la paleta del sitio) con palier bronce · plata · oro · platino · diamante; las bloqueadas se ven en gris con candado. Se comparten como imagen desde Perfil.
+- **Barra de XP**: marco de metal con muescas, brillo que la recorre y, al ganar XP, vibra y suelta chispas en la punta (se desactiva con `prefers-reduced-motion`).
 - **Perfil**: foto (se guarda a 160 px en la base), nombre, cambio de contraseña, datos corporales para Nutrición.
 - **Amigos**: se agregan por correo (se compara un hash SHA-256, el correo no se publica). La ladder tiene filtro «Mis amigos».
 - Todo se calcula en el cliente a partir de `calendars/{uid}` (done, libre, agua, friends) y se publica un resumen en `public/{uid}` y `ladder/{uid}`.

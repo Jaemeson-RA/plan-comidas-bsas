@@ -8,3 +8,4 @@ media/intro-vertical-full.mp4
 media/voz/
 tools/worker/dist/
 tools/worker/node_modules/
+tools/worker/.wrangler/
