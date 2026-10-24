@@ -636,14 +636,36 @@
     if (isAndroid) $("#appAndroid")?.classList.add("hl"); else if (isIOS) $("#appIos")?.classList.add("hl");
     fetch("descargas/menuario.apk", { method: "HEAD" }).then((r) => { const n = +r.headers.get("content-length"); if (r.ok && n) $("#apkSize").textContent = "· " + (n / 1048576).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " MB"; }).catch(() => {});
   }
-  document.addEventListener("click", async (e) => {
-    if (!e.target.closest(".install-btn")) return;
+  const APK = "descargas/menuario.apk";
+  function getApp() {
     $("#moreMenu") && ($("#moreMenu").hidden = true);
-    // en la compu, si el navegador ofrece instalarla, se instala ahí mismo; si no (o en el teléfono), la página de la app:
-    // Android baja el APK, iPhone ve cómo agregarla al inicio, la compu ve el QR
-    if (installEvt && !isAndroid && !isIOS) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if (r?.outcome === "accepted") showInstall(false); return; }
-    location.href = "app.html";
-  });
+    if (!isIOS) { const a = document.createElement("a"); a.href = APK; a.download = "menuario.apk"; document.body.appendChild(a); a.click(); a.remove(); }
+    let sh = $("#appSheet");
+    if (!sh) { sh = document.createElement("div"); sh.id = "appSheet"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
+    const steps = (l) => `<ol class="as-steps">${l.map((t, i) => `<li><span>${i + 1}</span><p>${t}</p></li>`).join("")}</ol>`;
+    const desk = !isIOS && !isAndroid;
+    sh.innerHTML = `<div class="sh-bg" data-shx></div><div class="sh-box as-box" role="dialog" aria-modal="true" aria-labelledby="asT">
+      <button class="as-x" type="button" data-shx aria-label="Cerrar">×</button>
+      <span class="as-ico"><img src="img/icons/icon-192.png" alt="" width="64" height="64"></span>
+      ${isIOS ? `<h3 id="asT">Agregá Menuario a tu inicio</h3><p class="muted small">En iPhone no hace falta bajar nada: queda como una app desde Safari.</p>
+        ${steps(["Abrí esta página en <b>Safari</b>.", "Tocá <b>Compartir</b>, el cuadrado con la flecha para arriba.", "Elegí <b>«Agregar a inicio»</b> y después <b>Agregar</b>."])}`
+      : desk ? `<h3 id="asT">Se está bajando Menuario</h3><p class="muted small">El archivo es para teléfonos Android. Lo más fácil: escaneá el código con el teléfono y bajala ahí.</p>
+        <img class="as-qr" src="img/qr-app.svg" width="150" height="150" alt="Código QR para abrir la página en el teléfono">
+        ${installEvt ? `<button class="btn ghost as-pwa" type="button" data-pwa>También podés instalarla en esta compu</button>` : ""}`
+      : `<h3 id="asT">Se está bajando Menuario</h3><p class="muted small">Pesa poco más de 1 MB. Cuando termine:</p>
+        ${steps(["Abrí <b>menuario.apk</b> desde la notificación o desde Descargas.", "Si te pide permiso para «instalar apps desconocidas», dáselo al navegador.", "Tocá <b>Instalar</b>. El ícono aparece en tu pantalla de inicio."])}`}
+      <div class="as-act">${isIOS ? "" : `<a class="mini-btn" href="${APK}" download="menuario.apk">${ic("download")} Bajar de nuevo</a>`}<button class="btn" type="button" data-shx>Listo</button></div>
+    </div>`;
+    sh.hidden = false; document.body.classList.add("no-scroll");
+    const close = () => { sh.hidden = true; document.body.classList.remove("no-scroll"); };
+    sh.onclick = async (e) => {
+      if (e.target.closest("[data-shx]")) return close();
+      if (e.target.closest("[data-pwa]") && installEvt) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if (r?.outcome === "accepted") { showInstall(false); close(); } }
+    };
+    sh.onkeydown = (e) => { if (e.key === "Escape") close(); };
+    sh.querySelector(".as-x").focus();
+  }
+  document.addEventListener("click", (e) => { if (e.target.closest(".install-btn, [data-get-app]")) { e.preventDefault(); getApp(); } });
   const net = () => {
     let p = $("#netPill"); if (navigator.onLine) { if (p) { p.classList.add("back"); setTimeout(() => p.remove(), 1200); } return; }
     if (!p) { p = document.createElement("div"); p.id = "netPill"; p.className = "net-pill"; p.setAttribute("role", "status"); p.innerHTML = `${ic("refresh")} Sin conexión: ves lo último guardado`; document.body.appendChild(p); }
