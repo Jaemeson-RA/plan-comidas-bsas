@@ -12,7 +12,7 @@ window.CONFIG = {
   demoLadder: true,
   // reCAPTCHA v2 («No soy un robot») para crear cuenta. Clave del SITIO (pública); la secreta va en el Worker.
   // Vacía = se usa la suma de control local.
-  recaptchaSiteKey: "",
+  recaptchaSiteKey: "6Lf8Xf4tAAAAAGt2IXoEhDFAVLEghBry_ZcaBlSS",
   // Proyecto Firebase existente (viaje-del-amor): Authentication (email + contraseña) + Realtime Database.
   firebase: {
     apiKey: "AIzaSyDby2S1qUHAChX_RwqPRLkU8qgpmsSvQWg",
