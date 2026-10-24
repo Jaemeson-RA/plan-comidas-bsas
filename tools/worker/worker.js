@@ -7,7 +7,7 @@
  */
 const VTEX = { Jumbo: "www.jumbo.com.ar", Disco: "www.disco.com.ar", Vea: "www.vea.com.ar", Carrefour: "www.carrefour.com.ar", "Día": "diaonline.supermercadosdia.com.ar", "ChangoMás": "www.masonline.com.ar" };
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36";
-import { pushRoute, pushCron } from "./push.js";
+import { pushRoute, pushCron, promoAlerts } from "./push.js";
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Cache-Control": "public, max-age=600" };
 
 async function vtex(store, host, q) {
@@ -185,6 +185,8 @@ export default {
   // crons (wrangler.toml): cada 3 horas recorre las cadenas y guarda las promos en KV; cada 15 minutos, los recordatorios
   async scheduled(event, env, ctx) {
     if (event.cron === "*/15 * * * *") { await pushCron(env, event.scheduledTime); return; }
-    if (env.PROMOS) await env.PROMOS.put("promos", JSON.stringify(await buildPromos()));
+    if (!env.PROMOS) return;
+    const data = await buildPromos(); await env.PROMOS.put("promos", JSON.stringify(data));
+    await promoAlerts(env, data, event.scheduledTime);  // productos de tu lista en promo
   },
 };

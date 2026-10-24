@@ -91,14 +91,26 @@ function buildNotes(snap, shown, now) {
                  : { t: "k", title: "¿Qué se come hoy?", body: "Mirá el menú del día y las recetas.", url: "index.html" });
   }
   if (due("m", p.m)) notes.push({ t: "m", title: "¿Cumpliste el plan hoy? ✅", body: "Marcá tu día en Mi plan y sumá XP sin cortar la racha.", url: "mi-plan.html" });
+  if (due("v", p.v)) {
+    const tom = new Date(now.d.getTime() + 864e5).toISOString().slice(0, 10);
+    const soon = (snap.vence || []).filter((x) => x.d >= now.iso && x.d <= tom).sort((a, b) => a.d.localeCompare(b.d));
+    if (soon.length) { const f = soon[0], cuando = f.d === now.iso ? "hoy" : "mañana";
+      notes.push({ t: "v", title: soon.length === 1 ? `Se vence ${cuando}: ${f.n} ❄` : `Se vencen ${soon.length} cosas de tu heladera ❄`, body: soon.length === 1 ? (f.r && f.r.length ? `Usalo en: ${f.r.join(" o ")}.` : "Usalo hoy en alguna receta.") : `${soon.map((x) => x.n).join(", ")}. Mirá qué cocinar en Hoy.`, url: "index.html" }); }
+  }
   return notes;
 }
 self.addEventListener("push", (e) => {
   e.waitUntil((async () => {
     const snap = (await readN("snap")) || {}, shown = (await readN("shown")) || {}, now = localNow();
-    let notes = buildNotes(snap, shown, now);
+    let notes = buildNotes(snap, shown, now), why = null;
+    // ¿por qué llegó? el servidor guarda el motivo de las promos de tu lista y de la prueba
+    try { const sub = await self.registration.pushManager.getSubscription(); if (sub && snap.api) why = await (await fetch(snap.api + "/push/why", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) })).json(); } catch (e) {}
+    if (why && why.type === "promos" && why.items && why.items.length) {
+      const it = why.items, p0 = it[0];
+      notes.push({ t: "pr", title: why.total === 1 ? `${p0.n} está en promo 🏷️` : `${why.total} productos de tu lista en promo 🏷️`, body: it.map((x) => `${x.n}: ${x.pct ? "-" + x.pct + "% " : ""}en ${x.store}`).join(" · ") + ". Tocá para verlas.", url: "promos.html" });
+    }
     // nada programado ahora: es la prueba desde el panel de recordatorios
-    if (!notes.length) notes = [{ t: "test", title: "¡Listo! Así te llegan los recordatorios", body: "Menuario te va a avisar cuando toque hacer las compras o cocinar, aunque la app esté cerrada.", url: "index.html" }];
+    if (!notes.length) notes = [why && why.type === "test" ? { t: "test", title: "¡Listo! Así te llegan los recordatorios", body: "Menuario te va a avisar cuando toque hacer las compras o cocinar, aunque la app esté cerrada.", url: "index.html" } : { t: "gen", title: "Menuario", body: "Mirá tu menú de hoy y tu lista de compras.", url: "index.html" }];
     for (const n of notes) {
       await self.registration.showNotification(n.title, { body: n.body, icon: "img/icons/icon-192.png", badge: "img/icons/badge-96.png", tag: "menuario-" + n.t, renotify: true, lang: "es-AR", data: { url: n.url } });
       if (n.t !== "test") shown[n.t] = now.iso;

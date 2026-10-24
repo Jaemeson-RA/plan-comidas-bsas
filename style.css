@@ -1265,3 +1265,16 @@ main{min-height:100vh}
 .pz-meta{margin-top:.6rem}.pz-meta p{margin:0}.pz-meta .ic{width:16px;height:16px;color:#E0A33A;vertical-align:-3px}
 .pz-note{margin:.6rem 0 0}
 @media (max-width:520px){.pz-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.pz-form input,.pz-meta input{width:100%}.pz-form label,.pz-meta label{flex:1 1 130px}.bt-kpis b{font-size:1rem}}
+
+/* ===== heladera: vencimientos y «Usá primero» ===== */
+.fr-chip.soon{color:#9A3412;background:#FDEBDD;border-color:#F5C3A3}
+.fr-chip small{font-size:.7rem;font-weight:700;opacity:.8;margin-left:.2rem}
+.fr-d{display:flex;flex-direction:column;gap:.15rem;font-size:.7rem;font-weight:700;color:var(--muted)}
+.fr-d input{font:inherit;font-size:.86rem;border:1.5px solid var(--border);border-radius:999px;padding:.45rem .6rem;background:#fff;width:150px}
+.fr-form{flex-wrap:wrap;align-items:flex-end}
+.fr-edit{display:flex;flex-direction:column;gap:.25rem;font-size:.8rem;font-weight:700;color:var(--muted);margin:.6rem 0 .3rem}
+.fr-edit input{font:inherit;font-weight:600;color:var(--ink);border:1.5px solid var(--border);border-radius:10px;padding:.5rem .6rem;background:#fff;max-width:200px}
+.ap-use{background:#FFF6EE;border:1.5px solid #F5D2B8;border-radius:18px;padding:.8rem .85rem}
+.ap-use-items{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.6rem}
+.ap-use-recs{display:grid;gap:.4rem}
+@media (max-width:520px){.fr-d{flex:1 1 130px}.fr-d input{width:100%}}

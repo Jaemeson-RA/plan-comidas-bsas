@@ -699,7 +699,13 @@
   const fHas = (ing, entry) => { const iw = fWords(ing), tw = fWords(entry); return tw.length > 0 && tw.every((t) => iw.some((w) => fSame(w, t))); };
   const fGet = () => { try { return JSON.parse(localStorage.getItem(FKEY) || "[]"); } catch (e) { return []; } };
   const fAtGet = () => { try { return JSON.parse(localStorage.getItem("heladeraAt") || "{}"); } catch (e) { return {}; } };
-  const fSet = (v) => { try { localStorage.setItem(FKEY, JSON.stringify(v)); const at = fAtGet(), now = Date.now(), keep = {}; v.forEach((h) => { const k = fNorm(h); keep[k] = at[k] || now; }); localStorage.setItem("heladeraAt", JSON.stringify(keep)); } catch (e) {} };
+  const fSet = (v) => { try { localStorage.setItem(FKEY, JSON.stringify(v)); const at = fAtGet(), now = Date.now(), keep = {}; v.forEach((h) => { const k = fNorm(h); keep[k] = at[k] || now; }); localStorage.setItem("heladeraAt", JSON.stringify(keep)); const ve = JSON.parse(localStorage.getItem("heladeraVence") || "{}"), vk = {}; v.forEach((h) => { const k = fNorm(h); if (ve[k]) vk[k] = ve[k]; }); localStorage.setItem("heladeraVence", JSON.stringify(vk)); } catch (e) {} window.notifResync?.(); };
+  const fVGet = () => { try { return JSON.parse(localStorage.getItem("heladeraVence") || "{}"); } catch (e) { return {}; } };
+  const fVSet = (v) => { try { localStorage.setItem("heladeraVence", JSON.stringify(v)); } catch (e) {} window.notifResync?.(); };
+  const fVence = (h) => fVGet()[fNorm(h)] || null;
+  const daysTo = (iso) => Math.round((new Date(iso + "T12:00") - new Date(todayISO + "T12:00")) / 864e5);
+  const venceTxt = (d) => { const n = daysTo(d); return n < 0 ? "vencido" : n === 0 ? "vence hoy" : n === 1 ? "vence mañana" : `vence ${d.slice(8)}/${d.slice(5, 7)}`; };
+  window.Heladera = window.Heladera || {};
   const fAge = (h) => { const t = fAtGet()[fNorm(h)]; return t ? Math.floor((Date.now() - t) / 864e5) : null; };
   window.Heladera = { get: fGet, has: (name) => fGet().some((h) => fHas(name, h)), toggle: (name) => { const hel = fGet(); if (hel.some((h) => fHas(name, h))) fSet(hel.filter((h) => !fHas(name, h))); else fSet([...hel, name.replace(/\s*\(.*?\)\s*/g, " ").trim()]); } };
   const xKey = (mon) => `extras:${mon}`;  // productos que agrega cada uno a la lista de esa semana
@@ -762,14 +768,14 @@
     });
     $("#shopGrid").innerHTML = full.length ? full.map((cat) => `<div class="shop-cat"><h4>${esc(cat.cat)} <small>${cat.items.filter((i) => !inFridge(i.n, hel)).length}</small></h4>
       ${cat.items.map((i) => { const fz = inFridge(i.n, hel), dn = !fz && localStorage.getItem(key(cat.cat, i.n)) === "1";
-        return `<div class="sh-row${fz ? " fz" : ""}"><label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}${fz ? " disabled" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>${i.extra != null ? `<button type="button" class="x-del" data-xdel="${i.extra}" aria-label="Sacar ${esc(i.n)} de la lista">×</button>` : ""}<button type="button" class="fz-btn" data-fz="${esc(i.n)}" aria-pressed="${fz}" title="${fz ? "Ya no lo tengo" : "Lo tengo en la heladera"}" aria-label="${fz ? `Sacar ${esc(i.n)} de la heladera` : `Tengo ${esc(i.n)} en la heladera`}">${ic("snow")}</button></div>`; }).join("")}</div>`).join("")
+        return `<div class="sh-row${fz ? " fz" : ""}"><label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}${fz ? " disabled" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>${i.extra != null ? `<button type="button" class="x-del" data-xdel="${i.extra}" aria-label="Sacar ${esc(i.n)} de la lista">×</button>` : ""}${fz ? `<button type="button" class="fz-btn" data-fz="${esc(i.n)}" aria-pressed="true" title="Está en tu heladera (tocá para sacarlo)" aria-label="Sacar ${esc(i.n)} de la heladera">${ic("snow")}</button>` : ""}</div>`; }).join("")}</div>`).join("")
       : `<div class="card shop-empty"><p><b>Tu calendario no tiene platos esa semana.</b></p><p class="muted small">Armala en <a href="mi-plan.html">Mi plan</a> o mirá la lista del plan de la casa.</p></div>`;
     $("#shopGrid").insertAdjacentHTML("beforeend", `<form class="card x-form" id="xForm"><label for="xQ"><b>¿Falta algo?</b> <span class="muted small">Sumalo a la lista de esta semana: se copia, se comparte y entra en el comparador.</span></label><div><input id="xQ" placeholder="Ej.: café, papel higiénico, detergente" autocomplete="off"><input id="xN" placeholder="Cantidad" autocomplete="off" aria-label="Cantidad (opcional)"><button class="btn" type="submit">Agregar</button></div></form>`);
     $("#pantryList").innerHTML = D.pantry.map((p) => `<li>${esc(p)}</li>`).join("");
     // la tarjeta de la heladera
     if ($("#frChips")) {
       const old = hel.filter((h) => (fAge(h) ?? 0) >= 14).length;
-      $("#frChips").innerHTML = hel.length ? hel.map((h, k) => { const a = fAge(h); return `<button type="button" class="fr-chip${a != null && a >= 14 ? " old" : ""}" data-frdel="${k}" aria-label="Sacar ${esc(h)} de la heladera"${a != null ? ` title="Guardado hace ${a} ${a === 1 ? "día" : "días"}"` : ""}>${ic("snow")}${esc(h)}${a != null && a >= 2 ? `<small>${a} d</small>` : ""}<span aria-hidden="true">×</span></button>`; }).join("") + (old ? `<button type="button" class="mini-btn" data-frold>Sacar lo de hace +2 semanas (${old})</button>` : "") + `<button type="button" class="mini-btn fr-clear" data-frclear>Vaciar</button>` : `<p class="muted small fr-empty">Vacía. Tocá el ${ic("snow")} de lo que ya tenés.</p>`;
+      $("#frChips").innerHTML = hel.length ? hel.map((h, k) => { const a = fAge(h), v = fVence(h), dv = v ? daysTo(v) : null; return `<button type="button" class="fr-chip${dv != null && dv <= 1 ? " soon" : a != null && a >= 14 ? " old" : ""}" data-fredit="${k}" aria-label="${esc(h)}: cambiar el vencimiento o sacarlo"${a != null ? ` title="Guardado hace ${a} ${a === 1 ? "día" : "días"}"` : ""}>${ic("snow")}${esc(h)}${v ? `<small>${venceTxt(v)}</small>` : a != null && a >= 2 ? `<small>${a} d</small>` : ""}</button>`; }).join("") + (old ? `<button type="button" class="mini-btn" data-frold>Sacar lo de hace +2 semanas (${old})</button>` : "") + `<button type="button" class="mini-btn fr-clear" data-frclear>Vaciar</button>` : `<p class="muted small fr-empty">Vacía. Tocá el ${ic("snow")} de lo que ya tenés.</p>`;
       $("#frList").innerHTML = [...new Set(full.flatMap((c) => c.items.map((i) => cleanName(i.n))))].sort().map((x) => `<option value="${esc(x)}">`).join("");
     }
   }
@@ -796,11 +802,29 @@
     $("#shopGrid").addEventListener("submit", (e) => { if (e.target.id !== "xForm") return; e.preventDefault(); const n = $("#xQ").value.trim(), q = $("#xN").value.trim(); if (!n) return; const mon = state.week, v = xGet(mon); n.split(/[,;]/).map((x) => x.trim()).filter(Boolean).forEach((nm) => { if (!v.some((x) => fNorm(x.n) === fNorm(nm))) v.push({ n: nm, q }); }); xSet(mon, v); renderShopping(); setTimeout(() => $("#xQ")?.focus(), 0); });
     $("#fridge")?.addEventListener("click", (e) => {
       if (e.target.closest("[data-frold]")) { fSet(fGet().filter((h) => (fAge(h) ?? 0) < 14)); renderShopping(); return; }
+      const ed = e.target.closest("[data-fredit]");
+      if (ed) {
+        const hel = fGet(), name = hel[+ed.dataset.fredit]; if (!name) return;
+        let sh = $("#frSheet"); if (!sh) { sh = document.createElement("div"); sh.id = "frSheet"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
+        const v = fVence(name), a = fAge(name);
+        sh.innerHTML = `<div class="sh-bg" data-shx></div><div class="sh-box as-box" role="dialog" aria-modal="true" aria-labelledby="frT"><button class="as-x" type="button" data-shx aria-label="Cerrar">×</button>
+          <h3 id="frT">${ic("snow")} ${esc(name)}</h3><p class="muted small">${a != null ? `En la heladera hace ${a} ${a === 1 ? "día" : "días"}.` : "En tu heladera."} ${v ? esc(venceTxt(v)[0].toUpperCase() + venceTxt(v).slice(1)) + "." : ""}</p>
+          <label class="fr-edit"><span>Vence el</span><input type="date" id="frEd" value="${v || ""}"></label>
+          <div class="as-act"><button type="button" class="mini-btn" data-frout>Ya no lo tengo</button><button type="button" class="btn" data-frsave>Guardar</button></div></div>`;
+        sh.hidden = false; document.body.classList.add("no-scroll");
+        const close = () => { sh.hidden = true; document.body.classList.remove("no-scroll"); };
+        sh.onclick = (ev) => {
+          if (ev.target.closest("[data-shx]")) return close();
+          if (ev.target.closest("[data-frout]")) { fSet(fGet().filter((h) => fNorm(h) !== fNorm(name))); close(); renderShopping(); return; }
+          if (ev.target.closest("[data-frsave]")) { const ve = fVGet(), d = $("#frEd").value; if (d) ve[fNorm(name)] = d; else delete ve[fNorm(name)]; fVSet(ve); close(); renderShopping(); }
+        };
+        return;
+      }
       const d = e.target.closest("[data-frdel]"), c = e.target.closest("[data-frclear]");
       if (d) { const hel = fGet(); hel.splice(+d.dataset.frdel, 1); fSet(hel); renderShopping(); }
       if (c) { fSet([]); renderShopping(); }
     });
-    $("#frForm")?.addEventListener("submit", (e) => { e.preventDefault(); const hel = fGet(); String($("#frQ").value).split(/[,;]/).map((x) => x.trim()).filter(Boolean).forEach((v) => { if (!hel.some((h) => fNorm(h) === fNorm(v))) hel.push(v); }); fSet(hel); $("#frQ").value = ""; renderShopping(); });
+    $("#frForm")?.addEventListener("submit", (e) => { e.preventDefault(); const hel = fGet(), dv = $("#frD")?.value, names = String($("#frQ").value).split(/[,;]/).map((x) => x.trim()).filter(Boolean); names.forEach((v) => { if (!hel.some((h) => fNorm(h) === fNorm(v))) hel.push(v); }); fSet(hel); if (dv) { const ve = fVGet(); names.forEach((v) => { ve[fNorm(v)] = dv; }); fVSet(ve); } $("#frQ").value = ""; if ($("#frD")) $("#frD").value = ""; renderShopping(); });
     $("#shopGrid").addEventListener("change", (e) => {
       const cb = e.target; if (cb.type !== "checkbox") return;
       localStorage.setItem(cb.dataset.k, cb.checked ? "1" : "0"); cb.closest("label").classList.toggle("done", cb.checked);
@@ -1042,7 +1066,17 @@
   const npSet = (v) => { try { localStorage.setItem(NP, JSON.stringify(v)); } catch (e) {} };
   const pushOk = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window && !!API && !!VAPID;
   const u8 = (b) => Uint8Array.from(atob(b.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
-  const wireP = (p) => ({ c: p.c && p.c.d.length ? p.c : null, k: p.k || null, m: p.m || null });
+  const wireP = (p) => ({ c: p.c && p.c.d.length ? p.c : null, k: p.k || null, m: p.m || null, v: p.v || null, pr: !!p.pr });
+  // lo que necesita el servidor para las alertas: los productos de la lista de esta semana (sin lo de la heladera) y lo que se vence
+  function notifData() {
+    try {
+      const hel = fGet(), mon = mondayOf(todayISO); let list = shoppingFor(weekAt(mon));
+      const my = myLists(); if (localStorage.getItem("shopSrc") === "mi" && my?.weeks?.[mon]) list = my.weeks[mon].list;
+      const items = list.flatMap((c) => c.items.map((i) => i.n)).concat(xGet(mon).map((x) => x.n)).filter((n) => !inFridge(n, hel));
+      const vence = {}; hel.forEach((h) => { const v = fVence(h); if (v) vence[h] = v; });
+      return { items, vence };
+    } catch (e) { return { items: [], vence: {} }; }
+  }
   async function notifSnap() {
     const p = npGet(); if (!p?.on || !("caches" in window)) return;
     let mine = null; try { mine = JSON.parse(localStorage.getItem("notifMine") || "null"); } catch (e) {}
@@ -1056,7 +1090,8 @@
       const mon = addDays(mondayOf(todayISO), o), mw = mine?.weeks?.[mon];
       weeks[mon] = mw ? { n: mw.n, url: "mi-plan.html" } : { n: shoppingFor(weekAt(mon)).reduce((t, c) => t + c.items.length, 0), url: `compras.html#semana-${mon}` };
     });
-    const snap = { at: new Date().toISOString(), prefs: wireP(p), days, weeks, api: API, vapid: VAPID };
+    const vence = fGet().map((h) => ({ n: h, d: fVence(h) })).filter((x) => x.d).map((x) => ({ ...x, r: Object.values(R).filter((r) => !r.custom && DIET.ok(r) && r.ing.some((i) => fHas(i.n, x.n))).slice(0, 2).map((r) => r.name) }));
+    const snap = { at: new Date().toISOString(), prefs: wireP(p), days, weeks, vence, api: API, vapid: VAPID };
     try { await (await caches.open("menuario-notif")).put("snap", new Response(JSON.stringify(snap), { headers: { "Content-Type": "application/json" } })); } catch (e) {}
   }
   window.notifSnap = notifSnap;
@@ -1071,8 +1106,12 @@
     const p = npGet(); if (!p?.on || !pushOk() || Notification.permission !== "granted") return;
     await notifSnap();
     if (localStorage.getItem("notifSync") === todayISO) return;
-    try { const sub = await notifSub(false); if (sub) { await notifPost("/push/sub", { endpoint: sub.endpoint, prefs: wireP(p) }); localStorage.setItem("notifSync", todayISO); } } catch (e) {}
+    try { const sub = await notifSub(false); if (sub) { await notifPost("/push/sub", { endpoint: sub.endpoint, prefs: wireP(p), data: notifData() }); localStorage.setItem("notifSync", todayISO); } } catch (e) {}
   })();
+  // cuando cambia la heladera o la lista, el servidor se entera (como mucho una vez cada 5 segundos)
+  let resyncT = 0;
+  window.notifResync = () => { clearTimeout(resyncT); resyncT = setTimeout(async () => { const p = npGet(); if (!p?.on || !pushOk() || Notification.permission !== "granted") return; await notifSnap(); try { const sub = await notifSub(false); if (sub) await notifPost("/push/sub", { endpoint: sub.endpoint, prefs: wireP(p), data: notifData() }); } catch (e) {} }, 5000); };
+  window.addEventListener("plan-swap", () => window.notifResync()); window.addEventListener("hogar", () => window.notifResync());
 
   const DOWL = [[1, "Lu"], [2, "Ma"], [3, "Mi"], [4, "Ju"], [5, "Vi"], [6, "Sá"], [0, "Do"]];
   const HOURS = Array.from({ length: 36 }, (_, i) => { const m = 360 + i * 30; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${m % 60 ? "30" : "00"}`; });
@@ -1099,6 +1138,9 @@
           <div class="nt-opts">${hourSel("ntKh", p.k || "11:30")}</div></section>
         <section class="nt-row"><label class="nt-sw"><input type="checkbox" id="ntM"${p.m ? " checked" : ""}><span class="nt-ico">${ic("check")}</span><span><b>Marcar el día</b><small>Para no cortar la racha en Mi plan.</small></span></label>
           <div class="nt-opts">${hourSel("ntMh", p.m || "21:30")}</div></section>
+        <section class="nt-row"><label class="nt-sw"><input type="checkbox" id="ntV"${p.v ? " checked" : ""}><span class="nt-ico">${ic("snow")}</span><span><b>Lo que se vence</b><small>Solo si algo de tu heladera se vence hoy o mañana, con recetas para usarlo.</small></span></label>
+          <div class="nt-opts">${hourSel("ntVh", p.v || "10:00")}</div></section>
+        <section class="nt-row"><label class="nt-sw"><input type="checkbox" id="ntP"${p.pr ? " checked" : ""}><span class="nt-ico">${ic("tag")}</span><span><b>Promos de tu lista</b><small>Cuando algo de tu lista está en oferta. Como mucho uno por día, entre las 9 y las 21.</small></span></label></section>
       </div>
       <p class="nt-msg small" id="ntMsg" role="status"></p>
       <div class="as-act">${p.on ? `<button class="mini-btn" type="button" data-ntoff>Apagar todo</button><button class="mini-btn" type="button" data-nttest>${ic("bell")} Probar</button>` : ""}<button class="btn" type="button" data-ntsave${blocked ? " disabled" : ""}>${p.on ? "Guardar" : "Activar recordatorios"}</button></div>
@@ -1123,15 +1165,15 @@
           const sub = await notifSub(false); if (!sub) { msg("Primero activá los recordatorios.", true); return; }
           const r = await notifPost("/push/test", { endpoint: sub.endpoint }); msg(r.ok ? "Enviado: en unos segundos te llega una notificación de prueba." : "No se pudo mandar la prueba. Guardá de nuevo y reintentá.", !r.ok); return;
         }
-        const np = { on: true, c: $("#ntC").checked ? { d: [...sh.querySelectorAll("[data-dow].on")].map((b) => +b.dataset.dow).sort(), h: $("#ntCh").value } : null, k: $("#ntK").checked ? $("#ntKh").value : null, m: $("#ntM").checked ? $("#ntMh").value : null };
-        if (!np.c && !np.k && !np.m) { msg("Elegí al menos un recordatorio, o tocá «Apagar todo».", true); return; }
+        const np = { on: true, c: $("#ntC").checked ? { d: [...sh.querySelectorAll("[data-dow].on")].map((b) => +b.dataset.dow).sort(), h: $("#ntCh").value } : null, k: $("#ntK").checked ? $("#ntKh").value : null, m: $("#ntM").checked ? $("#ntMh").value : null, v: $("#ntV").checked ? $("#ntVh").value : null, pr: $("#ntP").checked };
+        if (!np.c && !np.k && !np.m && !np.v && !np.pr) { msg("Elegí al menos un recordatorio, o tocá «Apagar todo».", true); return; }
         const perm = await Notification.requestPermission();
         if (perm !== "granted") { msg("Sin permiso no te podemos avisar. Aceptá las notificaciones cuando el teléfono pregunte.", true); return; }
         const sub = await notifSub(true);
-        const r = await notifPost("/push/sub", { endpoint: sub.endpoint, prefs: wireP(np) });
+        const r = await notifPost("/push/sub", { endpoint: sub.endpoint, prefs: wireP(np), data: notifData() });
         if (!r.ok) { msg("No se pudo guardar en el servidor. Probá de nuevo en un rato.", true); return; }
         npSet(np); localStorage.setItem("notifSync", todayISO); await notifSnap();
-        const parts = [np.c && `compras ${np.c.d.map((n) => DOWL.find((x) => x[0] === n)[1].toLowerCase()).join(", ")} a las ${np.c.h}`, np.k && `menú a las ${np.k}`, np.m && `marcar el día a las ${np.m}`].filter(Boolean);
+        const parts = [np.c && `compras ${np.c.d.map((n) => DOWL.find((x) => x[0] === n)[1].toLowerCase()).join(", ")} a las ${np.c.h}`, np.k && `menú a las ${np.k}`, np.m && `marcar el día a las ${np.m}`, np.v && `vencimientos a las ${np.v}`, np.pr && "promos de tu lista"].filter(Boolean);
         toastG(`Recordatorios activados: ${parts.join(" · ")}.`); close(); renderNotifState();
       } catch (ex) { msg("Algo falló al activar las notificaciones en este navegador.", true); }
       finally { btn.disabled = false; }
@@ -1179,6 +1221,9 @@
           <div class="ap-meals">${meal("desayuno", "Desayuno", "desayuno")}${meal("almuerzo", "Almuerzo", "almuerzo")}${meal("cena", "Cena", "cena")}
             <div class="ap-meal ap-mer"><span class="ap-mk">${ic("merienda")}Merienda</span><span class="ap-mn">${esc(td.merienda)}</span></div></div>
           <button type="button" class="ap-tmw" data-rec="${tm.almuerzo}">Mañana: <b>${esc(R[tm.almuerzo].name)}</b>${ic("arrow")}</button></section>
+        ${(() => { const hel = fGet().map((h) => ({ h, v: fVence(h) })).filter((x) => x.v && daysTo(x.v) <= 2).sort((a, b) => a.v.localeCompare(b.v)); if (!hel.length) return "";
+          const recs = Object.values(R).filter((r) => !r.custom && DIET.ok(r)).map((r) => ({ r, n: hel.filter((x) => r.ing.some((i) => fHas(i.n, x.h))).length })).filter((x) => x.n).sort((a, b) => b.n - a.n).slice(0, 3);
+          return `<section class="ap-use"><div class="ap-h"><h2>Usá primero</h2><a href="compras.html#fridge">Heladera</a></div><div class="ap-use-items">${hel.map((x) => `<span class="fr-chip soon">${ic("snow")}${esc(x.h)}<small>${venceTxt(x.v)}</small></span>`).join("")}</div>${recs.length ? `<div class="ap-use-recs">${recs.map(({ r }) => `<button type="button" class="bt-item" data-rec="${r.id}"><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span><b>${esc(r.name)}</b><small>${r.tiempo} min</small></span></button>`).join("")}</div>` : ""}</section>`; })()}
         <div class="ap-quick">
           <a class="ap-q" href="compras.html">${ic("compras")}<span><b>Tu lista</b><small>${n} productos</small></span></a>
           <a class="ap-q" href="pasos.html">${ic("bolt")}<span><b>Pasos</b><small class="ap-psq">Hoy</small></span></a>
