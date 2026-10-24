@@ -405,8 +405,10 @@
       res.innerHTML = `<p class="muted">Buscando «${esc(q)}» en las siete cadenas…</p>`;
       try {
         const j = await (await fetch(`${CFG.priceApi.replace(/\/$/, "")}/search?q=${encodeURIComponent(q)}`)).json();
-        const qn = q.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
-        const rows = (j.results || []).filter((r) => qn.every((w) => r.name.toLowerCase().includes(w.replace(/[,.]/g, "")) || true)).sort((a, b) => a.price - b.price);
+        const normS = (s) => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+        const qn = normS(q).split(/\s+/).map((w) => w.replace(/[,.]/g, "")).filter((w) => w.length > 2 && !/^\d+$/.test(w));
+        // cada palabra de la búsqueda tiene que estar en el nombre del producto (saca "barra proteica" cuando buscás "aceite de girasol")
+        const rows = (j.results || []).filter((r) => { const n = normS(r.name); return qn.every((w) => n.includes(w) || n.includes(w.replace(/s$/, ""))); }).sort((a, b) => a.price - b.price);
         const byStore = {}; rows.forEach((r) => { (byStore[r.store] = byStore[r.store] || []).push(r); });
         const best = rows[0];
         res.innerHTML = rows.length ? `<p class="small">${rows.length} resultados · el más barato: <b>${esc(best.name)}</b> en <b>${esc(best.store)}</b> a <b data-ars="${best.price}"></b>${best.unit === "kg" ? " por kg" : ""} · <a href="${best.link}" target="_blank" rel="noopener">comprar ↗</a></p>
