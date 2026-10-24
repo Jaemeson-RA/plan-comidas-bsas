@@ -823,7 +823,7 @@
         <div class="ap-quick">
           <a class="ap-q" href="compras.html">${ic("compras")}<span><b>Tu lista</b><small>${n} productos</small></span></a>
           <a class="ap-q" href="mi-plan.html">${ic("check")}<span><b>Marcar el día</b><small>Sumá XP</small></span></a>
-          <button type="button" class="ap-q notif-btn">${ic("bell")}<span><b>Recordatorios</b><small class="ap-nstate">Elegí cuándo</small></span></button>
+          <button type="button" class="ap-q notif-btn">${ic("bell")}<span><b>Avisos</b><small class="ap-nstate">Elegí cuándo</small></span></button>
         </div>
         <section class="ap-week"><div class="ap-h"><h2>Esta semana</h2><a href="plan.html">Ver el plan</a></div>
           <div class="ap-days">${week.map((d) => { const r = R[d.almuerzo]; return `<button type="button" class="ap-day${d.date === todayISO ? " is-today" : ""}" data-rec="${d.almuerzo}"><span class="ap-dw">${d.date === todayISO ? "Hoy" : d.dow.slice(0, 3)} <b>${+d.date.slice(8)}</b></span><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span class="ap-dn">${esc(r.name)}</span></button>`; }).join("")}</div></section>
