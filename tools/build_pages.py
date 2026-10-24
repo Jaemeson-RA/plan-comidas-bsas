@@ -8,7 +8,7 @@ foot = open(os.path.join(root, "_foot.html"), encoding="utf-8").read()
 META = {
  "index": ("Menuario · Plan de comidas en Buenos Aires", "Menuario: plan de comidas continuo para Buenos Aires: recetas fáciles, lista de compras, precios de supermercados con envío y alertas. Se instala como app."),
  "plan": ("Calendario · Menuario", "Qué se come cada día: plan continuo mes por mes, con recetas, fotos y videos."),
- "recetas": ("Recetas · Menuario", "44 recetas fáciles para una persona (también veganas, vegetarianas y sin TACC), con foto, video, nutrición y costo, y un buscador por lo que hay en tu heladera."),
+ "recetas": ("Recetas · Menuario", "54 recetas fáciles para una persona (también veganas, vegetarianas y sin TACC), con foto, video, nutrición y costo, y un buscador por lo que hay en tu heladera."),
  "compras": ("Lista de compras · Menuario", "Lista de compras semanal armada por góndola a partir de las recetas del plan."),
  "supermercados": ("Supermercados · Menuario", "Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR."),
  "temporada": ("Productos de estación · Menuario", "Frutas y verduras de estación en Argentina, mes por mes, y los platos del plan que las aprovechan."),

@@ -431,10 +431,10 @@
 
   // ---------- recetas por categoría ----------
   const CATS = [
-    { id: "desayunos", t: "Desayunos", d: "Siete opciones entre 5 y 25 minutos: sin cocción, con sartén, una vegana con avena y el chipá sin TACC.", ids: ["tostadas", "yogur", "revueltos", "panqueques", "avenamanzana", "tostadafrancesa", "chipa"] },
-    { id: "rapidas", t: "Rápidas para la semana", d: "Listas en 25 minutos o menos, con una sartén o sin cocinar. Las cenas de lunes a viernes.", ids: ["merluza", "atun", "omelette", "wok", "wrap", "garbanzos", "gramajo", "revueltozapallitos"] },
-    { id: "horno", t: "Al horno, una sola fuente", d: "Se arman en 10 minutos y el horno hace el resto. Conviene hacer el doble: lo que sobra es la vianda del día siguiente.", ids: ["pollohorno", "milanesas", "tarta", "salmon", "pescadohorno", "berenjenas", "hamburguesas", "pizzacasera", "cerdobatata"] },
-    { id: "ollas", t: "Ollas, guisos y arroces", d: "Las más económicas, las que mejor rinden y las que mejor se congelan en porciones.", ids: ["sopa", "lentejas", "curry", "arrozpollo", "albondigas", "guisofideos", "pollodisco"] },
+    { id: "desayunos", t: "Desayunos", d: "Diez opciones entre 5 y 25 minutos: sin cocción, con sartén, cuatro veganas y dos sin TACC.", ids: ["tostadas", "yogur", "revueltos", "panqueques", "avenamanzana", "tostadafrancesa", "chipa", "licuadobanana", "chiabanana", "tofurevuelto"] },
+    { id: "rapidas", t: "Rápidas para la semana", d: "Listas en 25 minutos o menos, con una sartén o sin cocinar. Las cenas de lunes a viernes.", ids: ["merluza", "atun", "omelette", "wok", "wrap", "garbanzos", "gramajo", "revueltozapallitos", "woktofu"] },
+    { id: "horno", t: "Al horno, una sola fuente", d: "Se arman en 10 minutos y el horno hace el resto. Conviene hacer el doble: lo que sobra es la vianda del día siguiente.", ids: ["pollohorno", "milanesas", "tarta", "salmon", "pescadohorno", "berenjenas", "hamburguesas", "pizzacasera", "cerdobatata", "milanesasberenjena", "falafel", "empanadaslentejas"] },
+    { id: "ollas", t: "Ollas, guisos y arroces", d: "Las más económicas, las que mejor rinden y las que mejor se congelan en porciones.", ids: ["sopa", "lentejas", "curry", "arrozpollo", "albondigas", "guisofideos", "pollodisco", "locrovegano", "currylentejas", "chiliporotos"] },
     { id: "clasicos", t: "Clásicos argentinos y pastas del finde", d: "Llevan más tiempo y más mesa: quedan para sábado y domingo (y los ñoquis, para el 29).", ids: ["empanadas", "bife", "zapallitos", "pastel", "noquis", "tortilla", "carbonara", "bifecriolla"] },
     { id: "verdes", t: "Verdes y de legumbres", d: "Sin carne y con legumbres, verduras o polenta: veganas o vegetarianas, económicas y que llenan.", ids: ["polenta", "hamblentejas", "garbanzosespinaca", "pastabrocoli", "bunuelosacelga"] },
   ];

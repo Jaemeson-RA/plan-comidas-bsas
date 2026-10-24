@@ -35,6 +35,12 @@ ORDER = [r[0] for r in RULES]
 # correcciones a mano (añadir con +, quitar con -)
 UT_FIX = {
     "yogur": {"-": ["tabla"], "+": ["bowl"]},
+    "tofurevuelto": {"+": ["sarten"]},
+    "chiliporotos": {"+": ["olla", "cacerola"]},
+    "empanadaslentejas": {"+": ["horno", "placa", "olla"]},
+    "chiabanana": {"+": ["bowl"]},
+    "locrovegano": {"+": ["bowl"]},
+    "woktofu": {"+": ["cacerola"]},
     "tostadas": {"+": ["tostadora", "tabla"], "-": ["sarten"]},
     "arrozpollo": {"+": ["cacerola", "tabla"], "-": ["sarten", "olla"]},
     "salmon": {"+": ["placa", "papel"], "-": ["fuente"]},

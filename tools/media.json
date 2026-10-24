@@ -1598,5 +1598,205 @@
     "channel": "Paulina Cocina"
    }
   ]
+ },
+ "licuadobanana": {
+  "title": "Licuado de banana, avena y pasta de maní",
+  "img": {
+   "file": "img/licuadobanana.jpg",
+   "title": "File:Banana Smoothie.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Banana_Smoothie.jpg",
+   "license": "CC0",
+   "artist": "Ourlibrary",
+   "q": "Licuado de banana, avena y pasta de maní",
+   "w": 1242,
+   "h": 2208
+  },
+  "yt": [
+   {
+    "id": "2kILFe1s884",
+    "title": "LICUADO de BANANA y AVENA para BAJAR de PESO 🥛🍌  | Bebidas Adelgazantes",
+    "channel": "RecetasGratis.net"
+   }
+  ]
+ },
+ "chiabanana": {
+  "title": "Pudding de chía con banana",
+  "img": {
+   "file": "img/chiabanana.jpg",
+   "title": "File:Banana chia pudding in a glass jar.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Banana_chia_pudding_in_a_glass_jar.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "পাপৰি বৰা",
+   "q": "Pudding de chía con banana",
+   "w": 868,
+   "h": 1156
+  },
+  "yt": [
+   {
+    "id": "0oSTbVeLQOU",
+    "title": "CHÍA PUDDING DE PLÁTANO CON CHÍA | Cómo hacer mousse de plátano vegana | Postre saludable",
+    "channel": "Simple Blending"
+   }
+  ]
+ },
+ "tofurevuelto": {
+  "title": "Revuelto de tofu con espinaca y tomate",
+  "img": {
+   "file": "img/tofurevuelto.jpg",
+   "title": "File:Tofu Scramble in New Orleans.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Tofu_Scramble_in_New_Orleans.jpg",
+   "license": "CC BY 2.0",
+   "artist": "Bart Everson",
+   "q": "Revuelto de tofu con espinaca y tomate",
+   "w": 1600,
+   "h": 1600
+  },
+  "yt": [
+   {
+    "id": "om9XGBfFDgU",
+    "title": "'HUEVOS' REVUELTOS | CON TOFU! | MUY FÁCIL! | RECETA VEGANA",
+    "channel": "La Cocina Lista"
+   }
+  ]
+ },
+ "locrovegano": {
+  "title": "Locro vegano",
+  "img": {
+   "file": "img/locrovegano.jpg",
+   "title": "File:Argentine locro (dish).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Argentine_locro_(dish).jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Horacio Cambeiro",
+   "q": "Locro vegano",
+   "w": 1600,
+   "h": 900
+  },
+  "yt": [
+   {
+    "id": "oaWywIx2lKc",
+    "title": "LOCRO VEGANO 🤤 (Fácil y rendidor) / Mi diario vegan",
+    "channel": "Midiariovegan"
+   }
+  ]
+ },
+ "milanesasberenjena": {
+  "title": "Milanesas de berenjena veganas al horno",
+  "img": {
+   "file": "img/milanesasberenjena.jpg",
+   "title": "File:Berenjenas rebozadas con salmorejo.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Berenjenas_rebozadas_con_salmorejo.jpg",
+   "license": "CC BY 3.0",
+   "artist": "Tamorlan",
+   "q": "Milanesas de berenjena veganas al horno",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "pJrDhWmAyzs",
+    "title": "🔥 EMPANAMOS MILANESAS de BERENJENAS 🍆 VEGANAS con HARINA de GARBANZOS, COMIDAS VEGANAS en casa 🏡",
+    "channel": "Facu David Rodriguez"
+   }
+  ]
+ },
+ "currylentejas": {
+  "title": "Curry de lentejas con leche de coco y arroz",
+  "img": {
+   "file": "img/currylentejas.jpg",
+   "title": "File:Lal Masoor Dal and Palak.JPG",
+   "page": "https://commons.wikimedia.org/wiki/File:Lal_Masoor_Dal_and_Palak.JPG",
+   "license": "CC0",
+   "artist": "Miansari66",
+   "q": "Curry de lentejas con leche de coco y arroz",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "aLh1BjLdKhE",
+    "title": "Lentejas al Curry con Leche de Coco (solo verduras)",
+    "channel": "El Mundo En Recetas"
+   }
+  ]
+ },
+ "chiliporotos": {
+  "title": "Chili de porotos negros y choclo con arroz",
+  "img": {
+   "file": "img/chiliporotos.jpg",
+   "title": "File:ChiliBlackBeans-0751.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:ChiliBlackBeans-0751.jpg",
+   "license": "CC BY 2.0",
+   "artist": "DC Central Kitchen",
+   "q": "Chili de porotos negros y choclo con arroz",
+   "w": 1600,
+   "h": 1064
+  },
+  "yt": [
+   {
+    "id": "s6NO4wKYn8k",
+    "title": "Delicioso chili de porotos negros y choclo (¡listo en 30 minutos!)",
+    "channel": "Simple Veganizer - Español"
+   }
+  ]
+ },
+ "woktofu": {
+  "title": "Wok de tofu y verduras con arroz",
+  "img": {
+   "file": "img/woktofu.jpg",
+   "title": "File:Stir-fry spinach with tofu - Golden white jade and Green Parrot (菠菜炒豆腐 - 金鑲白玉板，紅嘴綠鸚哥)(1).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Stir-fry_spinach_with_tofu_-_Golden_white_jade_and_Green_Parrot_(%E8%8F%A0%E8%8F%9C%E7%82%92%E8%B1%86%E8%85%90_-_%E9%87%91%E9%91%B2%E7%99%BD%E7%8E%89%E6%9D%BF%EF%BC%8C%E7%B4%85%E5%98%B4%E7%B6%A0%E9%B8%9A%E5%93%A5)(1).jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "NeoBatfreak",
+   "q": "Wok de tofu y verduras con arroz",
+   "w": 1600,
+   "h": 900
+  },
+  "yt": [
+   {
+    "id": "JcXWU7QysIc",
+    "title": "Wok de Verduras con Tofu Marinado - Recetas de Cocina Vegetariana ✅",
+    "channel": "Recetas de Cocina"
+   }
+  ]
+ },
+ "empanadaslentejas": {
+  "title": "Empanadas de lentejas veganas al horno",
+  "img": {
+   "file": "img/empanadaslentejas.jpg",
+   "title": "File:Argentine oven-baked empanadas served on a decorative plate.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Argentine_oven-baked_empanadas_served_on_a_decorative_plate.jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Horacio Cambeiro",
+   "q": "Empanadas de lentejas veganas al horno",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "2aowdIomktw",
+    "title": "EMPANADAS DE LENTEJAS 100% VEGANAS 🍃 plant based 🍃 recetas saludables",
+    "channel": "Pablo Martin Chef"
+   }
+  ]
+ },
+ "falafel": {
+  "title": "Falafel al horno con ensalada y salsa de tahini",
+  "img": {
+   "file": "img/falafel.jpg",
+   "title": "File:Baked Falafel (37624379346).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Baked_Falafel_(37624379346).jpg",
+   "license": "CC BY-SA 2.0",
+   "artist": "A Healthier Michigan from Detroit, United States",
+   "q": "Falafel al horno con ensalada y salsa de tahini",
+   "w": 1600,
+   "h": 818
+  },
+  "yt": [
+   {
+    "id": "W55JW5xTAxs",
+    "title": "🔶 Como hacer FALAFEL de GARBANZOS al horno",
+    "channel": "Enrico Rapalin"
+   }
+  ]
  }
 }

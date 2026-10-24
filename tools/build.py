@@ -28,7 +28,17 @@ YT = {  # video elegido por receta
  "cerdobatata":"kdxjSteQ7NE",
  "pollodisco":"-lSEUaUdKdE",
  "guisofideos":"bslIDRKAosw",
- "bifecriolla":"989XjP0mSyw"}
+ "bifecriolla":"989XjP0mSyw",
+ "licuadobanana":"2kILFe1s884",
+ "chiabanana":"0oSTbVeLQOU",
+ "tofurevuelto":"om9XGBfFDgU",
+ "locrovegano":"oaWywIx2lKc",
+ "milanesasberenjena":"pJrDhWmAyzs",
+ "currylentejas":"aLh1BjLdKhE",
+ "chiliporotos":"s6NO4wKYn8k",
+ "woktofu":"JcXWU7QysIc",
+ "empanadaslentejas":"2aowdIomktw",
+ "falafel":"W55JW5xTAxs"}
 # valores nutricionales aproximados por porción: kcal, proteínas g, carbohidratos g, grasas g, fibra g, sal g
 NUT = {
  "tostadas":(380,14,40,17,7,1.1),"yogur":(350,14,55,7,6,0.3),"revueltos":(420,24,22,26,3,1.3),"panqueques":(390,14,55,11,6,0.3),
@@ -52,7 +62,17 @@ NUT = {
  "cerdobatata":(617,45,54,25,9,1.5),
  "pollodisco":(538,50,51,14,9,1.3),
  "guisofideos":(615,38,77,18,8,2.8),
- "bifecriolla":(586,49,54,19,9,1.1)}
+ "bifecriolla":(586,49,54,19,9,1.1),
+ "licuadobanana":(333,14,51,11,7,0.3),
+ "chiabanana":(259,10,38,10,11,0.2),
+ "tofurevuelto":(366,28,16,24,9,1.0),
+ "locrovegano":(619,23,107,13,21,2.1),
+ "milanesasberenjena":(495,18,81,14,18,0.8),
+ "currylentejas":(649,27,97,20,14,1.2),
+ "chiliporotos":(598,24,113,7,24,3.1),
+ "woktofu":(586,34,75,19,11,2.3),
+ "empanadaslentejas":(623,25,104,13,11,2.0),
+ "falafel":(559,25,76,21,16,0.9)}
 MERIENDA_NUT = (200,8,28,6,2,0.4)
 
 # ---------- BASE DE INGREDIENTES (por 100 g: kcal, prot, carb, azúcar, grasa, saturada, fibra, sal) ----------
@@ -60,6 +80,18 @@ MERIENDA_NUT = (200,8,28,6,2,0.4)
 def ING(n, cat, kcal, prot, carb, sug, fat, sat, fib, sal, u=None, alias=()):
     return {"n":n,"cat":cat,"por100":{"kcal":kcal,"prot":prot,"carb":carb,"sug":sug,"fat":fat,"sat":sat,"fib":fib,"sal":sal},"u":u,"alias":list(alias)}
 ING_DB = [
+ ING("pasta de maní","alm",588,25,20,9,50,10,6,0.9),
+ ING("semillas de chía","alm",486,17,42,0,31,3.3,34,0.04),
+ ING("tofu firme","verd",144,15.8,2.8,0.6,8.7,1.3,2.3,0.03),
+ ING("maíz blanco partido","alm",365,9.4,74,0.6,4.7,0.7,7.3,0.01),
+ ING("porotos alubia cocidos (lata)","alm",114,7.5,20,0.3,0.4,0.1,6,0.6,u=240),
+ ING("choclo en grano (lata)","alm",80,2.6,15,4.5,1.2,0.2,2,0.5,u=200),
+ ING("harina de garbanzo","alm",387,22,58,11,6.7,0.7,11,0.06),
+ ING("porotos negros cocidos (lata)","alm",91,6,16.6,0.3,0.3,0.1,6.9,0.6,u=240),
+ ING("tapas para empanadas veganas","alm",320,8,55,2,8,3,2,1.2,u=25),
+ ING("garbanzos secos","alm",378,20.5,63,10.7,6,0.6,12,0.06),
+ ING("perejil (atado)","verd",36,3,6.3,0.9,0.8,0.1,3.3,0.14,u=100),
+ ING("pasta de sésamo (tahini)","alm",595,17,21,0.5,54,7.5,9,0.1),
  ING("bebida de soja","lact",45,3.3,4,2.5,2,0.3,0.5,0.1),
  ING("manzana","verd",52,0.3,14,10,0.2,0,2.4,0,u=180),
  ING("pasas de uva","alm",299,3.1,79,59,0.5,0.1,3.7,0.03),
@@ -187,12 +219,20 @@ OLD_PORC = {"lentejas":4,"empanadas":4,"pastel":4,"noquis":4,"albondigas":3,"arr
  "hamblentejas":2,
  "garbanzosespinaca":2,
  "pollodisco":2,
- "guisofideos":2}
+ "guisofideos":2,
+ "locrovegano":2,
+ "currylentejas":2,
+ "chiliporotos":2,
+ "empanadaslentejas":2}
 PORCIONES = {"lentejas":2,"empanadas":2,"pastel":2,"noquis":2,"albondigas":2,"arrozpollo":2,"tortilla":2,"curry":2,
  "hamblentejas":2,
  "garbanzosespinaca":2,
  "pollodisco":2,
- "guisofideos":2}
+ "guisofideos":2,
+ "locrovegano":2,
+ "currylentejas":2,
+ "chiliporotos":2,
+ "empanadaslentejas":2}
 HALVES = {"palta","cebolla","cebolla morada","morrón rojo","limón","tomate","zapallito","berenjena","lechuga","banana","pepino","brócoli o zapallito","puerro","zanahoria","acelga (atado)","espinaca fresca (atado)","garbanzos cocidos (lata)","tomate triturado (lata)","caldo de verduras (cubo)","atún al natural (lata 170 g)"}
 def _scale(id, ing):
     f = PORCIONES.get(id,1) / OLD_PORC.get(id,2)
@@ -416,6 +456,48 @@ rec("bifecriolla","Bifes a la criolla","plato",40,586,4200,["olla", "sin gluten"
  [I("nalga / bife magro",400,"g","carne"),I("papa",400,"g","verd"),I("cebolla",1.5,"u","verd"),I("morrón rojo",1,"u","verd"),I("tomate",2,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite",1,"cda","pantry"),I("pimentón, orégano, laurel, sal, pimienta",1,"pizca","pantry")],
  ["Cortá las papas en rodajas de 1 cm, la cebolla y el morrón en aros y el tomate en rodajas.", "En una olla o sartén honda con el aceite, armá capas: papa, cebolla, morrón, tomate y los bifes salpimentados; repetí.", "Espolvoreá pimentón, orégano, ajo picado y laurel entre capas.", "Sumá medio vaso de agua, tapá y cociná a fuego bajo 30-35 minutos, sin revolver, hasta que las papas estén tiernas."],
  "Pedí los bifes finitos de nalga o cuadrada: con la cocción lenta quedan tiernos aunque sean cortes económicos.")
+
+# ---------- RECETAS NUEVAS (tools/add_recipes.py) ----------
+rec("licuadobanana","Licuado de banana, avena y pasta de maní","desayuno",5,333,1100,["rápido", "sin cocción", "económico", "vegano", "vegetariano", "sin lactosa"],
+ [I("banana",2,"u","verd"),I("avena",40,"g","alm"),I("bebida de soja",400,"ml","lact"),I("pasta de maní",2,"cda","alm"),I("canela",1,"pizca","pantry")],
+ ["Pelá las bananas y cortalas en trozos (si están congeladas, mejor: queda más cremoso).", "Poné en la licuadora la banana, la avena, la bebida de soja, la pasta de maní y la canela.", "Licuá 1 minuto, hasta que no queden grumos de avena.", "Serví enseguida; si queda muy espeso, sumá un chorrito más de bebida."],
+ "Congelá las bananas bien maduras en rodajas: no se tiran y el licuado sale frío sin hielo.")
+rec("chiabanana","Pudding de chía con banana","desayuno",10,259,1600,["sin cocción", "sin gluten", "vegano", "vegetariano", "sin lactosa"],
+ [I("semillas de chía",40,"g","alm"),I("bebida de soja",300,"ml","lact"),I("banana",1,"u","verd"),I("fruta de estación",1,"u","verd"),I("canela",1,"pizca","pantry")],
+ ["La noche anterior, pisá media banana y mezclala con la chía, la bebida de soja y la canela en un frasco.", "Revolvé bien, esperá 5 minutos y volvé a revolver para que la chía no se pegue en el fondo.", "Tapá y dejá en la heladera toda la noche (mínimo 4 horas).", "A la mañana serví con la otra media banana y la fruta en cubitos."],
+ "Armá dos frascos juntos: aguantan 3 días en la heladera y el desayuno queda listo con solo abrir la tapa.")
+rec("tofurevuelto","Revuelto de tofu con espinaca y tomate","desayuno",12,366,2600,["rápido", "sin gluten", "proteico", "vegano", "vegetariano", "sin lactosa"],
+ [I("tofu firme",300,"g","verd"),I("espinaca",0.5,"u","verd"),I("tomate",1,"u","verd"),I("cebolla",0.5,"u","verd"),I("aceite",1,"cda","pantry"),I("palta",0.5,"u","verd"),I("cúrcuma, sal, pimienta",1,"pizca","pantry")],
+ ["Escurrí el tofu apretándolo con papel y desmenuzalo con un tenedor.", "Rehogá la cebolla picada en el aceite 3 minutos.", "Sumá el tofu, la cúrcuma, sal y pimienta y cociná 4 minutos revolviendo, hasta que tome color amarillo.", "Agregá el tomate en cubos y la espinaca picada y revolvé 1-2 minutos, hasta que se achique.", "Serví con la palta en láminas."],
+ "La cúrcuma le da el color de huevo revuelto; una pizca de sal negra (kala namak) le suma el sabor, si la conseguís en una dietética.")
+rec("locrovegano","Locro vegano","plato",120,619,2200,["olla", "sin gluten", "económico", "vegano", "vegetariano", "sin lactosa"],
+ [I("maíz blanco partido",100,"g","alm"),I("porotos alubia cocidos (lata)",1.5,"u","alm"),I("zapallo anco / calabaza",400,"g","verd"),I("choclo en grano (lata)",0.5,"u","alm"),I("cebolla",1,"u","verd"),I("morrón rojo",0.5,"u","verd"),I("cebolla de verdeo",2,"u","verd"),I("aceite",2,"cda","pantry"),I("pimentón, comino, laurel, ají molido, sal",1,"pizca","pantry")],
+ ["Dejá el maíz en remojo la noche anterior. Al otro día, colalo y hervilo en 1,2 litros de agua con laurel 1 hora, a fuego bajo.", "Rehogá la cebolla y el morrón picados en una cucharada de aceite y sumalos a la olla con el zapallo en cubos.", "Cociná 40 minutos más, revolviendo seguido para que no se pegue: el zapallo se tiene que deshacer y espesar.", "Agregá los porotos enjuagados y el choclo, con pimentón, comino y sal; 10 minutos más.", "Para la salsita: verdeo picado con la otra cucharada de aceite, pimentón y ají molido. Servila arriba de cada plato."],
+ "Rinde mucho y se congela perfecto: hacé el doble el fin de semana y guardá porciones para días de frío.")
+rec("milanesasberenjena","Milanesas de berenjena veganas al horno","plato",40,495,2000,["horno", "sin gluten", "vegano", "vegetariano", "sin lactosa"],
+ [I("berenjena",2,"u","verd"),I("harina de garbanzo",80,"g","alm"),I("harina de maíz (polenta)",80,"g","alm"),I("ajo (dientes)",1,"u","verd"),I("aceite",2,"cda","pantry"),I("lechuga",0.5,"u","verd"),I("tomate",2,"u","verd"),I("orégano, pimentón, sal, pimienta",1,"pizca","pantry")],
+ ["Cortá las berenjenas en rodajas de 1 cm, salalas y dejalas 15 minutos; secalas bien con papel.", "Mezclá la harina de garbanzo con unos 120 ml de agua, el ajo picado, sal y pimentón hasta tener una pasta como de huevo batido.", "Pasá cada rodaja por esa mezcla y después por la polenta con orégano, apretando.", "Acomodalas en una placa aceitada, rociá con el resto del aceite y horneá a 220 °C unos 25 minutos, dándolas vuelta a mitad.", "Serví con ensalada de lechuga y tomate."],
+ "La harina de garbanzo reemplaza al huevo; si cocinás para alguien celíaco, comprá harinas con el logo «sin TACC».")
+rec("currylentejas","Curry de lentejas con leche de coco y arroz","plato",40,649,2300,["olla", "sin gluten", "proteico", "vegano", "vegetariano", "sin lactosa"],
+ [I("lentejas secas",140,"g","alm"),I("leche de coco",150,"ml","alm"),I("tomate triturado (lata)",0.5,"u","alm"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("curry en polvo",1,"cda","pantry"),I("espinaca",0.5,"u","verd"),I("arroz",80,"g","alm"),I("aceite",0.5,"cda","pantry"),I("jengibre (opcional)",1,"pizca","pantry"),I("sal",1,"pizca","pantry")],
+ ["Cociná el arroz en agua con sal y reservá.", "Rehogá la cebolla y el ajo picados en el aceite 4 minutos; sumá el curry y el jengibre 30 segundos.", "Agregá las lentejas enjuagadas, el tomate y 500 ml de agua; cociná tapado 25-30 minutos a fuego bajo, hasta que estén tiernas.", "Sumá la leche de coco y la espinaca picada y cociná 5 minutos más. Ajustá la sal.", "Serví con el arroz."],
+ "El resto de la lata de leche de coco se congela en una cubetera: cada cubito es una cucharada para el próximo curry.")
+rec("chiliporotos","Chili de porotos negros y choclo con arroz","plato",35,598,2100,["olla", "sin gluten", "económico", "vegano", "vegetariano", "sin lactosa"],
+ [I("porotos negros cocidos (lata)",2,"u","alm"),I("choclo en grano (lata)",0.5,"u","alm"),I("tomate triturado (lata)",1,"u","alm"),I("cebolla",1,"u","verd"),I("morrón rojo",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("arroz",100,"g","alm"),I("aceite",1,"cda","pantry"),I("comino, pimentón, ají molido, sal",1,"pizca","pantry")],
+ ["Cociná el arroz y reservá.", "Rehogá la cebolla, el morrón y el ajo picados en el aceite 5 minutos.", "Sumá comino, pimentón y ají molido; revolvé 30 segundos y agregá el tomate.", "Agregá los porotos enjuagados y el choclo y cociná 15 minutos a fuego bajo, hasta que espese. Ajustá la sal.", "Serví con el arroz (y palta, si tenés)."],
+ "Enjuagá bien los porotos y el choclo de lata antes de usarlos: baja mucho la sal. Con porotos secos sale la mitad: remojalos la noche anterior y hervilos 1 hora; el chili se congela muy bien.")
+rec("woktofu","Wok de tofu y verduras con arroz","plato",25,586,3000,["rápido", "proteico", "vegano", "vegetariano", "sin lactosa"],
+ [I("tofu firme",300,"g","verd"),I("brócoli",200,"g","verd"),I("zanahoria",1,"u","verd"),I("morrón rojo",1,"u","verd"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("salsa de soja",2,"cda","pantry"),I("arroz",120,"g","alm"),I("aceite",1,"cda","pantry"),I("jengibre (opcional)",1,"pizca","pantry")],
+ ["Cociná el arroz. Escurrí el tofu apretándolo con papel y cortalo en cubos.", "Dorá el tofu en el wok o sartén grande con la mitad del aceite, sin moverlo mucho, 6-8 minutos; reservá.", "Con el resto del aceite salteá a fuego fuerte la cebolla, la zanahoria y el morrón en bastones y el brócoli en arbolitos, 4-5 minutos.", "Volvé el tofu, sumá el ajo, el jengibre y la salsa de soja y salteá 1 minuto más.", "Serví sobre el arroz."],
+ "Si cocinás para alguien celíaco, usá salsa de soja con el logo «sin TACC» y el plato queda apto.")
+rec("empanadaslentejas","Empanadas de lentejas veganas al horno","plato",60,623,2400,["horno", "económico", "vegano", "vegetariano", "sin lactosa"],
+ [I("tapas para empanadas veganas",8,"u","alm"),I("lentejas secas",120,"g","alm"),I("cebolla",1.5,"u","verd"),I("morrón rojo",0.5,"u","verd"),I("cebolla de verdeo",1,"u","verd"),I("aceite",1,"cda","pantry"),I("pimentón, comino, ají molido, sal",1,"pizca","pantry")],
+ ["Hervé las lentejas 20 minutos, hasta que estén tiernas pero enteras, y colalas bien.", "Rehogá la cebolla y el morrón picados en el aceite 8 minutos; condimentá fuerte con pimentón, comino, ají molido y sal.", "Mezclá con las lentejas y el verdeo picado y dejá enfriar el relleno.", "Rellená las tapas, cerralas con repulgue o tenedor y pintalas con un poco de aceite o agua.", "Horneá a 220 °C unos 15-18 minutos, hasta que doren."],
+ "Leé la etiqueta de las tapas: muchas criollas llevan grasa vacuna; las de hojaldre con margarina vegetal suelen ser veganas.")
+rec("falafel","Falafel al horno con ensalada y salsa de tahini","plato",45,559,1900,["horno", "sin gluten", "económico", "vegano", "vegetariano", "sin lactosa"],
+ [I("garbanzos secos",160,"g","alm"),I("cebolla",0.5,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("perejil (atado)",0.5,"u","verd"),I("harina de garbanzo",2,"cda","alm"),I("aceite",2,"cda","pantry"),I("lechuga",0.5,"u","verd"),I("tomate",2,"u","verd"),I("pepino",0.5,"u","verd"),I("pasta de sésamo (tahini)",2,"cda","alm"),I("limón",0.5,"u","verd"),I("comino, sal, pimienta",1,"pizca","pantry")],
+ ["Remojá los garbanzos secos en mucha agua toda la noche (no los cocines) y escurrilos muy bien.", "Procesalos con la cebolla, el ajo, el perejil, comino, sal y pimienta hasta una pasta granulosa; sumá la harina de garbanzo.", "Formá bolitas apenas aplastadas, ponelas en una placa aceitada y pincelalas con aceite.", "Horneá a 200 °C unos 25 minutos, dándolas vuelta a mitad, hasta que estén doradas.", "Salsa: tahini con jugo de limón, sal y agua hasta que quede cremosa. Serví con la ensalada de lechuga, tomate y pepino."],
+ "Tienen que ser garbanzos remojados crudos: con los de lata la mezcla queda blanda y se desarma.")
 
 BREAK = ["tostadas","yogur","revueltos","yogur","tostadas","panqueques","revueltos"]
 LUNCH = ["pollohorno","merluza","wok","lentejas","milanesas","curry","arrozpollo","pescadohorno","albondigas","tortilla","noquis"]

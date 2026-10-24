@@ -11,8 +11,9 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.normpath(os.path.join(HERE, ".."))
 SRC = sys.argv[1]
 recs = json.load(open(SRC, encoding="utf-8"))
+BATCH_JSON = {r["id"] for r in recs if r.get("batch")}
 UA = "MenuarioBot/1.0 (https://jaemeson-ra.github.io/plan-comidas-bsas/; recetas con fotos de Wikimedia Commons)"
-BATCH = {"garbanzosespinaca", "guisofideos", "pollodisco", "hamblentejas"}  # platos de olla: 2 porciones (hoy + vianda o freezer)
+BATCH = {"garbanzosespinaca", "guisofideos", "pollodisco", "hamblentejas"} | BATCH_JSON  # platos de olla: 2 porciones (hoy + vianda o freezer)
 
 # 1) fotos (máximo 1600 px de ancho: el sitio usa WebP de 480 y 900)
 for r in recs:
