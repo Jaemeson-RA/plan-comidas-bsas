@@ -437,7 +437,7 @@ for l in NUT_LOG: print("NUT", l)
 os.makedirs("site",exist_ok=True)
 with open(OUT,"w",encoding="utf-8") as f:
     f.write("window.DATA = ")
-    json.dump(data,f,ensure_ascii=False)
+    json.dump(data,f,ensure_ascii=False,separators=(",",":"))  # compacto: menos peso
     f.write(";\n")
 print("OK", OUT, os.path.getsize(OUT)//1024, "KB; recetas:", len(R))
 for wk in weeks:

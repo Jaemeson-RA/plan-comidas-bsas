@@ -1,5 +1,5 @@
 # Ensambla las páginas HTML: _head.html + tools/pages/<p>.body.html + _foot.html
-import os, sys
+import os, sys, json
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 root = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 head = open(os.path.join(root, "icons.svg"), encoding="utf-8").read() + "\n" + open(os.path.join(root, "_head.html"), encoding="utf-8").read()
@@ -26,7 +26,19 @@ SITE = "https://jaemeson-ra.github.io/plan-comidas-bsas/"
 FB = "https://www.gstatic.com/firebasejs/10.14.1/"
 FB_HINTS = ("<link rel=\"preconnect\" href=\"https://www.gstatic.com\" crossorigin>\n<link rel=\"preconnect\" href=\"https://viaje-del-amor-default-rtdb.europe-west1.firebasedatabase.app\">\n"
             + "".join(f"<link rel=\"modulepreload\" href=\"{FB}{m}.js\">\n" for m in ("firebase-app", "firebase-auth", "firebase-database")))
-import datetime
+import datetime, hashlib, base64, subprocess
+# script en línea del <head>: marca el modo app antes de pintar (sin parpadeo)
+EARLY_JS = ('try{if(matchMedia("(display-mode: standalone)").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)'
+            '||sessionStorage.getItem("inApp")==="1"){document.documentElement.classList.add("is-app");sessionStorage.setItem("inApp","1")}}catch(e){}')
+# navegación casi instantánea: Chrome (y la app) bajan la página de un enlace interno al apoyar el dedo o el mouse encima
+SPEC_JS = json.dumps({"prefetch": [{"where": {"and": [{"href_matches": "/plan-comidas-bsas/*.html"}, {"not": {"selector_matches": "[download], [target=_blank]"}}]}, "eagerness": "moderate"}]}, separators=(",", ":"))
+sha = lambda s: "'sha256-" + base64.b64encode(hashlib.sha256(s.encode("utf-8")).digest()).decode() + "'"
+# Política de seguridad: scripts solo de este sitio, de Firebase/reCAPTCHA (Google) y de las dos bibliotecas de cdnjs/jsDelivr
+CSP = ('<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; '
+       f"script-src 'self' {sha(EARLY_JS)} {sha(SPEC_JS)} https://www.gstatic.com https://www.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://*.firebasedatabase.app; "
+       "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; font-src 'self'; media-src 'self'; "
+       "connect-src 'self' https: wss:; frame-src https://www.youtube-nocookie.com https://www.google.com https://recaptcha.google.com https://viaje-del-amor.firebaseapp.com; "
+       "worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://script.google.com\">\n")
 for page, (title, desc) in META.items():
     body = open(os.path.join(root, "tools", "pages", f"{page}.body.html"), encoding="utf-8").read()
     body = body.replace("<main ", '<main id="main" ', 1)
@@ -51,11 +63,15 @@ for page, (title, desc) in META.items():
         "<link rel=\"manifest\" href=\"manifest.webmanifest\">\n<meta name=\"theme-color\" content=\"#2F8F5B\">\n"
         "<link rel=\"apple-touch-icon\" href=\"img/icons/apple-touch-180.png\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n"
         "<meta name=\"apple-mobile-web-app-title\" content=\"Menuario\">\n<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\">\n"
-        "<script>try{if(matchMedia(\"(display-mode: standalone)\").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)||sessionStorage.getItem(\"inApp\")===\"1\"){document.documentElement.classList.add(\"is-app\");sessionStorage.setItem(\"inApp\",\"1\")}}catch(e){}</script>\n<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
+        f"<script>{EARLY_JS}</script>\n<script type=\"speculationrules\">{SPEC_JS}</script>\n<link rel=\"stylesheet\" href=\"menuario.min.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
+    html = html.replace("<head>\n<meta charset=\"UTF-8\">\n", "<head>\n<meta charset=\"UTF-8\">\n" + CSP + "<meta name=\"referrer\" content=\"strict-origin-when-cross-origin\">\n", 1)
     if page not in ("compras", "promos", "supermercados"):
         html = html.replace('<script src="ahorro.js" data-only="compras promos supermercados"></script>\n', "")
     if page not in ("mi-plan", "nutricion", "pasos"):
         html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion pasos"></script>\n', "")
+    # se sirven las versiones minificadas (las fuentes quedan legibles en el repositorio)
+    for js in ("app", "ahorro", "cuenta"):
+        html = html.replace(f'src="{js}.js"', f'src="{js}.min.js"')
     open(os.path.join(root, f"{page}.html"), "w", encoding="utf-8").write(html)
     print("OK", page + ".html", len(html))
 
@@ -67,6 +83,14 @@ open(os.path.join(root, "sitemap.xml"), "w", encoding="utf-8").write('<?xml vers
     f"  <url><loc>{SITE}{'' if p == 'index' else p + '.html'}</loc><lastmod>{hoy}</lastmod><changefreq>{'daily' if p in ('promos', 'plan') else 'weekly'}</changefreq><priority>{prio.get(p, '0.5')}</priority></url>\n" for p in pages) + "</urlset>\n")
 open(os.path.join(root, "robots.txt"), "w", encoding="utf-8").write(f"User-agent: *\nAllow: /\nDisallow: /plan-comidas-bsas/tools/\nSitemap: {SITE}sitemap.xml\n")
 
+# JS y CSS minificados con esbuild (npx): menos peso y, en el CSS, un solo pedido en vez de tres
+def esb(*args): subprocess.run(["npx", "--yes", "esbuild@0.28.2", *args, "--log-level=warning"], cwd=root, check=True, shell=(os.name == "nt"))
+for js in ("app", "ahorro"): esb(f"{js}.js", "--minify", "--target=es2020", f"--outfile={js}.min.js")
+esb("cuenta.js", "--minify", "--target=es2020", "--format=esm", "--outfile=cuenta.min.js")
+css = "".join(open(os.path.join(root, f), encoding="utf-8").read() + "\n" for f in ("style.css", "motion.css", "gami.css"))
+open(os.path.join(root, "tools", "_bundle.css"), "w", encoding="utf-8").write(css)
+esb("tools/_bundle.css", "--minify", "--loader:.css=css", "--outfile=menuario.min.css"); os.remove(os.path.join(root, "tools", "_bundle.css"))
+for f in ("app.min.js", "ahorro.min.js", "cuenta.min.js", "menuario.min.css"): print("OK", f, os.path.getsize(os.path.join(root, f)) // 1024, "KB")
+
 # PWA: el service worker se versiona con el contenido de los archivos recién generados
-import subprocess
 subprocess.run([sys.executable, os.path.join(root, "tools", "build_pwa.py"), "--no-icons"], check=False)

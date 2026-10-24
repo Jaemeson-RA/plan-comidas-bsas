@@ -249,8 +249,8 @@
   if (page === "supermercados" && $("#mapBox")) {
     const st = { chains: new Set(STORES), radius: ls.get("mapRadius", 1500), center: null, shops: [], map: null, layer: null, me: null };
     const loadLeaflet = () => window.L ? Promise.resolve() : new Promise((res, rej) => {
-      const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; document.head.appendChild(css);
-      const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+      const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; css.integrity = "sha384-c6Rcwz4e4CITMbu/NBmnNS8yN2sC3cUElMEMfP3vqqKFp7GOYaaBBCqmaWBjmkjb"; css.crossOrigin = "anonymous"; document.head.appendChild(css);
+      const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"; s.integrity = "sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO"; s.crossOrigin = "anonymous"; s.onload = res; s.onerror = rej; document.head.appendChild(s);
     });
     const km = (a, b) => { const r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r; const h = Math.sin(dLa / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); };
     function chips() { $("#mapChains").innerHTML = STORES.map((s) => `<button class="pchip${st.chains.has(s) ? " on" : ""}" data-chain="${esc(s)}" style="--c:${COLOR[s]}">${esc(s)}</button>`).join(""); }

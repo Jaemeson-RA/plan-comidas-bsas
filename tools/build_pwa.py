@@ -47,7 +47,7 @@ MANIFEST = {
 }
 
 PAGES = ["index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html", "promos.html", "app.html", "pasos.html"]
-CORE = ["./"] + PAGES + ["style.css", "motion.css", "gami.css", "app.js", "ahorro.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest",
+CORE = ["./"] + PAGES + ["menuario.min.css", "app.min.js", "ahorro.min.js", "cuenta.min.js", "config.js", "data.js", "manifest.webmanifest",
         "img/icons/icon-192.png"] + sorted("fonts/" + os.path.basename(f) for f in glob.glob(os.path.join(ROOT, "fonts", "*.woff2")))
 
 SW = r"""/* Service worker · Menuario (generado por tools/build_pwa.py, no editar a mano) */

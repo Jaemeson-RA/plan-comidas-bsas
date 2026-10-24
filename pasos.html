@@ -2,6 +2,8 @@
 <html lang="es-AR">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-hMf4o+CMYy3n8JZyCV9U4zOHTGDlk6VCrObOIjStmOc=' 'sha256-CC5Q2Bwi6VmCzvLcVWxoaduvZsP8Kppg9k8MSHAj/Dw=' https://www.gstatic.com https://www.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://*.firebasedatabase.app; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; font-src 'self'; media-src 'self'; connect-src 'self' https: wss:; frame-src https://www.youtube-nocookie.com https://www.google.com https://recaptcha.google.com https://viaje-del-amor.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://script.google.com">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pasos · Menuario</title>
 <meta name="description" content="Tus pasos de cada día con un objetivo a tu medida, kilómetros, calorías y gráficos. Con la app de Android se cuentan solos.">
@@ -33,9 +35,8 @@
 <meta name="apple-mobile-web-app-title" content="Menuario">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>try{if(matchMedia("(display-mode: standalone)").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)||sessionStorage.getItem("inApp")==="1"){document.documentElement.classList.add("is-app");sessionStorage.setItem("inApp","1")}}catch(e){}</script>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="motion.css">
-<link rel="stylesheet" href="gami.css">
+<script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/plan-comidas-bsas/*.html"},{"not":{"selector_matches":"[download], [target=_blank]"}}]},"eagerness":"moderate"}]}</script>
+<link rel="stylesheet" href="menuario.min.css">
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -213,7 +214,7 @@
 </div>
 <script src="config.js"></script>
 <script src="data.js"></script>
-<script src="app.js"></script>
-<script type="module" src="cuenta.js" data-only="miplan nutricion pasos"></script>
+<script src="app.min.js"></script>
+<script type="module" src="cuenta.min.js" data-only="miplan nutricion pasos"></script>
 </body>
 </html>

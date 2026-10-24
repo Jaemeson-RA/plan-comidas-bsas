@@ -431,7 +431,7 @@ async function startScan() {
       const det = new window.BarcodeDetector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] });
       scanTimer = setInterval(async () => { try { const codes = await det.detect(video); if (codes.length) { const c = codes[0].rawValue; stopScan(true); offLookup(c); } } catch (e) {} }, 350);
     } else {
-      if (!window.ZXing) await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+      if (!window.ZXing) await new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"; s.integrity = "sha384-BzBxP10ZE72aitqj5UMmUsbKFliP/DZqA8Wq+BNNhlIJDGoEd1tpkMYXOg9+n6sB"; s.crossOrigin = "anonymous"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
       zxReader = new window.ZXing.BrowserMultiFormatReader();
       zxReader.decodeFromStream(stream, video, (result) => { if (result) { const c = result.getText(); stopScan(true); offLookup(c); } });
     }

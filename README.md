@@ -167,6 +167,12 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 - Funciona en Chrome / Edge / Firefox (Android y compu), en la app de Android (TWA con `enableNotifications`, desde la versión 1.0.2) y en iPhone solo con Menuario agregada al inicio (iOS 16.4+).
 - Rutas: `POST /push/sub`, `POST /push/unsub`, `POST /push/test`. La clave privada es el secreto `VAPID_JWK` del Worker (copia en `../plan-comidas-android/vapid-private.json`, fuera del repo).
 
+## Peso, seguridad y navegación
+
+- `build_pages.py` minifica con esbuild (`npx esbuild@0.28.2`): `app.min.js`, `ahorro.min.js`, `cuenta.min.js` y un solo `menuario.min.css` (style + motion + gami). Las páginas y el service worker usan las versiones minificadas; **se editan siempre los archivos fuente** y se vuelve a correr `build_pages.py`. `data.js` se escribe compacto.
+- **Seguridad**: Content-Security-Policy en cada página (scripts solo del sitio, de Google/Firebase/reCAPTCHA y de cdnjs/jsDelivr, con hash para los dos scripts en línea; sin `object`, `base-uri` propio), `referrer` estricto, integridad SRI en Leaflet y ZXing, y en el Worker solo servicios de push conocidos.
+- **Navegación**: reglas de especulación (`speculationrules`): Chrome y la app bajan la página de un enlace interno al apoyar el dedo, así se abre casi al instante. Fuentes principales precargadas, Firebase con `preconnect` + `modulepreload` y sin saltos de diseño en Promos ni en el video del inicio.
+
 ## Licencia y páginas legales
 
 © 2026 Jaemeson Dieu, **todos los derechos reservados** (ver `LICENSE`). El repositorio es público porque GitHub Pages gratis lo exige, pero eso solo permite verlo: no autoriza a copiar ni reutilizar el código. Las fotos (Creative Commons, Wikimedia), los íconos (Tabler, MIT), las fuentes (SIL OFL) y los videos (YouTube) conservan sus licencias.

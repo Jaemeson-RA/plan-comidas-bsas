@@ -607,7 +607,7 @@
     renderShopping();
     window.addEventListener("milistas", () => renderShopping());  // cuenta.js trajo (o borró) el calendario propio
     // cuenta.js (y el SDK de Firebase) solo si hay una cuenta abierta en este dispositivo: sin cuenta, Compras no baja nada de más
-    if (localStorage.getItem("acct") === "1") import("./cuenta.js").catch(() => {});
+    if (localStorage.getItem("acct") === "1") import("./cuenta.min.js").catch(() => {});
     $("#shopSrc")?.addEventListener("click", (e) => { const b = e.target.closest("[data-src]"); if (!b) return; state.src = b.dataset.src; try { localStorage.setItem("shopSrc", state.src); } catch (x) {} renderShopping(); });
     $("#shopGrid").addEventListener("click", (e) => {
       const b = e.target.closest("[data-fz]"); if (!b) return; e.preventDefault();
