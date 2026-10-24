@@ -160,10 +160,10 @@
     const first = D.weeks[0].days[0];
     const d = day || first;
     const title = day ? "Hoy, " + longDate(d.date) : "El plan arranca el " + longDate(first.date);
-    $("#today").innerHTML = `<p class="kicker">${day ? "Menú de hoy" : "Primer día del plan"}</p><h3>${title}</h3>
+    $("#today").innerHTML = `<div class="t-head"><p class="kicker">${day ? "Menú de hoy" : "Primer día del plan"}</p><h3>${title}</h3></div>
       ${["desayuno", "almuerzo", "cena"].map((m) => `<div class="t-row"><small>${ICON[m]} ${m}</small>${mealBtn(d[m])}</div>`).join("")}
-      <div class="t-row"><small>${ICON.merienda} merienda</small><span class="muted">${esc(d.merienda)}</span></div>
-      <a class="btn small-btn" href="plan.html">Ver toda la semana →</a>`;
+      <div class="t-row mer"><small>${ICON.merienda} merienda</small><span class="muted">${esc(d.merienda)}</span></div>
+      <a class="btn small-btn" href="plan.html">Ver la semana →</a>`;
   }
 
   // ---------- plan: calendario + semana ----------

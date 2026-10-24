@@ -23,8 +23,8 @@ img.ld { opacity: 1 !important; }
 
 /* Hover y presión */
 .rc, .entry, .store, .shop-cat, .app, .cal-cell { transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s, border-color .22s; }
-.rc:hover, .entry:hover, .store:hover, .shop-cat:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
-.cal-cell:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
+.rc:hover, .entry:hover, .store:hover, .shop-cat:hover { transform: translate(-2px,-2px); box-shadow: 0 12px 28px rgba(31,45,42,.14); }
+.cal-cell:hover { transform: translate(-2px,-2px); box-shadow: 0 10px 24px rgba(31,45,42,.12); }
 .sug-panel { animation: pop .28s cubic-bezier(.2,.8,.2,1) both; }
 .cm { transition: background .18s, color .18s, transform .18s; }
 .cm:hover { transform: translateX(2px); }
@@ -72,7 +72,7 @@ button:active, .btn:active, .mini-btn:active { transform: scale(.97); }
   .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding: .35rem .3rem calc(.35rem + env(safe-area-inset-bottom)); }
   .tabbar a { display: flex; flex-direction: column; align-items: center; gap: .1rem; text-decoration: none; color: var(--muted); font-size: .68rem; font-weight: 700; padding: .3rem 0; border-radius: 10px; transition: color .2s, background .2s; }
   .tabbar a .ic { transition: transform .2s; }
-  .tabbar a.on { color: var(--ink); background: var(--oro2); }
+  .tabbar a.on { color: var(--verde3); background: var(--verde2); }
   .tabbar a.on .ic { transform: translateY(-2px) scale(1.08); }
   .tabbar a:not(.on) .ic .sh { stroke: transparent; }
   .foot-nav { display: none; }

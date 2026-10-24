@@ -30,7 +30,7 @@ Todo lo que un usuario crea (recetas e ingredientes) queda disponible para toda 
 | `config.js` | configuración pública: correo admin, URL del Apps Script, claves públicas de Firebase |
 | `data.js` | datos generados por `tools/build.py`: plan, recetas (con nutrición), listas, supermercados, estación, base de ingredientes |
 | `icons.svg` | sprite de íconos generado por `tools/build_icons.py` (Tabler + íconos propios), inlineado en cada página |
-| `img/`, `fonts/` | fotos (Wikimedia Commons, licencia en cada receta) y fuentes woff2 (Fraunces, Nunito) |
+| `img/`, `fonts/` | fotos (Wikimedia Commons, licencia en cada receta) y fuentes woff2 (Young Serif para títulos, Outfit para texto) |
 | `docs/firebase-rules.json` | reglas de la Realtime Database (incluye las del proyecto Camino del Corazón, que comparte el proyecto) |
 | `docs/apps-script.gs` | script de Google que reenvía por correo todo lo que pasa en el sitio |
 

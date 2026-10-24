@@ -145,7 +145,7 @@ function render() { if (page === "miplan") { renderMiPlan(); renderMyRecipes(); 
 // =====================================================================
 let myWeek = null, pickCtx = null, notifyTimer = null;
 $("#mpSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; $$("#mpSeg button").forEach((x) => x.classList.toggle("on", x === b)); ["cal", "rec", "ing", "rank"].forEach((t) => { $("#tab" + t[0].toUpperCase() + t.slice(1)).hidden = b.dataset.tab !== t; }); localStorage.setItem("mpTab", b.dataset.tab); window.dispatchEvent(new Event("scroll")); });
-if (page === "miplan") { const t = localStorage.getItem("mpTab"); if (t) $(`#mpSeg [data-tab="${t}"]`)?.click(); }
+if (page === "miplan") { const t = location.hash === "#rank" ? "rank" : localStorage.getItem("mpTab"); if (t) $(`#mpSeg [data-tab="${t}"]`)?.click(); }
 function renderMiPlan() {
   const box = $("#planBox"); if (!box) return; box.hidden = !user; if (!user) return;
   $("#whoName").textContent = myName(); $("#whoEmail").textContent = "· " + user.email;
