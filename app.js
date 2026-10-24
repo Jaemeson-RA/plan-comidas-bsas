@@ -639,35 +639,48 @@
     fetch("descargas/menuario.apk", { method: "HEAD" }).then((r) => { const n = +r.headers.get("content-length"); if (r.ok && n) $("#apkSize").textContent = "· " + (n / 1048576).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " MB"; }).catch(() => {});
   }
   const APK = "descargas/menuario.apk";
-  function getApp() {
+  const dlApk = () => { const a = document.createElement("a"); a.href = APK; a.download = "menuario.apk"; document.body.appendChild(a); a.click(); a.remove(); };
+  // Android: lo primero es la instalación del navegador (Chrome arma una app firmada por Google: sin avisos de «fuente desconocida»).
+  // Si el navegador no la ofrece, se explica cómo hacerlo desde su menú, y el APK queda como respaldo.
+  async function getApp(mode) {
     $("#moreMenu") && ($("#moreMenu").hidden = true);
-    if (!isIOS) { const a = document.createElement("a"); a.href = APK; a.download = "menuario.apk"; document.body.appendChild(a); a.click(); a.remove(); }
+    if (mode !== "apk" && installEvt && !isIOS) {
+      installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null;
+      if (r?.outcome === "accepted") { showInstall(false); toastG("¡Listo! Menuario se está instalando: en unos segundos aparece en tu pantalla de inicio."); return; }
+    }
+    if (mode === "apk") dlApk();
     let sh = $("#appSheet");
     if (!sh) { sh = document.createElement("div"); sh.id = "appSheet"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
     const steps = (l) => `<ol class="as-steps">${l.map((t, i) => `<li><span>${i + 1}</span><p>${t}</p></li>`).join("")}</ol>`;
     const desk = !isIOS && !isAndroid;
+    const chrome = /Chrome\//.test(navigator.userAgent) && !/EdgA|SamsungBrowser|OPR|Firefox|FxiOS/.test(navigator.userAgent);
+    const apkLink = `<div class="as-alt"><p class="muted small">¿No te aparece la opción o usás otro navegador?</p><button type="button" class="mini-btn" data-get-apk>${ic("download")} Bajar el APK (1,2 MB)</button></div>`;
     sh.innerHTML = `<div class="sh-bg" data-shx></div><div class="sh-box as-box" role="dialog" aria-modal="true" aria-labelledby="asT">
       <button class="as-x" type="button" data-shx aria-label="Cerrar">×</button>
       <span class="as-ico"><img src="img/icons/icon-192.png" alt="" width="64" height="64"></span>
       ${isIOS ? `<h3 id="asT">Agregá Menuario a tu inicio</h3><p class="muted small">En iPhone no hace falta bajar nada: queda como una app desde Safari.</p>
         ${steps(["Abrí esta página en <b>Safari</b>.", "Tocá <b>Compartir</b>, el cuadrado con la flecha para arriba.", "Elegí <b>«Agregar a inicio»</b> y después <b>Agregar</b>."])}`
-      : desk ? `<h3 id="asT">Se está bajando Menuario</h3><p class="muted small">El archivo es para teléfonos Android. Lo más fácil: escaneá el código con el teléfono y bajala ahí.</p>
+      : mode === "apk" ? `<h3 id="asT">Se está bajando Menuario</h3><p class="muted small">Pesa poco más de 1 MB. Cuando termine:</p>
+        ${steps(["Abrí <b>menuario.apk</b> desde la notificación o desde Descargas.", "Si te pide permiso para «instalar apps desconocidas», dáselo al navegador.", "Tocá <b>Instalar</b>. El ícono aparece en tu pantalla de inicio."])}`
+      : desk ? `<h3 id="asT">Menuario va en tu teléfono</h3><p class="muted small">Escaneá el código con la cámara del teléfono: abre esta página ahí y la instalás en un toque.</p>
         <img class="as-qr" src="img/qr-app.svg" width="150" height="150" alt="Código QR para abrir la página en el teléfono">
-        ${installEvt ? `<button class="btn ghost as-pwa" type="button" data-pwa>También podés instalarla en esta compu</button>` : ""}`
-      : `<h3 id="asT">Se está bajando Menuario</h3><p class="muted small">Pesa poco más de 1 MB. Cuando termine:</p>
-        ${steps(["Abrí <b>menuario.apk</b> desde la notificación o desde Descargas.", "Si te pide permiso para «instalar apps desconocidas», dáselo al navegador.", "Tocá <b>Instalar</b>. El ícono aparece en tu pantalla de inicio."])}`}
-      <div class="as-act">${isIOS ? "" : `<a class="mini-btn" href="${APK}" download="menuario.apk">${ic("download")} Bajar de nuevo</a>`}<button class="btn" type="button" data-shx>Listo</button></div>
+        ${installEvt ? `<button class="btn ghost as-pwa" type="button" data-pwa>Instalarla también en esta compu</button>` : ""}`
+      : `<h3 id="asT">Instalala desde ${chrome ? "Chrome" : "el navegador"}</h3><p class="muted small">Así queda como una app más, sin avisos de seguridad ni archivos para bajar.</p>
+        ${steps([chrome ? "Tocá los <b>tres puntitos ⋮</b> arriba a la derecha." : "Abrí esta página en <b>Chrome</b> y tocá los <b>tres puntitos ⋮</b> arriba a la derecha.", "Elegí <b>«Instalar app»</b> (o <b>«Agregar a la pantalla principal»</b>).", "Confirmá con <b>Instalar</b>: el ícono de Menuario aparece en tu inicio."])}
+        ${apkLink}`}
+      <div class="as-act">${mode === "apk" ? `<a class="mini-btn" href="${APK}" download="menuario.apk">${ic("download")} Bajar de nuevo</a>` : desk ? `<a class="mini-btn" href="${APK}" download="menuario.apk">${ic("download")} APK para Android</a>` : ""}<button class="btn" type="button" data-shx>Listo</button></div>
     </div>`;
     sh.hidden = false; document.body.classList.add("no-scroll");
     const close = () => { sh.hidden = true; document.body.classList.remove("no-scroll"); };
     sh.onclick = async (e) => {
       if (e.target.closest("[data-shx]")) return close();
+      if (e.target.closest("[data-get-apk]")) { close(); return getApp("apk"); }
       if (e.target.closest("[data-pwa]") && installEvt) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if (r?.outcome === "accepted") { showInstall(false); close(); } }
     };
     sh.onkeydown = (e) => { if (e.key === "Escape") close(); };
     sh.querySelector(".as-x").focus();
   }
-  document.addEventListener("click", (e) => { if (e.target.closest(".install-btn, [data-get-app]")) { e.preventDefault(); getApp(); } });
+  document.addEventListener("click", (e) => { const t = e.target.closest(".install-btn, [data-get-app], [data-get-apk]"); if (!t || !t.isConnected || t.closest(".share-sheet")) return; e.preventDefault(); getApp(t.matches("[data-get-apk]") ? "apk" : ""); });
   const net = () => {
     let p = $("#netPill"); if (navigator.onLine) { if (p) { p.classList.add("back"); setTimeout(() => p.remove(), 1200); } return; }
     if (!p) { p = document.createElement("div"); p.id = "netPill"; p.className = "net-pill"; p.setAttribute("role", "status"); p.innerHTML = `${ic("refresh")} Sin conexión: ves lo último guardado`; document.body.appendChild(p); }
@@ -854,6 +867,49 @@
       };
       sh.onkeydown = (ev) => { if (ev.key === "Escape") close(); };
     }, true);
+  }
+
+  // ---------- actualizaciones ----------
+  // 1) Sitio: el service worker nuevo toma el control solo (skipWaiting + claim). Si la página ya estaba abierta,
+  //    aparece una barra para recargar. Al volver a la app (que en el teléfono queda abierta días) se busca una versión nueva.
+  if ("serviceWorker" in navigator) {
+    let hadCtl = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!hadCtl) { hadCtl = true; return; }  // primera instalación: no hay nada viejo que recargar
+      if ($("#updBar")) return;
+      const b = document.createElement("div"); b.id = "updBar"; b.className = "upd-bar"; b.setAttribute("role", "status");
+      b.innerHTML = `${ic("refresh")}<span><b>Hay una versión nueva de Menuario</b><small>Tocá para verla. No perdés nada.</small></span><button type="button" class="btn" data-upd>Actualizar</button><button type="button" class="upd-x" aria-label="Más tarde" data-updx>×</button>`;
+      b.addEventListener("click", (e) => { if (e.target.closest("[data-updx]")) return b.remove(); location.reload(); });
+      document.body.appendChild(b);
+    });
+    let lastChk = Date.now();
+    document.addEventListener("visibilitychange", () => { if (document.hidden || Date.now() - lastChk < 30 * 60e3) return; lastChk = Date.now(); navigator.serviceWorker.getRegistration().then((r) => r && r.update()).catch(() => {}); });
+  }
+  // 2) App de Android instalada con el APK: cada APK abre el sitio con ?v=<versión>. Si hay uno más nuevo publicado
+  //    (descargas/version.json, lo escribe tools/build_android.py), se ofrece bajarlo: se instala encima y no se pierde nada.
+  //    Instalada desde Chrome, la app se actualiza sola y esto no aparece.
+  {
+    const qs = new URLSearchParams(location.search);
+    if (/^android-app:\/\/ar\.menuario\.app/.test(document.referrer)) { try { sessionStorage.setItem("twa", "1"); sessionStorage.setItem("apkv", qs.get("v") || "0"); } catch (e) {} }
+    const cmpV = (a, b) => { const x = String(a).split(".").map(Number), y = String(b).split(".").map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); } return 0; };
+    if (sessionStorage.getItem("twa") === "1" && page === "inicio") {
+      fetch("descargas/version.json", { cache: "no-store" }).then((r) => r.ok && r.json()).then((v) => {
+        const mine = sessionStorage.getItem("apkv") || "0";
+        if (!v?.apk || cmpV(v.apk, mine) <= 0 || +(localStorage.getItem("apkSnooze") || 0) > Date.now()) return;
+        let sh = $("#apkUpd"); if (!sh) { sh = document.createElement("div"); sh.id = "apkUpd"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
+        sh.innerHTML = `<div class="sh-bg" data-later></div><div class="sh-box as-box" role="dialog" aria-modal="true" aria-labelledby="auT">
+          <span class="as-ico"><img src="img/icons/icon-192.png" alt="" width="64" height="64"></span>
+          <h3 id="auT">Actualización disponible</h3>
+          <p class="muted small">Versión ${esc(v.apk)}${mine !== "0" ? ` (tenés la ${esc(mine)})` : ""}.${v.notes ? ` ${esc(v.notes)}` : ""}</p>
+          <ol class="as-steps"><li><span>1</span><p>Tocá <b>Actualizar</b>: se baja la versión nueva (poco más de 1 MB).</p></li><li><span>2</span><p>Abrí <b>menuario.apk</b> desde la notificación y tocá <b>Actualizar</b>.</p></li><li><span>3</span><p>Listo: tu cuenta, tu calendario y tus listas siguen igual.</p></li></ol>
+          <div class="as-act"><button type="button" class="mini-btn" data-later>Más tarde</button><button type="button" class="btn" data-apkgo>${ic("download")} Actualizar</button></div></div>`;
+        sh.hidden = false;
+        sh.onclick = (e) => {
+          if (e.target.closest("[data-later]")) { try { localStorage.setItem("apkSnooze", Date.now() + 3 * 864e5); } catch (x) {} sh.hidden = true; return; }  // vuelve a preguntar en 3 días
+          if (e.target.closest("[data-apkgo]")) { dlApk(); sh.querySelector("h3").textContent = "Bajando la actualización…"; sh.querySelector("[data-apkgo]").remove(); sh.querySelector("[data-later]").textContent = "Cerrar"; }
+        };
+      }).catch(() => {});
+    }
   }
 
   const REM = "recordatorio";

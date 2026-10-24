@@ -3,7 +3,7 @@
 
     python build_android.py                       # compila con el nombre actual
     python build_android.py "Nombre" "Corto"      # cambia el nombre de la app y del ícono, y compila
-    python build_android.py --version             # sube el número de versión (necesario para cada envío a Play)
+    python build_android.py --version --notas="Qué trae"   # versión nueva: los que tienen el APK ven el aviso para actualizar
 
 El proyecto de Android y la clave de firma viven FUERA del repositorio público, en
 ../../plan-comidas-android (android.keystore + keystore.env con las contraseñas).
@@ -35,6 +35,14 @@ if "--version" in sys.argv:
     tm["appVersionCode"] = int(tm["appVersionCode"]) + 1
     major, minor, patch = (tm["appVersionName"].split(".") + ["0", "0"])[:3]
     tm["appVersionName"] = tm["appVersion"] = f"{major}.{minor}.{int(patch) + 1}"; changed = True
+# el APK abre el sitio con ?v=<versión> (también los accesos directos): así el sitio sabe si hay uno más nuevo para ofrecer
+V = tm["appVersionName"]
+start = f"/plan-comidas-bsas/index.html?app=1&v={V}"
+if tm.get("startUrl") != start:
+    tm["startUrl"] = start; changed = True
+for sc in tm.get("shortcuts", []):
+    u = sc["url"].split("&v=")[0]
+    if sc["url"] != f"{u}&v={V}": sc["url"] = f"{u}&v={V}"; changed = True
 if changed:
     json.dump(tm, open(tm_path, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     sh("bubblewrap update --skipVersionUpgrade", input=b"\n")
@@ -49,5 +57,8 @@ sh("gradlew.bat --stop" if os.name == "nt" else "./gradlew --stop")  # que el de
 apk = os.path.join(AND, "app-release-signed.apk"); aab = os.path.join(AND, "app-release-bundle.aab")
 os.makedirs(os.path.join(ROOT, "descargas"), exist_ok=True)
 shutil.copyfile(apk, os.path.join(ROOT, "descargas", "menuario.apk"))
+notes = next((x.split("=", 1)[1] for x in sys.argv if x.startswith("--notas=")), "Mejoras y arreglos.")
+json.dump({"apk": V, "code": tm["appVersionCode"], "notes": notes, "at": __import__("datetime").date.today().isoformat()},
+          open(os.path.join(ROOT, "descargas", "version.json"), "w", encoding="utf-8"), ensure_ascii=False)
 print("OK descargas/menuario.apk", round(os.path.getsize(apk) / 1048576, 2), "MB")
 print("OK AAB para Google Play:", aab)
