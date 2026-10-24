@@ -133,7 +133,7 @@
   function showPop(el) {
     if (!pop || window.matchMedia("(hover: none)").matches) return;
     const r = R[el.dataset.rec]; if (!r) return;
-    pop.innerHTML = `<img src="${r.img}" alt=""><div class="pb"><b>${esc(r.name)}</b><span>${ic("clock")} ${r.tiempo} min · ${ic("flame")} ${r.kcal} kcal · ${ic("tag")} ${fmt(r.cost)}/porción</span><em>${r.tags.slice(0, 3).map(esc).join(" · ")}</em><small>clic para abrir la receta</small></div>`;
+    pop.innerHTML = `<img src="${r.img}" alt=""><div class="pb"><b>${esc(r.name)}</b><span>${ic("clock")} ${r.tiempo} min · ${ic("flame")} ${r.kcal} kcal · ${ic("tag")} ${fmt(r.cost)}/porción</span><em>${r.tags.slice(0, 3).map(esc).join(" · ")}</em><small>tocá para abrir la receta</small></div>`;
     pop.hidden = false;
     const b = el.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
     let x = b.left + b.width / 2 - pw / 2, y = b.top - ph - 10;

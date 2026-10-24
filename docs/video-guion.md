@@ -5,7 +5,7 @@ Tono: cercano, rioplatense, ritmo ágil pero sin apuro. Grabá en un lugar silen
 | Tiempo | Pantalla | Texto a grabar |
 |---|---|---|
 | 0:00–0:04 | Portada con el pizarrón del menú del día | **Plan de comidas Buenos Aires: qué comemos hoy, qué compramos y dónde.** |
-| 0:04–0:10 | Calendario del mes, popover sobre un plato, se abre la receta | **Un mes entero de desayunos, almuerzos y cenas. Pasás el mouse, ves la foto; hacés clic y tenés la receta con video.** |
+| 0:04–0:10 | Calendario del mes, se abre la receta de un plato | **Un mes entero de desayunos, almuerzos y cenas. Tocás un plato y tenés la receta, con foto y video.** |
 | 0:10–0:15 | Lista de compras con tildes, botón «Copiar lista» | **La lista de compras se arma sola, por góndola. La copiás y la pegás en las notas del teléfono.** |
 | 0:15–0:20 | Ranking de supermercados, precios en ARS/USD/EUR | **Comparamos siete supermercados con envío a domicilio, en pesos, dólares o euros.** |
 | 0:20–0:26 | Mi plan: calendario propio, editor de recetas, escáner de código de barras | **Con tu cuenta armás tu propio calendario, creás recetas y sumás ingredientes escaneando el paquete. Lo que creás queda para todos.** |

@@ -9,7 +9,7 @@ Sitio estático (HTML + CSS + JS, sin build ni dependencias) con un plan de comi
 | Página | Qué hace |
 |---|---|
 | `index.html` | Portada: menú del día (pizarrón), entradas a cada sección, cómo se usa |
-| `plan.html` | Calendario mensual (27 oct → 30 nov 2026) con popover al pasar el mouse; vista por semana |
+| `plan.html` | Calendario mensual (27 oct → 30 nov 2026); tocar un plato abre la receta (en escritorio, además, vista previa al pasar por encima); vista por semana |
 | `recetas.html` | 30 recetas en 5 categorías, para 2–4 porciones, con nutrición calculada por ingrediente |
 | `compras.html` | Lista de compras semanal por góndola, con tildes, «Copiar lista» y «Compartir» |
 | `supermercados.html` | 7 cadenas comparadas: condiciones de envío, ranking del changuito, tabla por producto |
