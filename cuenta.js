@@ -133,7 +133,7 @@ onAuthStateChanged(auth, (u) => {
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
-    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
     if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
@@ -150,6 +150,27 @@ function dayPlan(dateISO, src) {
   const h = houseDay(dateISO); return { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena };
 }
 // para los recordatorios: los próximos 14 días del calendario propio y cuántos productos tiene su lista (lo lee app.js → service worker)
+// pasos: +25 XP el día que se llega al objetivo y +5 cada 2.000 pasos (hasta +20)
+const pasosXP = (p) => (!p || !(p.s > 0) ? 0 : (p.s >= (p.g || 8000) ? 25 : 0) + Math.min(20, Math.floor(p.s / 2000) * 5));
+let pasosBusy = false;
+async function syncPasos() {
+  if (!user || pasosBusy) return; pasosBusy = true;
+  try {
+    let loc = {}; try { loc = JSON.parse(localStorage.getItem("pasos") || "{}"); } catch (e) {}
+    const rem = cal?.pasos || {}, g = Math.round(window.pasosGoal?.() || 8000), min = addDays(todayISO, -35), upd = {};
+    Object.entries(loc).forEach(([d, v]) => { if (d < min || d > todayISO || !(v.s >= 0)) return; const r = rem[d], gd = d === todayISO ? g : (r?.g || g); if (!r || r.s !== v.s || r.g !== gd) upd[d] = { s: Math.min(100000, Math.round(v.s)), g: gd }; });
+    let changed = false;  // lo cargado en otro dispositivo
+    Object.entries(rem).forEach(([d, r]) => { if (d >= min && (!loc[d] || (loc[d].src !== "app" && loc[d].s < r.s))) { loc[d] = { s: r.s, src: "nube" }; changed = true; } });
+    if (changed) { localStorage.setItem("pasos", JSON.stringify(loc)); window.dispatchEvent(new Event("pasos")); }
+    if (Object.keys(upd).length) {
+      const before = Object.keys(upd).reduce((a, d) => a + pasosXP(rem[d]), 0), after = Object.keys(upd).reduce((a, d) => a + pasosXP(upd[d]), 0), snap = myXP();
+      await update(ref(db, `calendars/${user.uid}/pasos`), upd);
+      if (after > before) gainXP(after - before, "pasos", snap);
+      syncPublic?.();
+    }
+  } catch (e) {} finally { pasosBusy = false; }
+}
+window.addEventListener("pasos", () => setTimeout(syncPasos, 300));
 // para Compras: la lista de cada semana del calendario propio (la pasada, esta y las tres que vienen)
 function saveMyLists() {
   try {
@@ -647,6 +668,7 @@ function myXP(cut) {
   const bridged = (a, b) => { let d = addDays(a, 1); while (d < b) { if (!libre[d]) return false; d = addDays(d, 1); } return true; };
   dates.forEach((d) => { run = prev && (addDays(prev, 1) === d || bridged(prev, d)) ? run + 1 : 1; prev = d; xp += xpDay(run); });
   xp += st.weeks * 200 + st.retos * 100 + c.recipes * 80 + c.ings * 40 + c.vasos * 10 + c.aguaFull * 20;
+  xp += Object.values(cutObj(cal?.pasos, cut)).reduce((a, p) => a + pasosXP(p), 0);
   const level = levelOf(xp);
   return { xp, level, st, c, next: xpForLevel(level + 1), base: xpForLevel(level) };
 }

@@ -1,0 +1,20 @@
+<main data-page="pasos">
+<section class="page-head">
+  <p class="kicker">Pasos</p>
+  <h1>Cuánto <mark>caminaste</mark></h1>
+  <p class="lead">Tus pasos de cada día con un objetivo a tu medida, los kilómetros y las calorías. Cumplir el objetivo suma XP en Mi plan.</p>
+</section>
+<section class="card ps-today" id="psToday" aria-live="polite"></section>
+<section class="card ps-src" id="psSrc"></section>
+<section class="card ps-chart">
+  <div class="ps-head"><h2>Tu historial</h2><div class="seg" id="psRange"><button type="button" data-r="7" class="on">7 días</button><button type="button" data-r="30">30 días</button></div></div>
+  <div class="ps-bars" id="psChart" role="img"></div>
+  <div class="ps-stats" id="psStats"></div>
+</section>
+<section class="card ps-set" id="psSet"></section>
+<section class="card ps-manual">
+  <h2>Cargar a mano</h2>
+  <p class="muted small">Si tu teléfono ya cuenta pasos (Google Fit, Samsung Health o la app Salud del iPhone), copiá el número de ese día.</p>
+  <form class="ps-form" id="psForm"><label><span>Día</span><input type="date" id="psDate" required></label><label><span>Pasos</span><input type="number" id="psN" min="0" max="100000" step="1" inputmode="numeric" placeholder="Ej.: 7500" required></label><button class="btn" type="submit">Guardar</button></form>
+</section>
+</main>

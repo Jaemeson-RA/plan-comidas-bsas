@@ -17,6 +17,7 @@ META = {
  "terminos": ("Términos de uso · Menuario", "Condiciones de uso del sitio: salud, precios, cuentas, contenido de usuarios y propiedad intelectual."),
  "privacidad": ("Política de privacidad · Menuario", "Qué datos se guardan, para qué, quién los procesa y cómo borrarlos, según la Ley 25.326."),
  "mi-plan": ("Mi plan · Menuario", "Creá tu cuenta y armá tu propio calendario de comidas eligiendo las recetas que quieras."),
+ "pasos": ("Pasos · Menuario", "Tus pasos de cada día con un objetivo a tu medida, kilómetros, calorías y gráficos. Con la app de Android se cuentan solos."),
  "app": ("La app · Menuario", "Bajá la app para Android o agregala al inicio del iPhone: el plan, las recetas y la lista de compras a pantalla completa y sin conexión."),
  "404": ("Página no encontrada · Menuario", "Esa página no existe: volvé al plan, las recetas o la lista de compras."),
 }
@@ -46,15 +47,15 @@ for page, (title, desc) in META.items():
         "<link rel=\"preload\" href=\"fonts/young-serif-v2-latin_latin-ext-regular.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n"
         "<link rel=\"preload\" href=\"fonts/outfit-v15-latin_latin-ext-regular.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n"
         "<link rel=\"preload\" href=\"fonts/outfit-v15-latin_latin-ext-600.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n"
-        + (FB_HINTS if page in ("mi-plan", "nutricion") else "") +
+        + (FB_HINTS if page in ("mi-plan", "nutricion", "pasos") else "") +
         "<link rel=\"manifest\" href=\"manifest.webmanifest\">\n<meta name=\"theme-color\" content=\"#2F8F5B\">\n"
         "<link rel=\"apple-touch-icon\" href=\"img/icons/apple-touch-180.png\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n"
         "<meta name=\"apple-mobile-web-app-title\" content=\"Menuario\">\n<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\">\n"
         "<script>try{if(matchMedia(\"(display-mode: standalone)\").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)||sessionStorage.getItem(\"inApp\")===\"1\"){document.documentElement.classList.add(\"is-app\");sessionStorage.setItem(\"inApp\",\"1\")}}catch(e){}</script>\n<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
     if page not in ("compras", "promos", "supermercados"):
         html = html.replace('<script src="ahorro.js" data-only="compras promos supermercados"></script>\n', "")
-    if page not in ("mi-plan", "nutricion"):
-        html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion compras"></script>\n', "")
+    if page not in ("mi-plan", "nutricion", "pasos"):
+        html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion pasos"></script>\n', "")
     open(os.path.join(root, f"{page}.html"), "w", encoding="utf-8").write(html)
     print("OK", page + ".html", len(html))
 

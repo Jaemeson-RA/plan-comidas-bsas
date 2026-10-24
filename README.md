@@ -145,6 +145,14 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 - **Más**: las mismas categorías, recordatorios, moneda y sugerir un plato.
 - Lo que solo va en la web lleva `data-web`; lo que solo va en la app, `data-app`. Ojo: la clase es `is-app` porque `.app` ya existe (tarjetas de las apps de delivery) y `.today` es el pizarrón de la web.
 
+## Pasos (`pasos.html`, `tools/android_native/`)
+
+- **Podómetro de la app de Android (desde la 1.0.5).** Código nativo propio que `build_android.py` vuelve a poner después de cada `bubblewrap update`: `StepStore` (pasos por día en SharedPreferences, a partir del contador `TYPE_STEP_COUNTER` que cuenta desde el reinicio), `StepReader` (una lectura), `StepWorker` (WorkManager cada ~15 min), `PasosActivity` (la abre el sitio con `intent://pasos?accion=activar|sync#Intent;scheme=menuario;package=ar.menuario.app;end`: pide el permiso de actividad física, lee y vuelve a `pasos.html?pasos=...`) y un agregado en `LauncherActivity.getLaunchingUrl()` que suma `?pasos=20261025:5234,...` (últimos 35 días) cada vez que se abre la app. Permiso `ACTIVITY_RECOGNITION`, dependencia `androidx.work:work-runtime`.
+- **Sin la app** (web, iPhone, app instalada desde Chrome): se cargan a mano.
+- **Objetivo**: según el perfil de Nutrición (actividad sedentaria 6.000 · ligera 8.000 · moderada 10.000 · alta 12.000; −1.000 desde los 50 años, −2.000 desde los 65), o personalizado. **Largo del paso**: 41,5 % (varones) o 41,3 % (mujeres) de la altura, o medido. Km = pasos × paso; kcal ≈ 0,57 × peso × km; minutos activos ≈ pasos / 105.
+- **Gráficos** de 7 y 30 días con la línea del objetivo, promedio, mejor día, días con objetivo, racha, km y kcal.
+- **XP** (con cuenta): +25 el día que se llega al objetivo y +5 cada 2.000 pasos (hasta +20). Se guarda en `calendars/{uid}/pasos/{día}` = `{s, g}` y entra en `myXP()`.
+
 ## Recordatorios (Web Push, `tools/worker/push.js`)
 
 - El navegador se suscribe con la clave pública VAPID de `config.js` y manda la dirección de la suscripción y las preferencias a `POST /push/sub` del Worker. Se guardan en KV (`PROMOS`, claves `sub:<hash>`, todo en la metadata) y vencen a los 120 días si no se vuelve a abrir el sitio (cada visita las renueva una vez por día).

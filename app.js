@@ -860,7 +860,7 @@
   if (document.documentElement.classList.contains("is-app")) {
     const H = new Date().getHours();
     const TITLES = { inicio: ["", H < 12 ? "Buen día" : H < 20 ? "Buenas tardes" : "Buenas noches"], plan: ["", "Plan"], recetas: ["", "Recetas"], compras: ["", "Compras"],
-      supermercados: ["Comprar", "Súper"], promos: ["Comprar", "Promos"], temporada: ["Cocinar", "Estación"], nutricion: ["Vos", "Nutrición"], miplan: ["Vos", "Mi plan"],
+      supermercados: ["Comprar", "Súper"], promos: ["Comprar", "Promos"], temporada: ["Cocinar", "Estación"], nutricion: ["Vos", "Nutrición"], miplan: ["Vos", "Mi plan"], pasos: ["Vos", "Pasos"],
       app: ["Menuario", "La app"], terminos: ["Menuario", "Términos de uso"], privacidad: ["Menuario", "Privacidad"], "404": ["Menuario", "No encontrada"] };
     const TABS = ["inicio", "plan", "recetas", "compras"];
     const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"], MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
@@ -878,7 +878,7 @@
     const CATS_APP = [
       ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "bolt", "Mes a medida"], ["temporada.html", "leaf", "Estación"]]],
       ["Comprar", "c2", [["compras.html", "compras", "Lista"], ["compras.html#comparar", "coin", "Comparar precios"], ["promos.html", "tag", "Promos"], ["supermercados.html#mapa", "pin", "Sucursales"]]],
-      ["Vos", "c3", [["mi-plan.html", "users", "Mi plan"], ["mi-plan.html#prog", "chart", "Progreso"], ["nutricion.html", "flame", "Nutrición"], ["mi-plan.html#rank", "trophy", "Ranking"]]],
+      ["Vos", "c3", [["mi-plan.html", "users", "Mi plan"], ["mi-plan.html#prog", "chart", "Progreso"], ["nutricion.html", "flame", "Nutrición"], ["mi-plan.html#rank", "trophy", "Ranking"], ["pasos.html", "bolt", "Pasos"]]],
     ];
     const grid = () => CATS_APP.map(([t, c, items]) => `<section class="ap-cat ${c}"><h2>${t}</h2><div class="ap-grid">${items.map(([href, i, l]) => `<a class="ap-tile" href="${href}"><span class="ap-ic">${ic(i)}</span><span class="ap-l">${l}</span></a>`).join("")}</div></section>`).join("");
     if (page === "inicio" && $("#appHome")) {
@@ -893,6 +893,7 @@
           <button type="button" class="ap-tmw" data-rec="${tm.almuerzo}">Mañana: <b>${esc(R[tm.almuerzo].name)}</b>${ic("arrow")}</button></section>
         <div class="ap-quick">
           <a class="ap-q" href="compras.html">${ic("compras")}<span><b>Tu lista</b><small>${n} productos</small></span></a>
+          <a class="ap-q" href="pasos.html">${ic("bolt")}<span><b>Pasos</b><small class="ap-psq">Hoy</small></span></a>
           <a class="ap-q" href="mi-plan.html">${ic("check")}<span><b>Marcar el día</b><small>Sumá XP</small></span></a>
           <button type="button" class="ap-q notif-btn">${ic("bell")}<span><b>Avisos</b><small class="ap-nstate">Elegí cuándo</small></span></button>
         </div>
@@ -900,6 +901,8 @@
           <div class="ap-days">${week.map((d) => { const r = R[d.almuerzo]; return `<button type="button" class="ap-day${d.date === todayISO ? " is-today" : ""}" data-rec="${d.almuerzo}"><span class="ap-dw">${d.date === todayISO ? "Hoy" : d.dow.slice(0, 3)} <b>${+d.date.slice(8)}</b></span><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span class="ap-dn">${esc(r.name)}</span></button>`; }).join("")}</div></section>
         ${grid()}`;
       const p = npGet(); if (p?.on) $$(".ap-nstate").forEach((x) => { x.textContent = "Activados"; });
+      const psq = () => { let s = 0; try { s = JSON.parse(localStorage.getItem("pasos") || "{}")[todayISO]?.s || 0; } catch (e) {} const g = window.pasosGoal?.() || 8000; $$(".ap-psq").forEach((x) => { x.textContent = s ? `${s.toLocaleString("es-AR")} de ${g.toLocaleString("es-AR")}` : "Hoy"; }); };
+      setTimeout(psq, 0); window.addEventListener("pasos", psq);  // después de que cargue el bloque de pasos (objetivo)
       { const t = $(".ap-day.is-today"), row = $(".ap-days"); if (t && row) row.scrollLeft = t.offsetLeft - row.offsetLeft - (row.clientWidth - t.offsetWidth) / 2; }  // centra hoy sin mover la página
     }
     // «Más»: hoja con todas las funciones, moneda y ajustes
@@ -925,6 +928,101 @@
       };
       sh.onkeydown = (ev) => { if (ev.key === "Escape") close(); };
     }, true);
+  }
+
+  // ---------- pasos (podómetro de la app de Android, o cargados a mano) ----------
+  // localStorage «pasos» = {"2026-10-25": {s: 5234, src: "app" | "mano" | "nube"}}, «pasosMeta» = {meta, paso} (personalizados)
+  const PSK = "pasos";
+  const psGet = () => { try { return JSON.parse(localStorage.getItem(PSK) || "{}"); } catch (e) { return {}; } };
+  const psSet = (v) => { try { localStorage.setItem(PSK, JSON.stringify(v)); } catch (e) {} window.dispatchEvent(new Event("pasos")); };
+  const psCfg = () => { try { return JSON.parse(localStorage.getItem("pasosMeta") || "{}"); } catch (e) { return {}; } };
+  const psProf = () => { try { return JSON.parse(localStorage.getItem("perfil-nutricion") || "null"); } catch (e) { return null; } };
+  // objetivo a medida: según la actividad del perfil (6.000 a 12.000) y la edad; o el que eligió la persona
+  function psAutoGoal(p) {
+    if (!p) return 8000;
+    let g = p.act <= 1.3 ? 6000 : p.act <= 1.45 ? 8000 : p.act <= 1.6 ? 10000 : 12000;
+    if (p.edad >= 65) g -= 2000; else if (p.edad >= 50) g -= 1000; else if (p.edad < 18) g += 2000;
+    return Math.max(5000, Math.round(g / 500) * 500);
+  }
+  const psGoal = () => +psCfg().meta || psAutoGoal(psProf());
+  // largo del paso: ~41,5 % (varones) o 41,3 % (mujeres) de la altura; o el medido por la persona
+  const psStride = () => { const c = +psCfg().paso; if (c) return c / 100; const p = psProf(); return p?.altura ? p.altura * (p.sexo === "m" ? 0.415 : 0.413) / 100 : 0.7; };
+  const psKm = (s) => s * psStride() / 1000;
+  const psKcal = (s) => Math.round(psKm(s) * (psProf()?.peso || 70) * 0.57);  // caminar: ~0,57 kcal por kg y por km
+  const psXP = (s, g) => (s >= g ? 25 : 0) + Math.min(20, Math.floor(s / 2000) * 5);
+  window.pasosGoal = psGoal;
+  // lo que manda la app de Android en la dirección: ?pasos=20261025:5234,20261024:8012 (o denegado / nosensor / vacio)
+  {
+    const qs = new URLSearchParams(location.search), raw = qs.get("pasos");
+    if (raw) {
+      if (/^(denegado|nosensor|vacio)$/.test(raw)) localStorage.setItem("pasosEstado", raw);
+      else {
+        const st = psGet(); let n = 0;
+        raw.split(",").forEach((x) => { const m = /^(\d{4})(\d{2})(\d{2}):(\d{1,6})$/.exec(x); if (!m) return; const iso = `${m[1]}-${m[2]}-${m[3]}`, v = +m[4]; if (v > 0 || !st[iso]) { st[iso] = { s: v, src: "app" }; n++; } });
+        localStorage.setItem("pasosEstado", "ok"); localStorage.setItem("pasosSync", Date.now()); if (n) psSet(st);
+      }
+      qs.delete("pasos"); history.replaceState(history.state, "", location.pathname + (qs.toString() ? "?" + qs : "") + location.hash);
+    }
+  }
+  // ¿hay podómetro? solo en la app de Android 1.0.5 o más nueva (la app abre el sitio con ?v=<versión>)
+  if (/^android-app:\/\/ar\.menuario\.app/.test(document.referrer)) { try { sessionStorage.setItem("twa", "1"); sessionStorage.setItem("apkv", new URLSearchParams(location.search).get("v") || "0"); } catch (e) {} }
+  const apkV = sessionStorage.getItem("apkv") || "0";
+  const psNative = sessionStorage.getItem("twa") === "1" && apkV.split(".").map(Number).reduce((a, x, i) => a + x * [1e6, 1e3, 1][i], 0) >= 1000005;
+  const INTENT = (a) => `intent://pasos?accion=${a}#Intent;scheme=menuario;package=ar.menuario.app;end`;
+
+  if (page === "pasos") {
+    let range = 7;
+    const fmt = (n) => Math.round(n).toLocaleString("es-AR");
+    const DOW = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"];
+    function renderPasos() {
+      const st = psGet(), g = psGoal(), today = st[todayISO]?.s || 0, pct = Math.min(1, today / g);
+      const R0 = 54, C = 2 * Math.PI * R0;
+      $("#psToday").innerHTML = `<div class="ps-ring"><svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="${R0}" class="bg"/><circle cx="64" cy="64" r="${R0}" class="fg${today >= g ? " ok" : ""}" style="stroke-dasharray:${C};stroke-dashoffset:${C * (1 - pct)}"/></svg>
+          <div><b>${fmt(today)}</b><small>de ${fmt(g)} pasos</small></div></div>
+        <div class="ps-kpis"><div><b>${psKm(today).toLocaleString("es-AR", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</b><small>km</small></div><div><b>${fmt(psKcal(today))}</b><small>kcal</small></div><div><b>${fmt(today / 105)}</b><small>min activos</small></div><div><b>+${psXP(today, g)}</b><small>XP hoy</small></div></div>
+        <p class="ps-msg">${today >= g ? `${ic("trophy")} ¡Objetivo cumplido! +25 XP` : today ? `Te faltan <b>${fmt(g - today)}</b> pasos (unos ${fmt((g - today) / 105)} minutos caminando).` : "Todavía no hay pasos de hoy."}</p>`;
+      // origen de los datos
+      const est = localStorage.getItem("pasosEstado"), sync = +localStorage.getItem("pasosSync") || 0;
+      $("#psSrc").innerHTML = psNative
+        ? (est === "ok" ? `<div class="pss-row">${ic("check")}<span><b>Podómetro del teléfono activado</b><small>Se actualiza cada vez que abrís la app${sync ? ` · última vez a las ${new Date(sync).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })}` : ""}</small></span><a class="btn" href="${INTENT("sync")}">${ic("refresh")} Actualizar</a></div>`
+          : est === "denegado" ? `<div class="pss-row">${ic("x")}<span><b>Falta el permiso de actividad física</b><small>Sin ese permiso el teléfono no le pasa los pasos a Menuario. Podés darlo ahora o en Ajustes → Apps → Menuario → Permisos.</small></span><a class="btn" href="${INTENT("activar")}">Dar permiso</a></div>`
+          : est === "nosensor" ? `<div class="pss-row">${ic("x")}<span><b>Este teléfono no tiene contador de pasos</b><small>Podés cargarlos a mano abajo.</small></span></div>`
+          : `<div class="pss-row">${ic("bolt")}<span><b>Contá tus pasos solo</b><small>Menuario usa el contador del teléfono (no gasta batería extra). Te va a pedir el permiso de actividad física.</small></span><a class="btn" href="${INTENT("activar")}">Activar podómetro</a></div>`)
+        : `<div class="pss-row">${ic("phone")}<span><b>Los pasos se cuentan solos con la app de Android</b><small>${isAndroid ? "Bajá la app con podómetro (APK). Mientras, cargalos a mano abajo." : "En iPhone o en la compu, cargalos a mano abajo con lo que marca tu teléfono."}</small></span>${isAndroid ? `<button type="button" class="btn ghost" data-get-apk>${ic("download")} Bajar el APK</button>` : ""}</div>`;
+      // gráfico
+      const days = Array.from({ length: range }, (_, i) => addDays(todayISO, i - range + 1)), vals = days.map((d) => st[d]?.s || 0);
+      const top = Math.max(g * 1.15, ...vals, 1);
+      $("#psChart").className = "ps-bars r" + range; $("#psChart").setAttribute("aria-label", `Pasos de los últimos ${range} días`);
+      $("#psChart").innerHTML = `<i class="ps-goal" style="bottom:${g / top * 100}%"><span>${fmt(g)}</span></i>` + days.map((d, i) => { const v = vals[i], dt = new Date(d + "T12:00"); return `<div class="ps-b${v >= g ? " ok" : ""}${d === todayISO ? " is-today" : ""}" title="${d.slice(8)}/${d.slice(5, 7)}: ${fmt(v)} pasos"><em style="height:${Math.max(v ? 2 : 0, v / top * 100)}%">${range === 7 && v ? `<small>${v >= 1000 ? (v / 1000).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " k" : v}</small>` : ""}</em><span>${range === 7 ? DOW[dt.getDay()] : (i % 5 === 4 || d === todayISO ? +d.slice(8) : "")}</span></div>`; }).join("");
+      const withData = vals.filter((v) => v > 0), avg = withData.length ? withData.reduce((a, b) => a + b, 0) / withData.length : 0;
+      const best = Math.max(0, ...vals), okDays = vals.filter((v) => v >= g).length;
+      let streak = 0; for (let k = (st[todayISO]?.s || 0) >= g ? 0 : 1; ; k++) { const d = addDays(todayISO, -k); if ((st[d]?.s || 0) >= g) streak++; else break; if (k > 400) break; }
+      const totKm = vals.reduce((a, v) => a + psKm(v), 0);
+      $("#psStats").innerHTML = `<div><b>${fmt(avg)}</b><small>promedio por día</small></div><div><b>${fmt(best)}</b><small>mejor día</small></div><div><b>${okDays}/${range}</b><small>días con objetivo</small></div><div><b>${streak}</b><small>${streak === 1 ? "día seguido" : "días seguidos"}</small></div><div><b>${totKm.toLocaleString("es-AR", { maximumFractionDigits: 1 })}</b><small>km en total</small></div><div><b>${fmt(vals.reduce((a, v) => a + psKcal(v), 0))}</b><small>kcal quemadas</small></div>`;
+      // ajustes
+      const cfg = psCfg(), p = psProf(), auto = psAutoGoal(p), autoStride = p?.altura ? Math.round(p.altura * (p.sexo === "m" ? 0.415 : 0.413)) : 70;
+      $("#psSet").innerHTML = `<h2>Tu objetivo</h2>
+        <p class="muted small">${p ? `Según tu perfil (${p.edad} años, actividad ${p.act <= 1.3 ? "sedentaria" : p.act <= 1.45 ? "ligera" : p.act <= 1.6 ? "moderada" : "alta"}): <b>${fmt(auto)} pasos por día</b>. La OMS recomienda moverse todos los días; entre 7.000 y 10.000 pasos ya bajan mucho los riesgos de salud.` : `Completá tu perfil en <a href="nutricion.html">Nutrición</a> (edad, altura, peso, actividad) y calculamos tu objetivo y el largo de tu paso. Mientras, usamos 8.000 pasos.`}</p>
+        <div class="ps-cfg"><label><span>Objetivo diario</span><input type="number" id="psMeta" min="1000" max="40000" step="500" inputmode="numeric" placeholder="${auto}" value="${cfg.meta || ""}"></label>
+          <label><span>Largo del paso (cm)</span><input type="number" id="psPaso" min="40" max="120" step="1" inputmode="numeric" placeholder="${autoStride}" value="${cfg.paso || ""}"></label>
+          <button type="button" class="mini-btn" id="psReset"${cfg.meta || cfg.paso ? "" : " hidden"}>Volver a lo automático</button></div>
+        <p class="muted small">Para medir tu paso: caminá 10 pasos normales, medí la distancia en centímetros y dividila por 10. XP: +25 al llegar al objetivo y +5 cada 2.000 pasos (hasta +20 por día), con la cuenta abierta.</p>`;
+    }
+    renderPasos(); window.addEventListener("pasos", renderPasos);
+    $("#psRange").addEventListener("click", (e) => { const b = e.target.closest("[data-r]"); if (!b) return; range = +b.dataset.r; $$("#psRange button").forEach((x) => x.classList.toggle("on", x === b)); renderPasos(); });
+    $("#psSet").addEventListener("change", (e) => {
+      if (!e.target.matches("#psMeta, #psPaso")) return;
+      const c = psCfg(), m = Math.round(+$("#psMeta").value), pa = Math.round(+$("#psPaso").value);
+      c.meta = m >= 1000 && m <= 40000 ? m : null; c.paso = pa >= 40 && pa <= 120 ? pa : null;
+      localStorage.setItem("pasosMeta", JSON.stringify(c)); renderPasos(); window.dispatchEvent(new Event("pasos"));
+    });
+    $("#psSet").addEventListener("click", (e) => { if (!e.target.closest("#psReset")) return; localStorage.removeItem("pasosMeta"); renderPasos(); window.dispatchEvent(new Event("pasos")); });
+    const di = $("#psDate"); di.value = todayISO; di.max = todayISO; di.min = addDays(todayISO, -30);
+    $("#psForm").addEventListener("submit", (e) => {
+      e.preventDefault(); const d = di.value, n = Math.round(+$("#psN").value);
+      if (!d || d > todayISO || n < 0 || n > 100000) return;
+      const st = psGet(); st[d] = { s: n, src: "mano" }; psSet(st); $("#psN").value = ""; toastG(`Guardado: ${n.toLocaleString("es-AR")} pasos el ${d.slice(8)}/${d.slice(5, 7)}.`);
+    });
   }
 
   // ---------- actualizaciones ----------

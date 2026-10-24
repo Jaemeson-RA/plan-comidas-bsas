@@ -48,6 +48,50 @@ if changed:
     sh("bubblewrap update --skipVersionUpgrade", input=b"\n")
 print(f"App: {tm['name']} ({tm['launcherName']}) · {tm['packageId']} · v{tm['appVersionName']} ({tm['appVersionCode']})")
 
+# código nativo propio (podómetro, tools/android_native): Bubblewrap regenera el proyecto, así que se vuelve a poner cada vez
+NAT = os.path.join(ROOT, "tools", "android_native")
+JAVA = os.path.join(AND, "app", "src", "main", "java", *tm["packageId"].split("."))
+LAUNCH = """        Uri uri = super.getLaunchingUrl();
+        // Menuario: los pasos del podómetro del teléfono van en la dirección (solo si la persona lo activó en Pasos)
+        try {
+            if (StepReader.allowed(this) && StepReader.available(this) && StepStore.started(this)) {
+                StepWorker.schedule(this);
+                String p = StepStore.param(this);
+                if (uri != null && !p.isEmpty() && uri.getQueryParameter("pasos") == null) uri = uri.buildUpon().appendQueryParameter("pasos", p).build();
+                StepReader.readOnce(getApplicationContext(), new android.os.Handler(getMainLooper()), 3000, new StepReader.Done() { @Override public void run(boolean ok) { } });
+            }
+        } catch (Exception ignored) { }
+"""
+PERM = """    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+    <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false"/>
+"""
+ACT = """        <activity android:name=".PasosActivity" android:exported="true" android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="menuario" android:host="pasos"/>
+            </intent-filter>
+        </activity>
+"""
+def apply_native():
+    for f in os.listdir(NAT):
+        if f.endswith(".java"): shutil.copyfile(os.path.join(NAT, f), os.path.join(JAVA, f))
+    la = os.path.join(JAVA, "LauncherActivity.java"); s = open(la, encoding="utf-8").read()
+    if "StepStore" not in s:
+        assert "        Uri uri = super.getLaunchingUrl();\n" in s, "LauncherActivity cambió de forma"
+        s = s.replace("        Uri uri = super.getLaunchingUrl();\n", LAUNCH, 1); open(la, "w", encoding="utf-8").write(s)
+    mf = os.path.join(AND, "app", "src", "main", "AndroidManifest.xml"); s = open(mf, encoding="utf-8").read()
+    if "ACTIVITY_RECOGNITION" not in s:
+        s = s.replace("    <application", PERM + "    <application", 1).replace("    </application>", ACT + "    </application>", 1)
+        open(mf, "w", encoding="utf-8").write(s)
+    bg = os.path.join(AND, "app", "build.gradle"); s = open(bg, encoding="utf-8").read()
+    if "androidx.work" not in s:
+        s = s.replace("implementation 'com.google.androidbrowserhelper:androidbrowserhelper:", "implementation 'androidx.work:work-runtime:2.9.1'\n        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:", 1)
+        open(bg, "w", encoding="utf-8").write(s)
+apply_native()
+
 # paquetes del SDK que pide el proyecto (las licencias ya tienen que estar aceptadas)
 sdkm = os.path.join(cfg["androidSdkPath"], "cmdline-tools", "latest", "bin", "sdkmanager.bat" if os.name == "nt" else "sdkmanager")
 sh(f'"{sdkm}" "platforms;android-36" "build-tools;36.1.0" "platform-tools"')
