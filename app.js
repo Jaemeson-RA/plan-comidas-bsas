@@ -483,6 +483,50 @@
       <article class="dc${d.date === todayISO ? " today" : ""}"><h4>${esc(d.label)}${d.date === todayISO ? ' <span class="hoy">hoy</span>' : ""}</h4>
         <div class="row"><small>Desayuno</small>${mealBtn(d.desayuno)}${swapBtn(d.date, "desayuno", d.sw?.desayuno)}</div><div class="row"><small>Almuerzo</small>${mealBtn(d.almuerzo)}${swapBtn(d.date, "almuerzo", d.sw?.almuerzo)}</div>
         <div class="row"><small>Merienda</small><span class="muted">${esc(d.merienda)}</span></div><div class="row"><small>Cena</small>${mealBtn(d.cena)}${swapBtn(d.date, "cena", d.sw?.cena)}</div></article>`).join("");
+    renderBatch();
+  }
+  // ---------- batch cooking del domingo: qué adelantar de la semana ----------
+  const BASES = [
+    { k: "granos", t: "Cociná de una vez", re: /\b(arroz|quinoa|lentejas secas|garbanzos secos|porotos secos|maiz blanco)/, how: (n) => `${n}: hervilo y guardalo en la heladera (hasta 4 días)` },
+    { k: "horno", t: "Horneá juntas en una placa", re: /\b(calabaza|zapallo|papa|batata|berenjena|morron)/, how: (n) => `${n}: en cubos, al horno 200 °C unos 35 minutos` },
+    { k: "picar", t: "Picá y guardá en frascos", re: /\b(cebolla|zanahoria|ajo|morron|puerro|cebolla de verdeo|perejil)/, how: (n) => `${n}: picada, en un frasco en la heladera (3 días)` },
+  ];
+  function renderBatch() {
+    const box = $("#batch"); if (!box) return;
+    let w = D.weeks.find((x) => x.start === state.week) || D.weeks[0]; if (!w) return;
+    // el sábado y el domingo se adelanta la semana que viene (no la que termina)
+    const dowNow = new Date().getDay(); if (w.start === mondayOf(todayISO) && (dowNow === 0 || dowNow === 6)) w = weekAt(addDays(w.start, 7));
+    const nzb =(s) => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const lab2 = (iso) => { const d = new Date(iso + "T12:00"); return ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"][d.getDay()]; };
+    const uses = new Map();
+    w.days.slice(0, 5).forEach((d) => ["almuerzo", "cena"].forEach((s) => { const r = R[d[s]]; if (!r) return; const u = uses.get(r.id) || { r, days: [] }; u.days.push(d.date); uses.set(r.id, u); }));
+    const good = (r) => r.porciones >= 2 || r.tags.some((t) => /batch|rinde|olla|horno/.test(nzb(t))) || r.tiempo >= 35;
+    const pick = [...uses.values()].filter((u) => good(u.r)).sort((a, b) => b.days.length * b.r.tiempo - a.days.length * a.r.tiempo).slice(0, 4);
+    if (!pick.length) { box.innerHTML = ""; return; }
+    const N = HOG(), ports = pick.reduce((a, u) => a + u.days.length * N, 0);
+    const oven = pick.filter((u) => u.r.tags.some((t) => /horno/.test(nzb(t))) || (u.r.ut || []).some((x) => (x.k || x) === "horno"));
+    const stove = pick.filter((u) => !oven.includes(u));
+    const total = Math.round((Math.max(oven.reduce((a, u) => Math.max(a, u.r.tiempo), 0), Math.ceil(stove.reduce((a, u) => a + u.r.tiempo, 0) / 2)) + 25) / 5) * 5;
+    // bases que aparecen en dos o más platos de lunes a viernes
+    const weekR = [...uses.values()].map((u) => u.r);
+    const bases = BASES.map((B) => { const m = new Map(); weekR.forEach((r) => r.ing.forEach((i) => { const n = nzb(i.n); const hit = n.match(B.re); if (hit) { const key = i.n.replace(/\s*\(.*?\)/g, "").split(/[,/]/)[0].trim(); const e = m.get(key) || new Set(); e.add(r.name); m.set(key, e); } })); return { B, items: [...m.entries()].filter(([, s]) => s.size >= 2) }; }).filter((x) => x.items.length);
+    const dayList = (u) => u.days.map(lab2).join(" y ");
+    const steps = [
+      oven.length && `Prendé el horno a 200 °C y meté ${oven.map((u) => `<b>${esc(u.r.name.toLowerCase())}</b>`).join(" y ")}${bases.some((b) => b.B.k === "horno") ? ", y en otra placa las verduras para asar" : ""}.`,
+      stove.length && `En las hornallas: ${stove.map((u) => `<b>${esc(u.r.name.toLowerCase())}</b>`).join(", ")}. Si tenés dos, van a la vez.`,
+      bases.some((b) => b.B.k === "granos") && "En una olla aparte, el arroz o las legumbres que se repiten en la semana.",
+      bases.some((b) => b.B.k === "picar") && "Mientras se cocina, picá la cebolla, la zanahoria y lo demás que se repite.",
+      `Dejá enfriar, porcioná en <b>${ports} ${ports === 1 ? "recipiente" : "recipientes"}</b> con etiqueta: a la heladera lo de lunes a miércoles y al freezer lo de jueves y viernes.`,
+    ].filter(Boolean);
+    box.innerHTML = `<div class="card bt-card">
+      <div class="bt-head"><span class="hel-ico">${ic("pot")}</span><div><p class="kicker">Domingo de batch cooking</p><h2>Adelantá la semana del ${esc(w.label.split(" → ")[0])}</h2>
+        <p class="muted small">Con unas horas el domingo, de lunes a viernes solo calentás. Para ${N === 1 ? "una persona" : N + " personas"}.</p></div></div>
+      <div class="bt-kpis"><div><b>${total >= 60 ? `${Math.floor(total / 60)} h${total % 60 ? " " + (total % 60) : ""}` : total + " min"}</b><small>en total</small></div><div><b>${pick.length}</b><small>${pick.length === 1 ? "plato" : "platos"}</small></div><div><b>${ports}</b><small>porciones</small></div></div>
+      <h3>Qué cocinar</h3>
+      <div class="bt-list">${pick.map((u) => `<button type="button" class="bt-item" data-rec="${u.r.id}"><img src="${u.r.img}"${srcs(u.r)} alt="" loading="lazy"><span><b>${esc(u.r.name)}</b><small>${u.r.tiempo} min · para el ${dayList(u)}</small></span></button>`).join("")}</div>
+      <h3>Paso a paso</h3><ol class="bt-steps">${steps.map((s) => `<li>${s}</li>`).join("")}</ol>
+      ${bases.length ? `<h3>Bases que se repiten</h3>${bases.map(({ B, items }) => `<div class="bt-base"><b>${B.t}</b><ul>${items.map(([n, s]) => `<li>${esc(B.how(n))} <small class="muted">(${esc([...s].join(", "))})</small></li>`).join("")}</ul></div>`).join("")}` : ""}
+      <p class="muted small bt-tip">${ic("bulb")} Lo cocido dura 3 a 4 días en la heladera y hasta 3 meses en el freezer. Descongelá en la heladera la noche anterior.</p></div>`;
   }
   if (page === "plan") {
     const qs = new URLSearchParams(location.search); const want = qs.get("semana") || qs.get("dia");
@@ -553,6 +597,61 @@
     });
     renderHel();
     $("#recSections").innerHTML = CATS.map((c) => `<section class="cat" id="${c.id}"><div class="cat-head"><h2>${esc(c.t)}</h2><p class="muted">${esc(c.d)}</p></div><div class="grid">${c.ids.map((id) => card(R[id])).join("")}</div></section>`).join("");
+  }
+
+  // ---------- peso: registro, gráfico, IMC y objetivo (Nutrición) ----------
+  if (page === "nutricion" && $("#pesoBox")) {
+    const PK = "pesos";
+    const pGet = () => { try { return JSON.parse(localStorage.getItem(PK) || "{}"); } catch (e) { return {}; } };
+    const pSet = (v) => { try { localStorage.setItem(PK, JSON.stringify(v)); } catch (e) {} };
+    const prof = () => { try { return JSON.parse(localStorage.getItem("perfil-nutricion") || "null"); } catch (e) { return null; } };
+    const fmt1 = (n) => (+n).toLocaleString("es-AR", { maximumFractionDigits: 1 });
+    function renderPeso() {
+      const st = pGet(), days = Object.keys(st).sort(), p = prof(), meta = +localStorage.getItem("pesoMeta") || null;
+      const last = days.length ? st[days[days.length - 1]] : p?.peso || null;
+      const ago = (n) => { const lim = addDays(todayISO, -n); const d = days.filter((x) => x <= lim).pop(); return d ? st[d] : null; };
+      const d30 = ago(30), d7 = ago(7);
+      const imc = last && p?.altura ? last / ((p.altura / 100) ** 2) : null;
+      const imcT = !imc ? "" : imc < 18.5 ? "bajo peso" : imc < 25 ? "peso saludable" : imc < 30 ? "sobrepeso" : "obesidad";
+      // gráfico de los últimos 90 días
+      const pts = days.filter((d) => d >= addDays(todayISO, -90)).map((d) => [d, st[d]]);
+      let svg = "";
+      if (pts.length >= 2) {
+        const vs = pts.map((x) => x[1]).concat(meta ? [meta] : []), lo = Math.min(...vs) - 1, hi = Math.max(...vs) + 1, W = 320, H = 130;
+        const t0 = new Date(pts[0][0]).getTime(), t1 = new Date(pts[pts.length - 1][0]).getTime() || t0 + 1;
+        const X = (d) => 8 + (W - 16) * ((new Date(d).getTime() - t0) / Math.max(1, t1 - t0)), Y = (v) => 10 + (H - 24) * (1 - (v - lo) / (hi - lo));
+        svg = `<svg class="pz-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Peso de los últimos 90 días">
+          ${meta ? `<line x1="0" x2="${W}" y1="${Y(meta)}" y2="${Y(meta)}" class="goal"/><text x="${W - 4}" y="${Y(meta) - 4}" text-anchor="end">objetivo ${fmt1(meta)}</text>` : ""}
+          <polyline points="${pts.map(([d, v]) => `${X(d).toFixed(1)},${Y(v).toFixed(1)}`).join(" ")}"/>
+          ${pts.map(([d, v]) => `<circle cx="${X(d).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="3"><title>${d.slice(8)}/${d.slice(5, 7)}: ${fmt1(v)} kg</title></circle>`).join("")}
+          <text x="8" y="${H - 2}">${pts[0][0].slice(8)}/${pts[0][0].slice(5, 7)}</text><text x="${W - 8}" y="${H - 2}" text-anchor="end">${pts[pts.length - 1][0].slice(8)}/${pts[pts.length - 1][0].slice(5, 7)}</text></svg>`;
+      }
+      const delta = (a) => (a == null || last == null ? "—" : `${last - a > 0 ? "+" : ""}${fmt1(last - a)} kg`);
+      $("#pesoBox").innerHTML = `<h3>${ic("scale")} Tu peso</h3>
+        <form class="pz-form" id="pzForm"><label><span>Peso hoy (kg)</span><input id="pzKg" type="number" step="0.1" min="30" max="250" inputmode="decimal" placeholder="${last ? fmt1(last) : "Ej.: 72,5"}" required></label>
+          <label><span>Día</span><input id="pzDate" type="date" value="${todayISO}" max="${todayISO}"></label><button class="btn" type="submit">Guardar</button></form>
+        ${last ? `<div class="pz-kpis"><div><b>${fmt1(last)} kg</b><small>ahora</small></div><div><b>${delta(d7)}</b><small>en 7 días</small></div><div><b>${delta(d30)}</b><small>en 30 días</small></div><div><b>${imc ? fmt1(imc) : "—"}</b><small>IMC${imcT ? " · " + imcT : ""}</small></div></div>` : `<p class="muted small">Cargá tu peso cada tanto (mejor a la mañana, en ayunas): vas a ver cómo cambia y el mes a medida se ajusta a tu peso actual.</p>`}
+        ${svg || (days.length === 1 ? `<p class="muted small">Con dos o más registros aparece el gráfico.</p>` : "")}
+        <div class="pz-meta"><label><span>Peso objetivo (opcional)</span><input id="pzMeta" type="number" step="0.5" min="30" max="250" inputmode="decimal" value="${meta || ""}" placeholder="kg"></label>
+          ${meta && last ? `<p class="small">${Math.abs(last - meta) < 0.5 ? `${ic("trophy")} ¡Llegaste a tu objetivo!` : `Te ${last > meta ? "faltan bajar" : "faltan subir"} <b>${fmt1(Math.abs(last - meta))} kg</b>. Un ritmo sano es de 0,25 a 0,5 kg por semana.`}</p>` : ""}</div>
+        <p class="muted small pz-note" id="pzNote" hidden></p>`;
+    }
+    renderPeso();
+    window.addEventListener("pesos", renderPeso);
+    $("#pesoBox").addEventListener("submit", (e) => {
+      if (e.target.id !== "pzForm") return; e.preventDefault();
+      const kg = Math.round(+String($("#pzKg").value).replace(",", ".") * 10) / 10, d = $("#pzDate").value || todayISO;
+      if (!(kg >= 30 && kg <= 250)) return;
+      const st = pGet(); st[d] = kg; pSet(st);
+      // el perfil (y con él el mes a medida, las calorías de los pasos y el análisis) usa el último peso
+      const lastDay = Object.keys(st).sort().pop(); const p = (() => { try { return JSON.parse(localStorage.getItem("perfil-nutricion") || "null"); } catch (x) { return null; } })();
+      if (p && lastDay === d) { p.peso = kg; localStorage.setItem("perfil-nutricion", JSON.stringify(p)); if ($("#pPeso")) $("#pPeso").value = kg; }
+      renderPeso(); window.dispatchEvent(new Event("pesos-guardado"));
+      const n = $("#pzNote"); if (n && p) { n.hidden = false; n.innerHTML = `Listo: tu análisis y el mes a medida ya usan ${fmt1(kg)} kg. <a href="#medida" data-md-recalc>Volver a armar mi mes</a>`; }
+      toastG(`Peso guardado: ${fmt1(kg)} kg.`);
+    });
+    $("#pesoBox").addEventListener("change", (e) => { if (e.target.id !== "pzMeta") return; const v = +String(e.target.value).replace(",", "."); if (v >= 30 && v <= 250) localStorage.setItem("pesoMeta", v); else localStorage.removeItem("pesoMeta"); renderPeso(); window.dispatchEvent(new Event("pesos-guardado")); });
+    document.addEventListener("click", (e) => { if (e.target.closest("[data-md-recalc]")) setTimeout(() => $("#mdGo")?.click(), 400); });
   }
 
   // ---------- recetas: solo las que van con el perfil (con «ver todas») ----------
@@ -1065,7 +1164,7 @@
     const tb = $(".tabbar a[data-nav='inicio']"); if (tb) tb.lastChild.textContent = "Hoy";
     // todas las funciones, por categoría
     const CATS_APP = [
-      ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "bolt", "Mes a medida"], ["temporada.html", "leaf", "Estación"]]],
+      ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "bolt", "Mes a medida"], ["temporada.html", "leaf", "Estación"], ["plan.html#batch", "pot", "Batch del domingo"]]],
       ["Comprar", "c2", [["compras.html", "compras", "Lista"], ["compras.html#comparar", "coin", "Comparar precios"], ["promos.html", "tag", "Promos"], ["supermercados.html#mapa", "pin", "Sucursales"]]],
       ["Vos", "c3", [["mi-plan.html", "users", "Mi plan"], ["mi-plan.html#prog", "chart", "Progreso"], ["nutricion.html", "flame", "Nutrición"], ["mi-plan.html#rank", "trophy", "Ranking"], ["pasos.html", "bolt", "Pasos"]]],
     ];

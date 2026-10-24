@@ -133,7 +133,7 @@ onAuthStateChanged(auth, (u) => {
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
-    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); syncPesos(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
     if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
@@ -150,6 +150,21 @@ function dayPlan(dateISO, src) {
   const h = houseDay(dateISO); return { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena };
 }
 // para los recordatorios: los próximos 14 días del calendario propio y cuántos productos tiene su lista (lo lee app.js → service worker)
+// peso: calendars/{uid}/pesos/{día} = kg y profile/pesoMeta
+let pesosPulled = false;
+function syncPesos() {
+  if (!user) return;
+  let loc = {}; try { loc = JSON.parse(localStorage.getItem("pesos") || "{}"); } catch (e) {}
+  const rem = cal?.pesos || {};
+  if (!pesosPulled) { pesosPulled = true; let ch = false; Object.entries(rem).forEach(([d, v]) => { if (loc[d] == null) { loc[d] = v; ch = true; } }); if (ch) { localStorage.setItem("pesos", JSON.stringify(loc)); window.dispatchEvent(new Event("pesos")); } if (cal?.profile?.pesoMeta && !localStorage.getItem("pesoMeta")) localStorage.setItem("pesoMeta", cal.profile.pesoMeta); }
+  const upd = {}; Object.entries(loc).forEach(([d, v]) => { if (rem[d] !== v) upd[d] = v; });
+  if (Object.keys(upd).length) update(ref(db, `calendars/${user.uid}/pesos`), upd).catch(() => {});
+}
+window.addEventListener("pesos-guardado", () => {
+  syncPesos();
+  if (user) { const p = loadProfile(); update(ref(db, `calendars/${user.uid}/profile`), { nut: p || null, pesoMeta: +localStorage.getItem("pesoMeta") || null }).catch(() => {}); }
+  if (page === "nutricion" && loadProfile()) { renderNut(); renderMedida(); }
+});
 // preferencias alimentarias: viajan con la cuenta (calendars/{uid}/profile/prefs)
 let prefsPulled = false;
 function syncPrefs() {
