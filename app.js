@@ -16,13 +16,18 @@
 
   // ---------- movimiento: aparición al hacer scroll, fundido de imágenes, header ----------
   const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -6% 0px", threshold: 0.05 }) : null;
+  const T0 = performance.now();
   function animateIn() {
     const els = $$(".rc, .entry, .store, .shop-cat, .cal-cell, .steps li, .app, .dc, .cat-head, .ranking, .verdict, .explain, .today");
-    let i = 0;
-    els.forEach((el) => { if (el.classList.contains("reveal")) return; el.classList.add("reveal"); el.style.setProperty("--d", ((i++) % 8) * 45 + "ms"); if (io) io.observe(el); else el.classList.add("in"); });
+    let i = 0; const late = performance.now() - T0 > 2500;
+    els.forEach((el) => { if (el.classList.contains("reveal")) return;
+      if (late && el.getBoundingClientRect().top < innerHeight) { el.classList.add("reveal", "now", "in"); return; }  // ya está a la vista: sin animación
+      el.classList.add("reveal"); el.style.setProperty("--d", ((i++) % 6) * 40 + "ms"); if (io) io.observe(el); else el.classList.add("in"); });
     $$("img").forEach((im) => { if (im.complete && im.naturalWidth > 0) im.classList.add("ld"); });
   }
   document.addEventListener("load", (e) => { if (e.target.tagName === "IMG") e.target.classList.add("ld"); }, true);
+  // fotos de productos de las cadenas que no cargan: un ícono en vez del recuadro vacío
+  document.addEventListener("error", (e) => { const im = e.target; if (im.tagName !== "IMG" || !/^https?:/.test(im.getAttribute("src") || "") || im.dataset.broken) return; im.dataset.broken = "1"; const s = document.createElement("span"); s.className = "img-ph"; s.innerHTML = '<svg class="ic"><use href="#i-tag"/></svg>'; im.replaceWith(s); }, true);
   const toastG = (msg) => { let t = $("#toast"); if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3600); };
   const vt = (fn) => { if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) { const t = document.startViewTransition(fn); [t.finished, t.ready, t.updateCallbackDone].forEach((p) => p?.catch?.(() => {})); return t; } return fn(); };
   const onScroll = () => $(".top")?.classList.toggle("scrolled", window.scrollY > 8);
@@ -45,8 +50,14 @@
     const dec = v < 20 ? 2 : v < 200 ? 1 : 0;
     return sym + v.toLocaleString("es-AR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
   }
+  function countUp(el) {
+    const to = +el.dataset.ars; el.dataset.counted = "1";
+    if (!to || document.hidden || matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = fmt(to); return; }
+    el.textContent = fmt(0); setTimeout(() => { el.textContent = fmt(to); }, 900);  // por si el navegador pausa las animaciones
+    const t0 = performance.now(), d = 750; const step = (t) => { const k = Math.min(1, (t - t0) / d), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(to * e); if (k < 1) requestAnimationFrame(step); else el.textContent = fmt(to); }; requestAnimationFrame(step);
+  }
   function renderMoney() {
-    $$("[data-ars]").forEach((el) => { el.textContent = fmt(+el.dataset.ars); });
+    $$("[data-ars]").forEach((el) => { if (el.dataset.count !== undefined && !el.dataset.counted) countUp(el); else el.textContent = fmt(+el.dataset.ars); });
     if ($("#rUsd")) $("#rUsd").textContent = "$ " + (state.mode === "blue" ? rates.usd_blue : rates.usd_oficial).toLocaleString("es-AR");
     if ($("#rEur")) $("#rEur").textContent = "$ " + (state.mode === "blue" ? rates.eur_blue : rates.eur_oficial).toLocaleString("es-AR");
   }
@@ -91,10 +102,14 @@
 
   // ---------- modal ----------
   const modal = $("#modal");
-  function qty(i) {
-    const q = i.q, u = i.u; const n = Number.isInteger(q) ? q : q.toLocaleString("es-AR");
-    if (u === "u") return n; if (u === "pizca") return ""; return n + " " + u;
+  function qty(i, f = 1) {
+    let q = i.q * f; const u = i.u; if (u === "pizca") return "";
+    if (f !== 1) { if (u === "g" || u === "ml") q = q >= 50 ? Math.round(q / 5) * 5 : Math.round(q); else if (u === "u") q = Math.max(0.5, Math.round(q * 2) / 2); else q = Math.round(q * 10) / 10; }
+    const n = Number.isInteger(q) ? q : q.toLocaleString("es-AR", { maximumFractionDigits: 1 });
+    return u === "u" ? n : n + " " + u;
   }
+  const ingHtml = (r, f) => r.ing.map((i) => `<li>${qty(i, f) ? `<b>${qty(i, f)}</b> ` : ""}${esc(i.n)}</li>`).join("");
+  let curRec = null, curPorc = 1;
   function openRecipe(id) {
     const r = R[id]; if (!r) return;
     const n = r.nut || {};
@@ -106,19 +121,30 @@
         ${r.custom ? `<p class="muted small">Receta de la comunidad, creada por <b>${esc(r.ownerName)}</b>.</p>` : ""}
         <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("plate")}<b>${r.porciones} ${r.porciones === 1 ? "porción" : "porciones"}</b></span>${r.cost ? `<span>${ic("tag")}<b data-ars="${r.cost}"></b> aprox./porción</span>` : ""}</div>
         ${nutLine}
+        <div class="rm-actions">${r.pasos.length ? `<button class="btn small-btn" type="button" data-cook="${r.id}">${ic("play")} Modo cocina</button>` : ""}<a class="mini-btn" href="mi-plan.html?add=${encodeURIComponent(r.id)}">${ic("calendar")} Agregar a mi plan</a></div>
+        ${r.ut?.length ? `<div class="rm-ut"><h3>Utensilios</h3>${utHtml(r)}</div>` : ""}
         <div class="rm-cols">
-          <div><h3>Ingredientes</h3><ul>${r.ing.map((i) => `<li>${qty(i) ? `<b>${qty(i)}</b> ` : ""}${esc(i.n)}</li>`).join("")}</ul></div>
+          <div><h3 class="ing-h">Ingredientes <span class="rm-porc"><button type="button" data-porc="-1" aria-label="Una porción menos">−</button><b id="porcN">${r.porciones}</b><small>${r.porciones === 1 ? "porción" : "porc."}</small><button type="button" data-porc="1" aria-label="Una porción más">+</button></span></h3><ul id="ingList">${ingHtml(r, 1)}</ul></div>
           <div><h3>Preparación</h3>${r.pasos.length ? `<ol>${r.pasos.map((p) => `<li>${esc(p)}</li>`).join("")}</ol>` : `<p class="muted">Sin pasos cargados.</p>`}${r.tip ? `<div class="tip">${ic("bulb")} ${esc(r.tip)}</div>` : ""}</div>
         </div>
         ${r.yt ? `<div class="yt"><h3>Video</h3><button class="yt-thumb" data-yt="${r.yt}" aria-label="Reproducir video"><img src="https://i.ytimg.com/vi/${r.yt}/hqdefault.jpg" alt="" loading="lazy"></button></div>` : ""}
         ${r.credit ? `<p class="credit">Foto: <a href="${r.credit.page}" target="_blank" rel="noopener">${esc(r.credit.title)}</a> · ${esc(r.credit.artist || "Wikimedia Commons")} · ${esc(r.credit.license)} (Wikimedia Commons). El costo se calcula con precios de supermercados online de Buenos Aires de octubre 2026 y es orientativo.</p>` : ""}
       </div>`;
+    curRec = r; curPorc = r.porciones; modal.classList.remove("closing");
     modal.hidden = false; document.body.style.overflow = "hidden"; $(".modal-box").scrollTop = 0; hidePop(); renderMoney();
     if (!history.state?.modal) history.pushState({ modal: 1 }, "");
   }
-  function closeModal(fromPop) { if (modal.hidden) return; modal.hidden = true; document.body.style.overflow = ""; $("#modalContent").innerHTML = ""; if (fromPop !== true && history.state?.modal) history.back(); }
+  function closeModal(fromPop) {
+    if (modal.hidden || modal.classList.contains("closing")) return;
+    const done = () => { modal.classList.remove("closing"); modal.hidden = true; document.body.style.overflow = ""; $("#modalContent").innerHTML = ""; curRec = null; };
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) done(); else { modal.classList.add("closing"); setTimeout(done, 210); }
+    if (fromPop !== true && history.state?.modal) history.back();
+  }
   window.addEventListener("popstate", () => { if (!modal.hidden) closeModal(true); });
   document.addEventListener("click", (e) => {
+    const pb = e.target.closest("[data-porc]");
+    if (pb && curRec) { curPorc = Math.min(12, Math.max(1, curPorc + +pb.dataset.porc)); $("#porcN").textContent = curPorc; $("#porcN").nextElementSibling.textContent = curPorc === 1 ? "porción" : "porc."; const ul = $("#ingList"); ul.innerHTML = ingHtml(curRec, curPorc / curRec.porciones); ul.classList.remove("bump"); void ul.offsetWidth; ul.classList.add("bump"); return; }
+    const ck = e.target.closest("[data-cook]"); if (ck) { openCook(ck.dataset.cook); return; }
     const rec = e.target.closest("[data-rec]"); if (rec) { openRecipe(rec.dataset.rec); return; }
     if (e.target.closest("[data-close]")) closeModal();
     const yt = e.target.closest("[data-yt]");
@@ -129,7 +155,54 @@
       yt.replaceWith(f);
     }
   });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.hidden && !cookEl) closeModal(); });
+  // ---------- modo cocina: un paso por pantalla, timers, pantalla siempre encendida ----------
+  let cookEl = null, wake = null, timers = [];
+  const short = (n) => String(n).replace(/ \(.*\)/, "").replace(/ o .*/, "");
+  const utHtml = (r) => (r.ut?.length ? `<ul class="ut-list">${r.ut.map((u) => `<li title="${esc(u.n)}"><span class="ut-ic">${ic(u.ic)}</span><small>${esc(short(u.n))}</small></li>`).join("")}</ul>` : "");
+  async function lockWake() { try { wake = await navigator.wakeLock?.request("screen"); } catch (e) {} }
+  document.addEventListener("visibilitychange", () => { if (cookEl && document.visibilityState === "visible") lockWake(); });
+  function beep() {
+    try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, 0.35, 0.7].forEach((t) => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(0.0001, a.currentTime + t); g.gain.exponentialRampToValueAtTime(0.25, a.currentTime + t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + t + 0.3); o.start(a.currentTime + t); o.stop(a.currentTime + t + 0.32); }); } catch (e) {}
+    try { navigator.vibrate?.([200, 100, 200]); } catch (e) {}
+  }
+  const timersIn = (txt) => { const out = []; const re = /(\d+)(?:\s*(?:-|–|a)\s*(\d+))?\s*(minutos|minuto|min|horas|hora|h)\b/gi; let m; while ((m = re.exec(txt))) { const v = +(m[2] || m[1]); const s = /^h/i.test(m[3]) ? v * 3600 : v * 60; if (s >= 60 && s <= 4 * 3600 && !out.some((x) => x.s === s)) out.push({ s, label: m[0] }); } return out; };
+  function startTimer(tb) {
+    let left = +tb.dataset.secs; tb.dataset.run = "1"; tb.classList.add("run"); cookEl.querySelector(".cook-running").appendChild(tb); const sp = tb.querySelector("span");
+    const tick = () => { const m = Math.floor(left / 60), s = left % 60; sp.textContent = `${m}:${String(s).padStart(2, "0")}`; if (left-- <= 0) { clearInterval(iv); tb.classList.remove("run"); tb.classList.add("done"); sp.textContent = "¡Tiempo!"; beep(); toastG("¡Terminó el timer!"); } };
+    const iv = setInterval(tick, 1000); timers.push(iv); tick();
+  }
+  function closeCook() { if (!cookEl) return; timers.forEach(clearInterval); timers = []; cookEl.remove(); cookEl = null; if (modal.hidden) document.body.style.overflow = ""; try { wake?.release(); } catch (e) {} wake = null; }
+  function openCook(id) {
+    const r = R[id]; if (!r || !r.pasos.length) return; closeCook(); let k = 0;
+    const f = curRec === r ? curPorc / r.porciones : 1;
+    cookEl = document.createElement("div"); cookEl.className = "cook"; cookEl.setAttribute("role", "dialog"); cookEl.setAttribute("aria-label", "Modo cocina: " + r.name);
+    cookEl.innerHTML = `<header class="cook-top"><div><small>Modo cocina</small><b>${esc(r.name)}</b></div><button class="cook-x" aria-label="Salir del modo cocina">×</button></header>
+      <div class="cook-bar"><i></i></div><div class="cook-running"></div>
+      <div class="cook-body"><p class="cook-n"></p><p class="cook-step" aria-live="polite"></p><div class="cook-timers"></div></div>
+      <details class="cook-ing"><summary>${ic("recetas")} Ingredientes${r.ut?.length ? " y utensilios" : ""}</summary><ul>${ingHtml(r, f)}</ul>${utHtml(r)}</details>
+      <footer class="cook-nav"><button class="mini-btn" data-cprev>← Anterior</button><button class="btn" data-cnext>Siguiente →</button></footer>`;
+    document.body.appendChild(cookEl); document.body.style.overflow = "hidden"; lockWake();
+    const show = (dir) => {
+      const st = cookEl.querySelector(".cook-step"); st.classList.remove("in-l", "in-r"); void st.offsetWidth; st.classList.add(dir < 0 ? "in-l" : "in-r");
+      st.textContent = r.pasos[k]; cookEl.querySelector(".cook-n").textContent = `Paso ${k + 1} de ${r.pasos.length}`;
+      cookEl.querySelector(".cook-bar i").style.width = ((k + 1) / r.pasos.length) * 100 + "%";
+      cookEl.querySelector(".cook-timers").innerHTML = timersIn(r.pasos[k]).map((t) => `<button class="cook-timer" data-secs="${t.s}">${ic("clock")} <span>Timer de ${esc(t.label)}</span></button>`).join("");
+      cookEl.querySelector("[data-cprev]").disabled = k === 0;
+      cookEl.querySelector("[data-cnext]").innerHTML = k === r.pasos.length - 1 ? `${ic("check")} ¡Listo!` : "Siguiente →";
+    };
+    const go = (d) => { if (d > 0 && k === r.pasos.length - 1) { closeCook(); toastG("¡Buen provecho!"); return; } const nk = Math.max(0, Math.min(r.pasos.length - 1, k + d)); if (nk === k) return; k = nk; show(d); };
+    cookEl.addEventListener("click", (e) => {
+      if (e.target.closest(".cook-x")) { closeCook(); return; }
+      if (e.target.closest("[data-cnext]")) go(1); else if (e.target.closest("[data-cprev]")) go(-1);
+      const tb = e.target.closest(".cook-timer"); if (tb && !tb.dataset.run) startTimer(tb);
+    });
+    let x0 = null; cookEl.addEventListener("touchstart", (e) => { if (!e.target.closest("details")) x0 = e.touches[0].clientX; }, { passive: true });
+    cookEl.addEventListener("touchend", (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 60) go(dx < 0 ? 1 : -1); x0 = null; });
+    show(1);
+  }
+  document.addEventListener("keydown", (e) => { if (!cookEl) return; if (e.key === "ArrowRight") cookEl.querySelector("[data-cnext]").click(); if (e.key === "ArrowLeft" && !cookEl.querySelector("[data-cprev]").disabled) cookEl.querySelector("[data-cprev]").click(); if (e.key === "Escape") closeCook(); });
+
 
   // ---------- popover (hover) ----------
   const pop = $("#pop");
@@ -195,7 +268,7 @@
 
 
   // ---------- inicio ----------
-  if (page === "inicio") {
+  if ((page === "inicio" || page === "404") && $("#today")) {
     const vid = $("#introVideo");
     if (vid && window.matchMedia("(max-width: 720px)").matches) { vid.poster = "media/intro-vertical-poster.jpg"; vid.querySelector("source").src = "media/intro-vertical.mp4"; vid.classList.add("vertical"); vid.load(); }
     const d = houseDay(todayISO);
@@ -309,6 +382,26 @@
     $("#recSections").innerHTML = CATS.map((c) => `<section class="cat" id="${c.id}"><div class="cat-head"><h2>${esc(c.t)}</h2><p class="muted">${esc(c.d)}</p></div><div class="grid">${c.ids.map((id) => card(R[id])).join("")}</div></section>`).join("");
   }
 
+  // ---------- recetas: búsqueda y filtros ----------
+  if (page === "recetas" && $("#recQ")) {
+    const nz = (s) => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    const F = [["rapidas", "Hasta 20 min", (r) => r.tiempo <= 20], ["veg", "Vegetarianas", (r) => r.tags.includes("vegetariano")], ["horno", "Al horno", (r) => r.tags.includes("horno")],
+      ["eco", "Económicas", (r) => r.cost && r.cost <= 2500], ["prot", "Proteicas", (r) => r.tags.includes("proteico") || (r.nut?.prot || 0) >= 35], ["liv", "Livianas", (r) => r.kcal < 450], ["sinc", "Sin cocción", (r) => r.tags.includes("sin cocción")]];
+    const on = new Set();
+    $("#recF").innerHTML = F.map(([k, t]) => `<button class="pchip" type="button" data-f="${k}" aria-pressed="false">${t}</button>`).join("");
+    const run = () => {
+      const raw = $("#recQ").value.trim(), q = nz(raw), act = !!(q || on.size);
+      $("#recSections").hidden = act; $("#catNav").hidden = act; $("#recFound").hidden = !act; if (!act) return;
+      const list = Object.values(R).filter((r) => !r.custom && [...on].every((k) => F.find((f) => f[0] === k)[2](r)) && (!q || q.split(/\s+/).every((w) => nz(r.name + " " + r.tags.join(" ") + " " + r.ing.map((i) => i.n).join(" ")).includes(w))));
+      $("#recFound").innerHTML = list.length ? `<p class="muted small rec-count">${list.length === 1 ? "1 receta" : list.length + " recetas"}${raw ? ` con «${esc(raw)}»` : ""} · <button class="linkish" type="button" data-fclear>ver todas</button></p><div class="grid">${list.map(card).join("")}</div>`
+        : `<div class="card empty"><p>Ninguna receta cumple todo eso a la vez.</p><button class="mini-btn" type="button" data-fclear>Limpiar la búsqueda</button></div>`;
+      renderMoney();
+    };
+    $("#recF").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (!b) return; const k = b.dataset.f; if (on.has(k)) on.delete(k); else on.add(k); b.classList.toggle("on", on.has(k)); b.setAttribute("aria-pressed", String(on.has(k))); run(); });
+    let tq; $("#recQ").addEventListener("input", () => { clearTimeout(tq); tq = setTimeout(run, 150); });
+    document.addEventListener("click", (e) => { if (!e.target.closest("[data-fclear]")) return; on.clear(); $$("#recF .pchip").forEach((b) => { b.classList.remove("on"); b.setAttribute("aria-pressed", "false"); }); $("#recQ").value = ""; run(); });
+  }
+
   // ---------- compras ----------
   function renderShopping() {
     if (!$("#shopGrid")) return;
@@ -318,7 +411,8 @@
     const n = list.reduce((a, c) => a + c.items.length, 0);
     const key = (c, nm) => `shop:${w.start}:${c}:${nm}`;
     const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
-    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html?semana=${w.start}">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
+    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html?semana=${w.start}">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="printList">${ic("printer")} Imprimir</button><button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
+    $("#printList")?.addEventListener("click", () => window.print());
     $("#clearWeek").addEventListener("click", () => { list.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
     // texto plano de la lista (solo lo que falta comprar; si no hay nada tildado, todo) para pegar en Notas o WhatsApp
     const listText = () => {
@@ -491,7 +585,7 @@
         const rows = (j.results || []).filter((r) => { const n = normS(r.name); return qn.every((w) => n.includes(w) || n.includes(w.replace(/s$/, ""))); }).sort((a, b) => a.price - b.price);
         window.__lastRows = rows; window.__lastQ = q; const tracked = new Set(getAlerts().map((a) => a.link));
         const byStore = {}; rows.forEach((r) => { (byStore[r.store] = byStore[r.store] || []).push(r); });
-        const bsItem = (r) => `<div class="bs-item"><a class="bs-row" href="${r.link}" target="_blank" rel="noopener">${r.img ? `<img src="${r.img}" alt="" loading="lazy">` : ""}<span>${esc(r.name)}</span><b data-ars="${r.price}"></b>${r.unit === "kg" ? "<small>/kg</small>" : ""}</a><button class="bell${tracked.has(r.link) ? " on" : ""}" type="button" data-track="${rows.indexOf(r)}" aria-label="Avisarme si baja" title="Avisarme si baja">${ic("bell")}</button></div>`;
+        const bsItem = (r) => `<div class="bs-item"><a class="bs-row" href="${r.link}" target="_blank" rel="noopener">${r.img ? `<img src="${r.img}" alt="" loading="lazy">` : ""}<span>${esc(r.name)}</span><b data-ars="${r.price}"></b>${r.unit === "kg" ? (r.mult && Math.abs(r.mult - 1) > 0.01 ? `<small>${Math.round(r.mult * 1000)} g</small>` : "<small>/kg</small>") : ""}</a><button class="bell${tracked.has(r.link) ? " on" : ""}" type="button" data-track="${rows.indexOf(r)}" aria-label="Avisarme si baja" title="Avisarme si baja">${ic("bell")}</button></div>`;
         const best = rows[0];
         res.innerHTML = rows.length ? `<p class="small">${rows.length} resultados · el más barato: <b>${esc(best.name)}</b> en <b>${esc(best.store)}</b> a <b data-ars="${best.price}"></b>${best.unit === "kg" ? " por kg" : ""} · <a href="${best.link}" target="_blank" rel="noopener">comprar ↗</a></p>
           <div class="buscar-grid">${Object.entries(byStore).sort((a, b) => a[1][0].price - b[1][0].price).map(([s, list]) => `<div class="card bs"><h4>${esc(s)} <small>${list.length}</small></h4>${list.slice(0, 3).map(bsItem).join("")}${list.length > 3 ? `<details class="bs-more"><summary>ver ${Math.min(list.length, 8) - 3} más</summary>${list.slice(3, 8).map(bsItem).join("")}</details>` : ""}</div>`).join("")}</div>

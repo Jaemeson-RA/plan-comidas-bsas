@@ -149,7 +149,8 @@ function dayPlan(dateISO, src) {
 }
 function aggregateShopping(days) {
   const agg = new Map();
-  days.forEach((d) => SLOTS.forEach((s) => { const r = R[d?.[s]]; if (!r) return; r.ing.forEach((i) => { if (i.c === "pantry") return; const k = `${i.c}|${i.n}|${i.u}`; agg.set(k, (agg.get(k) || 0) + i.q); }); }));
+  days.forEach((d) => SLOTS.forEach((s) => { const r = R[d?.[s]]; if (!r) return; r.ing.forEach((i) => { if (i.c === "pantry") return; const k = `${i.c}|${i.n}|${i.u}`; agg.set(k, (agg.get(k) || 0) + i.q * (+d.x || 1)); }); }));
+  days.forEach((d) => { if (d?.colacion) { [["alm|frutos secos (mix)|g", 30], ["verd|fruta de estación (manzana, naranja, banana)|u", 1]].forEach(([k, q]) => agg.set(k, (agg.get(k) || 0) + q)); } });
   const CATS = { verd: "Verdulería", carne: "Carnicería y pescadería", lact: "Lácteos y huevos", alm: "Almacén", pan: "Panadería" };
   const fmtq = (q, u) => { q = Math.round(q * 10) / 10; if ((u === "g" || u === "ml") && q >= 1000) return `${q / 1000} ${u === "g" ? "kg" : "L"}`; return u === "u" ? `${q} u` : `${q} ${u}`; };
   const out = Object.keys(CATS).map((c) => ({ c, cat: CATS[c], items: [] }));
@@ -157,21 +158,21 @@ function aggregateShopping(days) {
   out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
   return out.filter((c) => c.items.length);
 }
-function render() { if (page === "miplan") { renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); renderWho(); renderPerfil(); renderFriends(); renderReto(); renderRecap(); renderInbox(); } if (page === "nutricion") renderNut(); }
+function render() { if (page === "miplan") { maybeAdd(); renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); renderWho(); renderPerfil(); renderFriends(); renderReto(); renderRecap(); renderInbox(); renderProg(); } if (page === "nutricion") renderNut(); }
 
 // =====================================================================
 // MI PLAN · calendario
 // =====================================================================
 let myWeek = null, pickCtx = null, notifyTimer = null;
-$("#mpSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; $$("#mpSeg button").forEach((x) => x.classList.toggle("on", x === b)); ["cal", "rec", "ing", "rank", "perfil"].forEach((t) => { $("#tab" + t[0].toUpperCase() + t.slice(1)).hidden = b.dataset.tab !== t; }); localStorage.setItem("mpTab", b.dataset.tab); window.dispatchEvent(new Event("scroll")); });
-if (page === "miplan") { const t = location.hash === "#rank" ? "rank" : localStorage.getItem("mpTab"); if (t) $(`#mpSeg [data-tab="${t}"]`)?.click(); }
+$("#mpSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; $$("#mpSeg button").forEach((x) => x.classList.toggle("on", x === b)); ["cal", "rec", "ing", "rank", "prog", "perfil"].forEach((t) => { $("#tab" + t[0].toUpperCase() + t.slice(1)).hidden = b.dataset.tab !== t; }); localStorage.setItem("mpTab", b.dataset.tab); window.dispatchEvent(new Event("scroll")); });
+if (page === "miplan") { const t = location.hash === "#rank" ? "rank" : location.hash === "#prog" || new URLSearchParams(location.search).get("gasto") ? "prog" : localStorage.getItem("mpTab"); if (t) $(`#mpSeg [data-tab="${t}"]`)?.click(); }
 function renderMiPlan() {
   const box = $("#planBox"); if (!box) return; box.hidden = !user; if (!user) return;
   $("#whoName").textContent = myName(); $("#whoEmail").textContent = "· " + user.email;
   const weeks = weekList(); if (!myWeek || !weeks.some((w) => w.start === myWeek)) myWeek = weeks[0].start;
   $("#myWeekTabs").innerHTML = weeks.map((w) => `<button data-w="${w.start}" class="${w.start === myWeek ? "on" : ""}">${esc(w.label)}</button>`).join("");
   const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i));
-  $("#myCal").innerHTML = days.map((dt, i) => { const d = cal?.days?.[dt] || {}; return `<article class="my-day${dt === todayISO ? " today" : ""}"><h4>${DOW[i]} <span>${label(dt)}</span></h4>
+  $("#myCal").innerHTML = days.map((dt, i) => { const d = cal?.days?.[dt] || {}; return `<article class="my-day${dt === todayISO ? " today" : ""}"><h4>${DOW[i]} <span>${label(dt)}</span>${d.x && Math.abs(d.x - 1) > 0.05 ? ` <em class="porc-x" title="Porciones del día (las ajustó «Tu mes a medida»)">×${(+d.x).toLocaleString("es-AR")}</em>` : ""}${d.colacion ? ` <em class="porc-x snack" title="Colación: frutos secos (30 g) y una fruta">+ colación</em>` : ""}</h4>
       ${SLOTS.map((s) => { const r = R[d[s]]; return `<button class="slot${r ? "" : " empty"}" data-date="${dt}" data-slot="${s}">${ic(s)}${r ? `<img src="${r.img}"${srcs(r)} alt=""><span>${esc(r.name)}${r.custom ? " <small>· receta de " + esc(r.ownerName) + "</small>" : ""}</span>` : `<span>+ elegir ${s}</span>`}</button>`; }).join("")}
       ${dt <= todayISO ? (cal?.libre?.[dt] ? `<span class="done-btn libre">${ic("star")} Día libre (combo a salvo)</span>` : `<span class="done-row"><button class="done-btn${cal?.done?.[dt] ? " on" : ""}" data-done="${dt}">${ic("check")} ${cal?.done?.[dt] ? "Día cumplido" : "Marcar cumplido"}</button>${!cal?.done?.[dt] && fichasDisponibles() > 0 ? `<button class="done-btn ficha" data-libre="${dt}" title="Usar una ficha: el día no suma puntos pero no corta la racha">${ic("coin")} Día libre</button>` : ""}</span>`) : `<span class="done-btn future">${ic("clock")} todavía no</span>`}
     </article>`; }).join("");
@@ -230,6 +231,7 @@ $("#picker")?.addEventListener("click", async (e) => {
   if (e.target.closest("[data-pclose]")) { closePicker(); return; }
   const p = e.target.closest("[data-pick]");
   if (p && pickCtx?.propose) { await sendProposal(p.dataset.pick); return; }
+  if (p && pickCtx?.addSelf) { const date = $("#propDate").value || todayISO, slot = $("#propSlot").value || "cena"; try { await update(ref(db, `calendars/${user.uid}/days/${date}`), { [slot]: p.dataset.pick }); closePicker(); myWeek = mondayOf(date); touched(`Listo: ${R[p.dataset.pick]?.name || "el plato"} quedó para ${slot === "cena" ? "la cena" : "el " + slot} del ${fechaLarga(date)}.`); renderMiPlan(); } catch (ex) { toast(errMsg(ex)); } return; }
   if (p && pickCtx) { try { await update(ref(db, `calendars/${user.uid}/days/${pickCtx.date}`), { [pickCtx.slot]: p.dataset.pick }); closePicker(); touched(); } catch (ex) { toast(errMsg(ex)); } }
 });
 $("#pickerClear")?.addEventListener("click", async () => { if (pickCtx) { await update(ref(db, `calendars/${user.uid}/days/${pickCtx.date}`), { [pickCtx.slot]: null }).catch(() => {}); closePicker(); touched(); } });
@@ -469,7 +471,7 @@ function daysForPeriod() {
 }
 function totals(days) {
   const t = Object.fromEntries(NUTK.map((k) => [k, 0])); const ids = new Set(); let sugKnown = true;
-  days.forEach((d) => { SLOTS.forEach((s) => { const r = R[d[s]]; if (!r) return; ids.add(r.id); NUTK.forEach((k) => { const v = r.nut[k]; if ((k === "sug" || k === "sat") && (v === null || v === undefined)) { sugKnown = false; return; } t[k] += v || 0; }); }); Object.keys(D.meriendaNut).forEach((k) => { t[k] += D.meriendaNut[k]; }); });
+  days.forEach((d) => { SLOTS.forEach((s) => { const r = R[d[s]]; if (!r) return; ids.add(r.id); NUTK.forEach((k) => { const v = r.nut[k]; if ((k === "sug" || k === "sat") && (v === null || v === undefined)) { sugKnown = false; return; } t[k] += (v || 0) * (+d.x || 1); }); }); Object.keys(D.meriendaNut).forEach((k) => { t[k] += D.meriendaNut[k]; }); if (d.colacion) NUTK.forEach((k) => { t[k] += COLACION[k] || 0; }); });
   const n = days.length || 1; NUTK.forEach((k) => { t[k] = t[k] / n; });
   return { avg: t, n: days.length, distinct: ids.size, sugKnown };
 }
@@ -555,12 +557,12 @@ if (page === "nutricion") {
     if (!p.edad || !p.altura || !p.peso) { $("#profState").textContent = "Completá edad, altura y peso."; return; }
     localStorage.setItem(PROF_KEY, JSON.stringify(p));
     if (user) update(ref(db, `calendars/${user.uid}/profile`), { nut: p }).catch(() => {});
-    renderNut(); toast("Listo: análisis actualizado.");
+    renderNut(); renderMedida(); toast("Listo: análisis actualizado. Abajo podés armar tu mes a medida.");
   });
   $("#srcSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; if (b.classList.contains("off")) { toast(user ? "Tu calendario todavía no tiene platos: armalos en Mi plan." : "Ingresá en Mi plan para analizar tu calendario."); if (!user) setTimeout(() => { location.href = "mi-plan.html"; }, 1400); return; } nut.src = b.dataset.src; nut.week = null; renderNut(); });
   $("#perSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { nut.per = b.dataset.per; $$("#perSeg button").forEach((x) => x.classList.toggle("on", x === b)); renderNut(); } });
   $("#nutWeekTabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { nut.week = b.dataset.w; renderNut(); } });
-  renderNut();
+  renderNut(); renderMedida();
 }
 
 // =====================================================================
@@ -1011,3 +1013,207 @@ $("#delForm")?.addEventListener("submit", async (e) => {
   } catch (ex) { err.textContent = ex?.code === "auth/wrong-password" || ex?.code === "auth/invalid-credential" ? "La contraseña no coincide." : errMsg(ex); err.hidden = false; }
   btn.disabled = false;
 });
+
+
+// ---- agregar una receta desde su ficha (mi-plan.html?add=id) ----
+const ADD = new URLSearchParams(location.search).get("add");
+function maybeAdd() {
+  if (!ADD || !user || !cal || window.__added || page !== "miplan") return; const r = R[ADD]; if (!r) return; window.__added = 1;
+  pickCtx = { addSelf: ADD, date: todayISO, slot: r.tipo === "desayuno" ? "desayuno" : "cena" };
+  $("#pickerTitle").textContent = `¿Cuándo comés «${r.name}»?`; $("#propRow").hidden = false; $("#propDate").value = pickCtx.date; $("#propDate").min = ""; $("#propSlot").value = pickCtx.slot; $("#pickerClear").hidden = true;
+  $("#pickerSearch").value = r.name; fillPicker(r.name); $("#picker").hidden = false; document.body.style.overflow = "hidden";
+  history.replaceState(null, "", location.pathname);
+}
+
+
+// =====================================================================
+// NUTRICIÓN · «Tu mes a medida»: un calendario armado para los aportes del perfil
+// Para cada día prueba todas las combinaciones desayuno + almuerzo + cena, ajusta la porción a la energía del perfil
+// y se queda con la que mejor cubre proteínas, fibra, sal, azúcares y el reparto de grasas e hidratos, sin repetir platos seguidos.
+// =====================================================================
+const MD_KEY = "mesMedida";
+// colación: un puñado de frutos secos (30 g) y una fruta; casi sin sal
+const COLACION = { kcal: 260, prot: 6, carb: 27, sug: 17, fat: 15, sat: 1.6, fib: 5, sal: 0.02 };
+const mulberry = (a) => () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+const fmtX = (x) => (Math.abs(x - 1) < 0.05 ? "" : "×" + x.toLocaleString("es-AR", { maximumFractionDigits: 2 }));
+function mdDates(per) {
+  if (per === "next") { const d = new Date(todayISO + "T12:00:00"); d.setDate(1); d.setMonth(d.getMonth() + 1); const y = d.getFullYear(), m = d.getMonth() + 1, n = new Date(y, m, 0).getDate(); return Array.from({ length: n }, (_, i) => `${y}-${String(m).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}`); }
+  return Array.from({ length: 30 }, (_, i) => addDays(todayISO, i));
+}
+function buildMonth(p, opts) {
+  const T = targets(p), M = D.meriendaNut, rnd = mulberry(opts.seed);
+  const base = Object.values(R).filter((r) => !r.custom && r.nut && r.nut.kcal);
+  const BK = base.filter((r) => r.tipo === "desayuno"), PL = base.filter((r) => r.tipo !== "desayuno");
+  const use = {}, last = {}, out = [];
+  const N = (r, k) => (r.nut[k] == null ? 0 : r.nut[k]);
+  mdDates(opts.per).forEach((date, di) => {
+    const dow = (new Date(date + "T12:00:00").getDay() + 6) % 7, finde = dow >= 5;
+    const E = T.kcal - M.kcal; let best = null;
+    const dia29 = date.slice(8) === "29" && PL.some((r) => r.id === "noquis");
+    const search = (gap) => {
+    const recent = (r) => (last[r.id] != null && di - last[r.id] < gap) || (gap >= 3 && (use[r.id] || 0) >= 5);  // como mucho 5 veces en el mes
+    BK.forEach((b) => {
+      if (gap > 1 && last[b.id] === di - 1 && BK.length > 2) return;  // el mismo desayuno dos días seguidos no
+      PL.forEach((l) => {
+        if (dia29 ? l.id !== "noquis" : recent(l)) return;  // ñoquis del 29, aunque se hayan comido hace poco
+        PL.forEach((c) => {
+          if (c === l || recent(c)) return;
+          const k3 = N(b, "kcal") + N(l, "kcal") + N(c, "kcal");
+          const snack = E / k3 > 1.3;  // si hace falta mucha energía, una colación sin sal en vez de agrandar todos los platos
+          const x = Math.min(1.8, Math.max(0.75, Math.round(((E - (snack ? COLACION.kcal : 0)) / k3) * 20) / 20));
+          const t = {}; NUTK.forEach((k) => { t[k] = (M[k] || 0) + (snack ? COLACION[k] || 0 : 0) + x * (N(b, k) + N(l, k) + N(c, k)); });
+          let s = 3 * Math.abs(t.kcal - T.kcal) / T.kcal;
+          s += 3 * Math.max(0, T.protMin - t.prot) / T.protMin + 0.6 * Math.max(0, t.prot - T.protMax) / T.protMax;
+          s += 3 * Math.max(0, T.fib - t.fib) / T.fib;
+          s += 4.5 * Math.max(0, t.sal - T.sal) / T.sal;
+          s += Math.max(0, t.sug - T.sug) / T.sug + Math.max(0, t.sat - T.sat) / T.sat;
+          const fp = t.fat * 9 / t.kcal, cp = t.carb * 4 / t.kcal; s += 2 * (Math.max(0, fp - 0.35) + Math.max(0, 0.25 - fp)) + 1.5 * (Math.max(0, cp - 0.6) + Math.max(0, 0.45 - cp));
+          s += 0.3 * ((use[l.id] || 0) + (use[c.id] || 0)) + 0.08 * (use[b.id] || 0);  // variedad en el mes
+          const largo = (r) => r.tiempo >= 45 || r.tags.includes("finde") || r.tags.includes("clásico argentino");
+          if (!finde && c.tiempo > 40) s += 0.35; if (!finde && l.tiempo > 50) s += 0.2; if (finde && !largo(l) && !largo(c)) s += 0.15;
+          if (opts.eco) s += 0.00012 * x * ((b.cost || 0) + (l.cost || 0) + (c.cost || 0));
+          s += 0.12 * rnd();
+          if (!best || s < best.s) best = { s, b, l, c, x, t, snack };
+        });
+      });
+    });
+    };
+    search(3); if (!best) search(1); if (!best) search(0);  // si no hay combinación sin repetir, se afloja la regla en vez de saltear el día
+    if (!best) return;
+    [best.b, best.l, best.c].forEach((r) => { use[r.id] = (use[r.id] || 0) + 1; last[r.id] = di; });
+    out.push({ date, desayuno: best.b.id, almuerzo: best.l.id, cena: best.c.id, x: best.x, t: best.t, snack: best.snack ? 1 : 0 });
+  });
+  return out;
+}
+function renderMedida() {
+  const box = $("#medida"); if (!box) return;
+  const p = loadProfile() || cal?.profile?.nut || null; box.hidden = !p; if (!p) return;
+  const st = (() => { try { return JSON.parse(localStorage.getItem(MD_KEY) || "null"); } catch (e) { return null; } })();
+  $$("#mdPer button").forEach((b) => b.classList.toggle("on", b.dataset.p === (st?.per || "30")));
+  if ($("#mdEco")) $("#mdEco").checked = !!st?.eco;
+  const res = $("#mdRes"); if (!st?.days?.length) { res.innerHTML = ""; return; }
+  const T = targets(p), days = st.days;
+  const avg = {}; NUTK.forEach((k) => { avg[k] = days.reduce((a, d) => a + (d.t[k] || 0), 0) / days.length; });
+  const ev = evaluate(avg, T, new Set(days.flatMap((d) => [d.desayuno, d.almuerzo, d.cena])).size, days.length, true);
+  const cost = days.reduce((a, d) => a + d.x * ((R[d.desayuno]?.cost || 0) + (R[d.almuerzo]?.cost || 0) + (R[d.cena]?.cost || 0)) + (d.snack ? 1100 : 0), 0);
+  const nSnack = days.filter((d) => d.snack).length;
+  const casa = totals(days.map((d) => dayPlan(d.date, "casa"))), evC = evaluate(casa.avg, T, casa.distinct, casa.n, casa.sugKnown);
+  const tile = (n, v, sub, ok) => `<div class="md-tile${ok ? " ok" : ""}"><small>${n}</small><b>${v}</b><span>${sub}</span></div>`;
+  const first = days[0].date, lead = (new Date(first + "T12:00:00").getDay() + 6) % 7;
+  const MES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  const title = st.per === "next" ? `${MES[+first.slice(5, 7) - 1]} ${first.slice(0, 4)}` : `${label(first)} → ${label(days[days.length - 1].date)}`;
+  const cell = (d) => { const dd = new Date(d.date + "T12:00:00"); return `<div class="md-day${d.date === todayISO ? " today" : ""}${dd.getDay() % 6 === 0 ? " wk" : ""}">
+      <div class="md-d"><b>${dd.getDate()}</b><small>${["dom", "lun", "mar", "mié", "jue", "vie", "sáb"][dd.getDay()]}</small>${fmtX(d.x) ? `<em title="Porciones de ese día">${fmtX(d.x)}</em>` : ""}</div>
+      ${SLOTS.map((s) => { const r = R[d[s]]; return r ? `<button class="md-m" data-rec="${r.id}" title="${esc(r.name)}">${ic(s)}<span>${esc(r.name)}</span></button>` : ""; }).join("")}
+      ${d.snack ? `<span class="md-snack" title="Un puñado de frutos secos (30 g) y una fruta">${ic("leaf")}<span>+ colación</span></span>` : ""}
+      <div class="md-k">${Math.round(d.t.kcal).toLocaleString("es-AR")} kcal · ${Math.round(d.t.prot)} g prot · ${Math.round(d.t.fib)} g fibra</div></div>`; };
+  res.innerHTML = `<div class="md-sum">
+      ${tile("Nota del mes", `${ev.score.toLocaleString("es-AR")}<small>/10</small>`, `el plan de la casa: ${evC.score.toLocaleString("es-AR")}/10`, ev.score >= 8)}
+      ${tile("Energía por día", `${Math.round(avg.kcal).toLocaleString("es-AR")}<small> kcal</small>`, `objetivo ${T.kcal.toLocaleString("es-AR")}`, Math.abs(avg.kcal - T.kcal) / T.kcal < 0.08)}
+      ${tile("Proteínas", `${Math.round(avg.prot)}<small> g</small>`, `mínimo ${T.protMin} g`, avg.prot >= T.protMin)}
+      ${tile("Fibra", `${Math.round(avg.fib)}<small> g</small>`, `objetivo ${T.fib} g`, avg.fib >= T.fib * 0.85)}
+      ${tile("Sal", `${avg.sal.toLocaleString("es-AR", { maximumFractionDigits: 1 })}<small> g</small>`, `máximo ${T.sal} g`, avg.sal <= T.sal)}
+      ${tile("Costo estimado", `<span data-ars="${Math.round(cost)}" data-count></span>`, "en el mes, sin la merienda", true)}
+    </div>
+    <p class="muted small">${esc(title)} · ${days.length} días. Las porciones de cada día (×1,2, ×1,5…) ajustan la energía a tu objetivo: en Mi plan, la lista de compras y la nutrición las tienen en cuenta.${nSnack ? ` ${nSnack} días suman una colación (frutos secos y una fruta) para llegar a la energía sin cargar de sal los platos.` : ""}${avg.sal > T.sal ? " Para bajar la sal: cociná sin sal agregada y salá apenas en el plato." : ""}${ev.bad.length ? " Lo que todavía no cierra: " + esc(ev.bad.map((b) => b.split(":")[0]).join(", ").toLowerCase()) + "." : ""}</p>
+    <div class="md-actions"><button class="btn" id="mdSave" type="button">${ic("calendar")} Guardar en Mi plan</button><button class="mini-btn" id="mdAgain" type="button">${ic("refresh")} Armar otro</button></div>
+    <div class="md-head">${["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map((d) => `<div>${d}</div>`).join("")}</div>
+    <div class="md-grid">${"<div class=\"md-pad\"></div>".repeat(lead)}${days.map(cell).join("")}</div>`;
+  window.renderMoney?.();
+}
+if (page === "nutricion" && $("#medida")) {
+  const go = (seed) => {
+    const p = loadProfile() || cal?.profile?.nut; if (!p) { toast("Completá tus datos arriba primero."); return; }
+    const per = $("#mdPer .on")?.dataset.p || "30", eco = $("#mdEco").checked;
+    $("#mdRes").innerHTML = `<div class="md-sum">${Array.from({ length: 6 }, () => `<div class="md-tile skel-box"><span class="skel" style="width:50%;height:11px"></span><span class="skel" style="width:70%;height:26px"></span></div>`).join("")}</div>`;
+    setTimeout(() => {
+      const days = buildMonth(p, { per, eco, seed: seed || (Date.now() & 0xffffff) });
+      try { localStorage.setItem(MD_KEY, JSON.stringify({ per, eco, at: Date.now(), days })); } catch (e) {}
+      renderMedida(); $("#mdRes").scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+  };
+  $("#mdGo").addEventListener("click", () => go());
+  $("#mdPer").addEventListener("click", (e) => { const b = e.target.closest("[data-p]"); if (!b) return; $$("#mdPer button").forEach((x) => x.classList.toggle("on", x === b)); });
+  $("#mdRes").addEventListener("click", async (e) => {
+    if (e.target.closest("#mdAgain")) { go(); return; }
+    if (!e.target.closest("#mdSave")) return;
+    if (!user) { toast("Ingresá en Mi plan para guardar el mes en tu calendario."); setTimeout(() => { location.href = "mi-plan.html"; }, 1500); return; }
+    const st = JSON.parse(localStorage.getItem(MD_KEY) || "null"); if (!st?.days?.length) return;
+    const ocupados = st.days.filter((d) => { const x = cal?.days?.[d.date]; return x && SLOTS.some((s) => x[s]); }).length;
+    if (ocupados && !confirm(`Vas a reemplazar ${ocupados} ${ocupados === 1 ? "día que ya tenías armado" : "días que ya tenías armados"} en tu calendario. ¿Seguimos?`)) return;
+    const upd = {}; st.days.forEach((d) => { upd[d.date] = { desayuno: d.desayuno, almuerzo: d.almuerzo, cena: d.cena, x: d.x, colacion: d.snack ? 1 : null }; });
+    try { await update(ref(db, `calendars/${user.uid}/days`), upd); toast(`Listo: ${st.days.length} días guardados en tu calendario.`); nut.src = "mio"; renderNut(); }
+    catch (ex) { toast(errMsg(ex)); }
+  });
+}
+
+
+// =====================================================================
+// MI PLAN · PROGRESO: semana a semana y gastos por supermercado
+// =====================================================================
+let progN = 8;
+const G_STORES = ["Coto", "Día", "Carrefour", "Jumbo", "Disco", "Vea", "ChangoMás", "Verdulería o almacén", "Otro"];
+const G_COL = { Carrefour: "#2A6FB8", "Día": "#D93A2B", Coto: "#8E2C48", Jumbo: "#3E9B4F", Disco: "#E58A1F", Vea: "#C99A1E", "ChangoMás": "#5B6BBF", "Verdulería o almacén": "#2F8F5B", Otro: "#8A948F" };
+const ars = (n) => `<span data-ars="${Math.round(n)}"></span>`;
+function renderProg() {
+  const box = $("#tabProg"); if (!box || !user || !cal) return;
+  const p = loadProfile() || cal?.profile?.nut || null, T = p ? targets(p) : null;
+  // se cuenta desde que empezaste (alta de la cuenta o primer día marcado), no desde antes
+  const firstDone = Object.keys(cal.done || {}).sort()[0], since = [String(cal.profile?.createdAt || "").slice(0, 10), firstDone].filter(Boolean).sort()[0] || todayISO;
+  const mon = mondayOf(todayISO), weeks = Array.from({ length: progN }, (_, i) => addDays(mon, -7 * i)).filter((m, i) => i === 0 || addDays(m, 6) >= since);
+  const nW = weeks.length;
+  const gastos = Object.entries(cal.gastos || {}).map(([k, g]) => Object.assign({ k }, g)).filter((g) => g.fecha).sort((a, b) => b.fecha.localeCompare(a.fecha) || (b.at || "").localeCompare(a.at || ""));
+  const W = weeks.map((m) => {
+    const end = addDays(m, 6), dates = Array.from({ length: 7 }, (_, i) => addDays(m, i)), past = dates.filter((d) => d <= todayISO && d >= since);
+    const planned = dates.map((d) => dayPlan(d, "mio")).filter(Boolean);
+    const g = gastos.filter((x) => x.fecha >= m && x.fecha <= end), byS = {}; g.forEach((x) => { byS[x.store] = (byS[x.store] || 0) + (+x.monto || 0); });
+    return { m, end, dates, past: past.length, done: dates.filter((d) => cal.done?.[d]).length, libre: dates.filter((d) => cal.libre?.[d]).length,
+      nut: planned.length ? totals(planned) : null, xp: Math.max(0, myXP(end > todayISO ? todayISO : end).xp - myXP(addDays(m, -1)).xp), gt: g.reduce((a, x) => a + (+x.monto || 0), 0), byS };
+  });
+  const sum = W.reduce((a, w) => ({ done: a.done + w.done, past: a.past + w.past, xp: a.xp + w.xp, gt: a.gt + w.gt }), { done: 0, past: 0, xp: 0, gt: 0 });
+  const nutDays = W.filter((w) => w.nut).flatMap((w) => w.dates.map((d) => dayPlan(d, "mio")).filter(Boolean)), N = nutDays.length ? totals(nutDays) : null;
+  const tile = (t, v, sub, ok) => `<div class="md-tile${ok ? " ok" : ""}"><small>${t}</small><b>${v}</b><span>${sub}</span></div>`;
+  $("#progSum").innerHTML = [
+    tile("Días cumplidos", `${sum.done}<small>/${sum.past}</small>`, sum.past ? `${Math.round(sum.done / sum.past * 100)} % de los días` : "todavía nada", sum.past && sum.done / sum.past >= 0.7),
+    tile("XP ganada", `+${sum.xp.toLocaleString("es-AR")}`, `${Math.round(sum.xp / nW).toLocaleString("es-AR")} por semana`, sum.xp > 0),
+    tile("Gastaste", sum.gt ? ars(sum.gt) : "—", sum.gt ? `≈ ${Math.round(sum.gt / nW).toLocaleString("es-AR")} ARS por semana` : "registrá tus compras abajo", false),
+    N ? tile("Energía por día", `${Math.round(N.avg.kcal).toLocaleString("es-AR")}<small> kcal</small>`, T ? `objetivo ${T.kcal.toLocaleString("es-AR")}` : "completá tus datos en Nutrición", T && Math.abs(N.avg.kcal - T.kcal) / T.kcal < 0.12) : tile("Energía por día", "—", "armá tu calendario", false),
+    N ? tile("Proteínas", `${Math.round(N.avg.prot)}<small> g</small>`, T ? `mínimo ${T.protMin} g` : "por día", T && N.avg.prot >= T.protMin) : "",
+    N ? tile("Fibra · sal", `${Math.round(N.avg.fib)}<small> g</small> · ${N.avg.sal.toLocaleString("es-AR", { maximumFractionDigits: 1 })}<small> g</small>`, T ? `fibra ≥ ${T.fib} g · sal ≤ ${T.sal} g` : "por día", T && N.avg.fib >= T.fib * 0.85 && N.avg.sal <= T.sal) : "",
+  ].join("");
+  // gráfico 1: días cumplidos por semana (de la más vieja a la actual)
+  const asc = [...W].reverse(), maxG = Math.max(1, ...asc.map((w) => w.gt));
+  const short = (m) => `${+m.slice(8)}/${+m.slice(5, 7)}`;
+  $("#progDays").innerHTML = `<h3>Días cumplidos</h3><div class="pc-bars">${asc.map((w) => `<div class="pc-col${w.m === mon ? " now" : ""}" title="${label(w.m)} → ${label(w.end)}: ${w.done} cumplidos${w.libre ? `, ${w.libre} libres` : ""}"><span class="pc-v">${w.done || ""}</span><div class="pc-bar"><i style="height:${Math.round(w.done / 7 * 100)}%"></i>${w.libre ? `<i class="lib" style="height:${Math.round(w.libre / 7 * 100)}%"></i>` : ""}</div><small>${short(w.m)}</small></div>`).join("")}</div><p class="muted small">De 7 días por semana. En dorado, los días libres con ficha.</p>`;
+  $("#progSpend").innerHTML = `<h3>Gastos por semana</h3>${sum.gt ? `<div class="pc-bars">${asc.map((w) => `<div class="pc-col${w.m === mon ? " now" : ""}" title="${label(w.m)} → ${label(w.end)}"><span class="pc-v">${w.gt ? Math.round(w.gt / 1000) + "k" : ""}</span><div class="pc-bar stack">${Object.entries(w.byS).sort((a, b) => b[1] - a[1]).map(([s, v]) => `<i style="height:${(v / maxG * 100).toFixed(1)}%;background:${G_COL[s] || "#8A948F"}" title="${esc(s)}"></i>`).join("")}</div><small>${short(w.m)}</small></div>`).join("")}</div><p class="muted small">En miles de pesos, por cadena.</p>` : `<p class="muted">Todavía no registraste compras. Anotalas abajo o desde el comparador de la lista («Ya compré acá»).</p>`}`;
+  // cada semana
+  $("#progWeeks").innerHTML = W.map((w) => {
+    const dots = w.dates.map((d) => `<i class="${cal.done?.[d] ? "ok" : cal.libre?.[d] ? "lib" : d > todayISO ? "fut" : ""}" title="${fechaLarga(d)}${cal.done?.[d] ? ": cumplido" : cal.libre?.[d] ? ": día libre" : ""}"></i>`).join("");
+    const a = w.nut?.avg, ok = (v, lo, hi) => (T ? (v >= lo && v <= hi ? " ok" : " warn") : "");
+    return `<article class="card pw${w.m === mon ? " now" : ""}"><header><b>${label(w.m)} → ${label(w.end)}</b>${w.m === mon ? `<span class="chip hot">esta semana</span>` : ""}</header>
+      <div class="pw-row"><span class="pw-dots" aria-label="${w.done} de 7 cumplidos">${dots}</span><span class="pw-k"><b>${w.done}</b>/7 cumplidos${w.libre ? ` · ${w.libre} libre` : ""}</span><span class="pw-k">${ic("bolt")} +${w.xp.toLocaleString("es-AR")} XP</span></div>
+      ${a ? `<div class="pw-nut"><span class="pwn${ok(a.kcal, T?.kcal * 0.88, T?.kcal * 1.12)}">${Math.round(a.kcal).toLocaleString("es-AR")} kcal</span><span class="pwn${ok(a.prot, T?.protMin, T?.protMax * 1.2)}">${Math.round(a.prot)} g prot</span><span class="pwn${ok(a.fib, T?.fib * 0.85, 999)}">${Math.round(a.fib)} g fibra</span><span class="pwn${ok(a.sal, 0, T?.sal)}">${a.sal.toLocaleString("es-AR", { maximumFractionDigits: 1 })} g sal</span><small class="muted">por día, ${w.nut.n} ${w.nut.n === 1 ? "día" : "días"} con platos</small></div>` : `<p class="muted small">Sin platos en tu calendario esa semana.</p>`}
+      ${w.gt ? `<div class="pw-g"><b>${ars(w.gt)}</b>${Object.entries(w.byS).sort((x, y) => y[1] - x[1]).map(([s, v]) => `<span class="gchip" style="--c:${G_COL[s] || "#8A948F"}">${esc(s)} ${ars(v)}</span>`).join("")}</div>` : ""}
+    </article>`;
+  }).join("");
+  // gastos por cadena
+  const inRange = gastos.filter((g) => g.fecha >= weeks[weeks.length - 1]), byStore = {}; inRange.forEach((g) => { byStore[g.store] = (byStore[g.store] || 0) + (+g.monto || 0); });
+  const tot = Object.values(byStore).reduce((a, b) => a + b, 0), maxS = Math.max(1, ...Object.values(byStore));
+  $("#progStores").innerHTML = `<h3>Dónde gastaste <small class="muted">${nW === 1 ? "esta semana" : `últimas ${nW} semanas`}</small></h3>${tot ? Object.entries(byStore).sort((a, b) => b[1] - a[1]).map(([s, v]) => `<div class="ps-row" style="--c:${G_COL[s] || "#8A948F"}"><span class="n">${esc(s)}</span><div class="bar"><i style="width:${(v / maxS * 100).toFixed(1)}%"></i></div><span class="v">${ars(v)} <small>${Math.round(v / tot * 100)} %</small></span></div>`).join("") + `<p class="ps-tot">Total: <b>${ars(tot)}</b> en ${inRange.length} ${inRange.length === 1 ? "compra" : "compras"}</p>` : `<p class="muted">Cuando registres compras, acá vas a ver cuánto se va en cada súper.</p>`}`;
+  $("#gList").innerHTML = gastos.length ? `<h4>Últimas compras</h4>${gastos.slice(0, 8).map((g) => `<div class="g-row"><span class="dot" style="background:${G_COL[g.store] || "#8A948F"}"></span><span><b>${esc(g.store)}</b><small>${fechaLarga(g.fecha)}${g.nota ? " · " + esc(g.nota) : ""}</small></span><b>${ars(+g.monto || 0)}</b><button type="button" class="mini-btn" data-gdel="${g.k}" aria-label="Borrar">${ic("x")}</button></div>`).join("")}` : "";
+  window.renderMoney?.();
+}
+if (page === "miplan" && $("#gastoForm")) {
+  $("#gStore").innerHTML = G_STORES.map((s) => `<option>${esc(s)}</option>`).join("");
+  $("#gFecha").value = todayISO; $("#gFecha").max = todayISO;
+  const q = new URLSearchParams(location.search);
+  if (q.get("gasto")) { if (G_STORES.includes(q.get("gasto"))) $("#gStore").value = q.get("gasto"); if (+q.get("monto")) $("#gMonto").value = Math.round(+q.get("monto")); $("#gNota").value = "según el comparador"; history.replaceState(null, "", location.pathname + "#prog"); }
+  $("#progN").addEventListener("click", (e) => { const b = e.target.closest("[data-n]"); if (!b) return; progN = +b.dataset.n; $$("#progN button").forEach((x) => x.classList.toggle("on", x === b)); renderProg(); });
+  $("#gastoForm").addEventListener("submit", async (e) => {
+    e.preventDefault(); const err = $("#gErr"); err.hidden = true; const monto = Math.round(+$("#gMonto").value);
+    if (!(monto > 0) || monto > 5e7) { err.textContent = "Poné un monto válido en pesos."; err.hidden = false; return; }
+    try { await push(ref(db, `calendars/${user.uid}/gastos`), { store: $("#gStore").value, monto, fecha: $("#gFecha").value || todayISO, nota: $("#gNota").value.trim().slice(0, 60), at: new Date().toISOString() }); $("#gMonto").value = ""; $("#gNota").value = ""; toast("Compra guardada."); }
+    catch (ex) { err.textContent = errMsg(ex); err.hidden = false; }
+  });
+  $("#gList").addEventListener("click", async (e) => { const b = e.target.closest("[data-gdel]"); if (b && confirm("¿Borrar esta compra?")) await remove(ref(db, `calendars/${user.uid}/gastos/${b.dataset.gdel}`)).catch((ex) => toast(errMsg(ex))); });
+}

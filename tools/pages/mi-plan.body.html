@@ -40,6 +40,7 @@
     <button data-tab="rec"><svg class="ic"><use href="#i-recetas"/></svg> Mis recetas</button>
     <button data-tab="ing"><svg class="ic"><use href="#i-tag"/></svg> Mis ingredientes</button>
     <button data-tab="rank"><svg class="ic"><use href="#i-bolt"/></svg> Ranking</button>
+    <button data-tab="prog"><svg class="ic"><use href="#i-chart"/></svg> Progreso</button>
     <button data-tab="perfil"><svg class="ic"><use href="#i-award"/></svg> Perfil</button>
   </div>
 
@@ -95,6 +96,31 @@
     <form class="friend-add" id="friendForm"><input id="friendEmail" type="email" placeholder="correo de tu amigo/a" required><button class="btn small-btn" type="submit" style="margin:0"><svg class="ic"><use href="#i-userplus"/></svg> Agregar</button></form>
     <p class="auth-err" id="friendErr" hidden></p>
     <div class="friends" id="friendsList"></div>
+  </section>
+
+  <!-- ===== Progreso ===== -->
+  <section id="tabProg" class="mp-tab" hidden>
+    <div class="prog-head"><div><p class="kicker">Tu progreso</p><h2>Semana a semana</h2></div><div class="seg" id="progN"><button data-n="4">4 semanas</button><button data-n="8" class="on">8</button><button data-n="12">12</button></div></div>
+    <div class="md-sum prog-sum" id="progSum"></div>
+    <div class="two prog-charts"><div class="card prog-chart" id="progDays"></div><div class="card prog-chart" id="progSpend"></div></div>
+    <h2 class="sub"><span class="squig">Cada semana</span></h2>
+    <div class="prog-weeks" id="progWeeks"></div>
+    <h2 class="sub"><span class="squig">Gastos por supermercado</span></h2>
+    <div class="two">
+      <div class="card prog-stores" id="progStores"></div>
+      <form class="card editor set-card" id="gastoForm">
+        <h3><svg class="ic"><use href="#i-receipt"/></svg> Registrar una compra</h3>
+        <div class="ed-grid">
+          <div class="f"><label for="gStore">Dónde</label><select id="gStore"></select></div>
+          <div class="f"><label for="gMonto">Cuánto (en pesos)</label><input id="gMonto" type="number" min="1" step="1" inputmode="numeric" required placeholder="$"></div>
+          <div class="f"><label for="gFecha">Cuándo</label><input id="gFecha" type="date" required></div>
+          <div class="f"><label for="gNota">Nota (opcional)</label><input id="gNota" maxlength="60" placeholder="compra grande, reposición…"></div>
+        </div>
+        <p class="auth-err" id="gErr" hidden></p>
+        <div class="sug-actions"><button class="btn" type="submit">Guardar compra</button></div>
+        <div class="g-list" id="gList"></div>
+      </form>
+    </div>
   </section>
 
   <!-- ===== Perfil ===== -->

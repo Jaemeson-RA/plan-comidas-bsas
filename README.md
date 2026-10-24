@@ -8,15 +8,16 @@ Sitio estático (HTML + CSS + JS, sin build ni dependencias en el navegador) con
 
 | Página | Qué hace |
 |---|---|
+| `404.html` | Página no encontrada con el menú de hoy y accesos a cada sección |
 | `index.html` | Portada: menú de hoy (pizarrón) y el almuerzo de mañana, entradas a cada sección, cómo se usa, preguntas frecuentes con video |
 | `plan.html` | Plan continuo mes por mes (‹ › y «Hoy»); tocar un plato abre la receta (en escritorio, además, vista previa al pasar por encima); vista por semana. En el teléfono, la vista mes oculta los días de otros meses y arranca en hoy |
-| `recetas.html` | 30 recetas en 5 categorías, para 1 persona (los platos de olla rinden 2 porciones), con nutrición calculada por ingrediente. Arriba, **«¿Qué hay en tu heladera?»**: cargás lo que tenés y muestra las recetas que más lo aprovechan, con lo que falta comprar |
+| `recetas.html` | 30 recetas en 5 categorías, para 1 persona (los platos de olla rinden 2 porciones), con nutrición calculada por ingrediente, **utensilios** en íconos chicos, porciones ajustables (½ a 4), **modo cocina** paso a paso a pantalla completa (temporizadores por paso, pantalla siempre encendida, se pasa con el dedo) e impresión. Búsqueda por nombre o ingrediente y filtros (hasta 20 min, vegetarianas, al horno, económicas, proteicas, livianas, sin cocción). Arriba, **«¿Qué hay en tu heladera?»**: cargás lo que tenés y muestra las recetas que más lo aprovechan, con lo que falta comprar |
 | `compras.html` | Lista de compras de la semana pasada, esta y las tres que vienen, por góndola, con tildes, «Copiar lista», «Bajar con enlaces» y «Compartir». Arriba, **«¿Dónde conviene comprarla?»**: la lista (o la de Mi plan) en las 7 cadenas, todo en un súper o repartido en 2 o 3, con el ahorro y el recorrido por súper |
 | `promos.html` | **Promos de hoy** de las 7 cadenas (se renuevan cada 3 h): primero las de tu lista de la semana, después búsqueda, filtro por cadena y rubro, orden por descuento o precio |
 | `supermercados.html` | Buscador en vivo en 7 cadenas (3 resultados por cadena y «ver más»), **alertas de precio** con campanita, **mapa de sucursales** (ubicación o dirección, radio, filtro por cadena, cómo llegar a pie), condiciones de envío, ranking del changuito, tabla por producto |
 | `temporada.html` | Frutas y verduras de estación en Argentina, mes por mes, y platos que las usan |
-| `nutricion.html` | Perfil (sexo, edad, altura, peso, actividad) → aportes recomendados, promedio diario de la semana o el mes, nota /10, comentarios y sugerencias |
-| `mi-plan.html` | Cuenta (correo + contraseña, con captcha local): calendario propio, **Mis recetas**, **Mis ingredientes** (Open Food Facts + escáner), lista de compras propia, ranking, desafío semanal, amigos, perfil con insignias y recordatorio diario |
+| `nutricion.html` | Perfil (sexo, edad, altura, peso, actividad) → aportes recomendados, promedio diario de la semana o el mes, nota /10, comentarios y sugerencias. **«Tu mes a medida»**: con el perfil cargado arma un calendario del mes que cumple los aportes y se guarda en Mi plan |
+| `mi-plan.html` | Cuenta (correo + contraseña, con reCAPTCHA v2 verificado por el Worker): calendario propio, **Progreso** (semana por semana), **Mis recetas**, **Mis ingredientes** (Open Food Facts + escáner), lista de compras propia, ranking, desafío semanal, amigos, perfil con insignias y recordatorio diario |
 
 Todo lo que un usuario crea (recetas e ingredientes) queda disponible para toda la comunidad y se puede usar en cualquier calendario.
 
@@ -98,7 +99,8 @@ python build.py        # regenera ../data.js (rotaciones, recetas, nutrición, e
 python build_icons.py  # solo si se agregan íconos
 python build_medals.py # solo si cambian las insignias
 python build_pwa.py    # íconos de la app + manifest + sw.js (build_pages lo llama sin íconos)
-python build_pages.py  # regenera los .html y la versión del service worker
+python build_og.py     # solo si cambia la imagen para compartir
+python build_pages.py  # regenera los .html, sitemap, robots y la versión del service worker
 ```
 
 Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `SUN` y `MERIENDA` en `build.py`. Las cotizaciones del dólar y el euro se leen en vivo desde dolarapi.com al abrir la página.
@@ -109,6 +111,17 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 - La nutrición de cada receta se calcula sumando sus ingredientes en gramos y dividiendo por las porciones. Si a una receta le falta algún dato, se usa una estimación y se indica «estimado».
 - Los ingredientes que cargan los usuarios (a mano, buscando en Open Food Facts o escaneando el código de barras) tienen la misma estructura y entran al cálculo de las recetas de la comunidad.
 - Recomendaciones: energía con Mifflin-St Jeor × factor de actividad; proteínas 0,8–1,6 g/kg (objetivo 1 g/kg); fibra 25 g (mujeres) / 30 g (varones); sal < 5 g; azúcares < 10 % de la energía; grasas 25–35 %, saturadas < 10 %; carbohidratos 45–60 %. La nota sobre 10 descuenta puntos por cada desvío y la variedad.
+
+## Cocina, mes a medida y progreso
+
+- **Utensilios**: `tools/utensilios.py` los deduce de los pasos y los ingredientes de cada receta (reglas por expresión regular, más una tabla de correcciones a mano) y `build.py` los guarda en `r.ut`. Cada uno es un ícono `u-*` del sprite (Tabler, Lucide o dibujado a mano) con su nombre debajo.
+- **Modo cocina** (botón en la receta): un paso por pantalla, temporizador cuando el paso dice minutos (suena y vibra), Wake Lock para que no se apague la pantalla, gesto de deslizar y teclas ← →.
+- **Tu mes a medida** (Nutrición, en `cuenta.js`): para cada día prueba todas las combinaciones desayuno × almuerzo × cena y elige la que más se acerca a los aportes; un factor de porción entre 0,75 y 1,8 ajusta la energía y, si hace falta mucho más, suma una colación baja en sal (fruta + yogur + frutos secos). Variedad: nada repetido en 3 días y cada receta 5 veces como máximo en el mes; los ñoquis caen el 29. Se guarda en el calendario con `{desayuno, almuerzo, cena, x, colacion}`, y la lista de compras y los totales multiplican por la porción.
+- **Progreso** (Mi plan): semana por semana desde que se creó la cuenta, días cumplidos, kcal y macros promedio contra el objetivo, y gastos por supermercado. Los gastos se cargan a mano o desde «Ya compré acá» del comparador, y se guardan en `calendars/{uid}/gastos`.
+
+## Control visual
+
+`python tools/qa_visual.py` abre cada página con Playwright (Edge) en 320, 375, 414, 768, 1024, 1280 y 1440 px, entra a Mi plan con una cuenta de prueba, abre modales y estados, y busca desbordes horizontales, elementos fuera de pantalla, superposiciones, áreas táctiles chicas, letra de menos de 11 px, imágenes rotas y errores de consola. Deja capturas y `_report.json` en `media/qa/` (fuera del repo); `python tools/qa_report.py` resume los hallazgos. Cada página trae Open Graph, Twitter Card y canonical; `build_pages.py` genera también `sitemap.xml` y `robots.txt`, y `tools/build_og.py` la imagen `img/og.jpg`.
 
 ## Licencia y páginas legales
 

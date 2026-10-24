@@ -9,3 +9,4 @@ media/voz/
 tools/worker/dist/
 tools/worker/node_modules/
 tools/worker/.wrangler/
+media/qa/

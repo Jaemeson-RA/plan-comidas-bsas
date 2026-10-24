@@ -17,24 +17,45 @@ META = {
  "terminos": ("Términos de uso · Plan de comidas Buenos Aires", "Condiciones de uso del sitio: salud, precios, cuentas, contenido de usuarios y propiedad intelectual."),
  "privacidad": ("Política de privacidad · Plan de comidas Buenos Aires", "Qué datos se guardan, para qué, quién los procesa y cómo borrarlos, según la Ley 25.326."),
  "mi-plan": ("Mi plan · Plan de comidas Buenos Aires", "Creá tu cuenta y armá tu propio calendario de comidas eligiendo las recetas que quieras."),
+ "404": ("Página no encontrada · Plan de comidas Buenos Aires", "Esa página no existe: volvé al plan, las recetas o la lista de compras."),
 }
+SITE = "https://jaemeson-ra.github.io/plan-comidas-bsas/"
+import datetime
 for page, (title, desc) in META.items():
     body = open(os.path.join(root, "tools", "pages", f"{page}.body.html"), encoding="utf-8").read()
+    body = body.replace("<main ", '<main id="main" ', 1)
+    url = SITE + ("" if page == "index" else f"{page}.html")
+    social = (  # vista previa al compartir en WhatsApp, redes y buscadores
+        f"<link rel=\"canonical\" href=\"{url}\">\n"
+        "<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:locale\" content=\"es_AR\">\n<meta property=\"og:site_name\" content=\"Plan de comidas Buenos Aires\">\n"
+        f"<meta property=\"og:title\" content=\"{title}\">\n<meta property=\"og:description\" content=\"{desc}\">\n<meta property=\"og:url\" content=\"{url}\">\n"
+        f"<meta property=\"og:image\" content=\"{SITE}img/og.jpg\">\n<meta property=\"og:image:width\" content=\"1200\">\n<meta property=\"og:image:height\" content=\"630\">\n"
+        "<meta property=\"og:image:alt\" content=\"Plan de comidas Buenos Aires: recetas, lista de compras y precios de supermercados\">\n"
+        "<meta name=\"twitter:card\" content=\"summary_large_image\">\n")
+    if page == "404": social = "<base href=\"/plan-comidas-bsas/\">\n<meta name=\"robots\" content=\"noindex\">\n"
     html = (
         "<!DOCTYPE html>\n<html lang=\"es-AR\">\n<head>\n<meta charset=\"UTF-8\">\n"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
-        f"<title>{title}</title>\n<meta name=\"description\" content=\"{desc}\">\n"
+        f"<title>{title}</title>\n<meta name=\"description\" content=\"{desc}\">\n" + social +
         f"<link rel=\"icon\" href=\"{FAVICON}\">\n"
         "<link rel=\"manifest\" href=\"manifest.webmanifest\">\n<meta name=\"theme-color\" content=\"#2F8F5B\">\n"
         "<link rel=\"apple-touch-icon\" href=\"img/icons/apple-touch-180.png\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n"
         "<meta name=\"apple-mobile-web-app-title\" content=\"Plan BA\">\n<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\">\n"
-        "<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n" + head + "\n" + body + "\n" + foot)
+        "<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
     if page not in ("compras", "promos", "supermercados"):
         html = html.replace('<script src="ahorro.js" data-only="compras promos supermercados"></script>\n', "")
     if page not in ("mi-plan", "nutricion"):
         html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion"></script>\n', "")
     open(os.path.join(root, f"{page}.html"), "w", encoding="utf-8").write(html)
     print("OK", page + ".html", len(html))
+
+# buscadores: robots.txt y sitemap.xml
+hoy = datetime.date.today().isoformat()
+pages = [p for p in META if p != "404"]
+prio = {"index": "1.0", "plan": "0.9", "recetas": "0.9", "compras": "0.8", "promos": "0.8", "supermercados": "0.8", "nutricion": "0.7", "temporada": "0.6", "mi-plan": "0.6", "terminos": "0.2", "privacidad": "0.2"}
+open(os.path.join(root, "sitemap.xml"), "w", encoding="utf-8").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
+    f"  <url><loc>{SITE}{'' if p == 'index' else p + '.html'}</loc><lastmod>{hoy}</lastmod><changefreq>{'daily' if p in ('promos', 'plan') else 'weekly'}</changefreq><priority>{prio.get(p, '0.5')}</priority></url>\n" for p in pages) + "</urlset>\n")
+open(os.path.join(root, "robots.txt"), "w", encoding="utf-8").write(f"User-agent: *\nAllow: /\nDisallow: /plan-comidas-bsas/tools/\nSitemap: {SITE}sitemap.xml\n")
 
 # PWA: el service worker se versiona con el contenido de los archivos recién generados
 import subprocess

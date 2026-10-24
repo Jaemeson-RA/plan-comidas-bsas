@@ -140,7 +140,8 @@
     $("#cmpGo").addEventListener("click", async () => {
       if (!API) { toast("Falta configurar el proxy de precios."); return; }
       const L = currentList(); if (!L.items.length) { toast("La lista está vacía."); return; }
-      const btn = $("#cmpGo"); btn.disabled = true; const pr = $("#cmpProg"); pr.hidden = false; $("#cmpRes").innerHTML = "";
+      const btn = $("#cmpGo"); btn.disabled = true; const pr = $("#cmpProg"); pr.hidden = false;
+      $("#cmpRes").innerHTML = `<div class="cmp-tiles">${[1, 2, 3].map(() => `<div class="cmp-tile skel-box"><span class="skel" style="width:45%;height:12px"></span><span class="skel" style="width:70%;height:28px"></span><span class="skel" style="width:55%;height:12px"></span></div>`).join("")}</div>`;
       const out = new Array(L.items.length); let done = 0, i = 0;
       const step = () => { done++; pr.querySelector("i").style.width = Math.round(done / L.items.length * 100) + "%"; pr.querySelector("small").textContent = `Buscando precios… ${done} de ${L.items.length}`; };
       await Promise.all(Array.from({ length: 5 }, async () => { while (i < L.items.length) { const k = i++; try { out[k] = await priceItem(L.items[k]); } catch (e) { out[k] = { it: L.items[k], need: needOf(L.items[k]), per: {} }; } step(); } }));
@@ -157,10 +158,11 @@
       let rec = 0; for (let k = 1; k < P.length; k++) { const save = P[rec].total - P[k].total; if (save >= Math.max(3000, P[rec].total * 0.08)) rec = k; }
       if (showK === null) showK = rec;
       const sel = P[showK]; const base = P[0].total; const n = last.res.length;
-      const tiles = P.map((p, k) => { const save = base - p.total; return `<button class="cmp-tile${k === showK ? " on" : ""}" data-k="${k}">${k === rec ? `<span class="rec">Recomendado</span>` : ""}<small>${k === 0 ? "Todo en un súper" : `Repartido en ${k + 1} súper`}</small><b data-ars="${Math.round(p.total)}"></b><span class="stores">${p.stores.map((s) => `<i style="--c:${COLOR[s]}">${esc(s)}</i>`).join(" + ")}</span>${k ? `<em class="save">ahorrás <span data-ars="${Math.round(save)}"></span> (${Math.round(save / base * 100)} %)</em>` : `<em class="save muted">la más barata para ir a una sola</em>`}</button>`; }).join("");
+      const tiles = P.map((p, k) => { const save = base - p.total; return `<button class="cmp-tile${k === showK ? " on" : ""}" data-k="${k}">${k === rec ? `<span class="rec">Recomendado</span>` : ""}<small>${k === 0 ? "Todo en un súper" : `Repartido en ${k + 1} súper`}</small><b data-ars="${Math.round(p.total)}" data-count></b><span class="stores">${p.stores.map((s) => `<i style="--c:${COLOR[s]}">${esc(s)}</i>`).join(" + ")}</span>${k ? `<em class="save">ahorrás <span data-ars="${Math.round(save)}"></span> (${Math.round(save / base * 100)} %)</em>` : `<em class="save muted">la más barata para ir a una sola</em>`}</button>`; }).join("");
       const byStore = {}; sel.assign.forEach((a) => { (byStore[a.store] = byStore[a.store] || []).push(a); });
       const cards = sel.stores.map((s) => { const list = byStore[s] || []; const sub = list.reduce((t, a) => t + a.x.cost, 0);
-        return `<div class="card cmp-store" style="--c:${COLOR[s]}"><h3><span class="dot"></span>${esc(s)} <small>${list.length} productos</small><b data-ars="${Math.round(sub)}"></b></h3>
+        return `<div class="card cmp-store" style="--c:${COLOR[s]}"><h3><span class="dot"></span>${esc(s)} <small>${list.length} productos</small><b data-ars="${Math.round(sub)}" data-count></b></h3>
+          <a class="mini-btn cmp-bought" href="mi-plan.html?gasto=${encodeURIComponent(s)}&monto=${Math.round(sub)}#prog">${ic("check")} Ya compré acá</a>
           ${list.map((a) => `<a class="cmp-row" href="${a.x.link}" target="_blank" rel="noopener">${a.x.img ? `<img src="${a.x.img}" alt="" loading="lazy">` : `<span class="ph">${ic("tag")}</span>`}<span class="t"><b>${esc(a.r.it.n.replace(/\s*\(.*?\)/g, ""))}</b> <small>${esc(a.r.it.q || "")}</small><small class="p">${esc(a.x.name)} · ${esc(a.x.how)}</small></span><span class="c" data-ars="${Math.round(a.x.cost)}"></span></a>`).join("")}</div>`; }).join("");
       const miss = [...sel.est.map((e) => e.r), ...last.res.filter((r) => !Object.keys(r.per).length)];
       $("#cmpRes").innerHTML = `<div class="cmp-tiles">${tiles}</div>
@@ -187,14 +189,16 @@
   // =====================================================================
   // PROMOS
   // =====================================================================
+  // «Hasta 30% en bebidas, desayuno, almacén…» → «Hasta 30%»: las etiquetas largas no entran en la tarjeta
+  const promoTxt = (t) => { t = String(t); const [promo, ...resto] = t.split(" · "); const corto = promo.length > 22 ? promo.replace(/\s+en\s+.*$/i, "") : promo; return [corto, ...resto].join(" · "); };
   const RUBRO = { almacen: "Almacén", desayuno: "Desayuno y merienda", frescos: "Lácteos y frescos", carnes: "Carnes y pescados", verduras: "Frutas y verduras", bebidas: "Bebidas", limpieza: "Limpieza" };
   if (page === "promos" && $("#prGrid")) {
     const st = { stores: new Set(ls.get("prStores", STORES)), rubro: "todos", q: "", sort: "pct", shown: 48 }; let data = null;
     const card = (x) => `<a class="promo" href="${x.link}" target="_blank" rel="noopener" style="--c:${COLOR[x.store] || "#2F8F5B"}">
         <span class="pimg">${x.img ? `<img src="${x.img}" alt="" loading="lazy">` : ic("tag")}${x.pct ? `<em class="pct">−${x.pct}%</em>` : ""}</span>
         <span class="pstore">${esc(x.store)}</span><b class="pname">${esc(x.name)}</b>
-        ${x.promo ? `<span class="ptag">${esc(x.promo)}${x.caja ? " · en la caja" : ""}</span>` : ""}
-        <span class="pprice"><b data-ars="${x.price}"></b>${x.list ? `<s data-ars="${x.list}"></s>` : ""}${x.unit === "kg" ? "<small>/kg</small>" : ""}</span></a>`;
+        ${x.promo ? `<span class="ptag">${esc(promoTxt(x.promo))}${x.caja ? " · en la caja" : ""}</span>` : ""}
+        <span class="pprice"><b data-ars="${x.price}"></b>${x.list ? `<s data-ars="${x.list}"></s>` : ""}${x.unit === "kg" ? (x.mult && Math.abs(x.mult - 1) > 0.01 ? `<small>${Math.round(x.mult * 1000)} g</small>` : "<small>/kg</small>") : ""}</span></a>`;
     function filtered() {
       const qn = norm(st.q).split(/\s+/).filter((w) => w.length > 1);
       return data.items.filter((x) => st.stores.has(x.store) && (st.rubro === "todos" || x.rubro === st.rubro) && (!qn.length || qn.every((w) => norm(x.name).includes(w))))
@@ -219,7 +223,7 @@
       });
       $("#promoPlan").hidden = !hits.length;
       $("#promoPlan").innerHTML = `<div class="pp-head"><div><p class="kicker">Para tu lista de esta semana</p><h2>${hits.length} productos del plan están en promo</h2><p class="muted small">La mejor promo de cada uno. Tocá para ir al producto.</p></div><a class="mini-btn" href="compras.html#comparar">${ic("compras")} Comparar mi lista</a></div>
-        <div class="promo-grid mini">${hits.slice(0, 12).map((h) => card(Object.assign({}, h.x, { promo: (h.x.promo ? h.x.promo + " · " : "") + "para " + h.it.n.replace(/\s*\(.*?\)/g, "") }))).join("")}</div>`;
+        <div class="promo-grid mini">${hits.slice(0, 12).map((h) => card(Object.assign({}, h.x, { promo: (h.x.promo ? promoTxt(h.x.promo) + " · " : "") + "para " + h.it.n.replace(/\s*\(.*?\)/g, "") }))).join("")}</div>`;
       money();
     }
     $("#prStores").addEventListener("click", (e) => { const b = e.target.closest("[data-store]"); if (!b) return; const s = b.dataset.store; if (st.stores.has(s) && st.stores.size > 1) st.stores.delete(s); else st.stores.add(s); ls.set("prStores", [...st.stores]); st.shown = 48; render(); });
@@ -229,6 +233,7 @@
     $("#prMore").addEventListener("click", () => { st.shown += 48; render(); });
     (async () => {
       $("#prMeta").textContent = "Cargando las promos de las siete cadenas…";
+      $("#prGrid").innerHTML = Array.from({ length: 12 }, () => `<div class="promo skel-box"><span class="skel" style="height:110px"></span><span class="skel" style="width:40%;height:10px"></span><span class="skel" style="height:13px"></span><span class="skel" style="width:70%;height:13px"></span><span class="skel" style="width:35%;height:16px;margin-top:auto"></span></div>`).join("");
       try { data = await (await fetch(`${API}/promos`)).json(); render(); forPlan(); }
       catch (e) { $("#prMeta").textContent = navigator.onLine ? "No se pudieron cargar las promos. Probá de nuevo en un rato." : "Sin conexión: las promos necesitan internet."; }
     })();
@@ -290,7 +295,7 @@
         L.circleMarker([s.lat, s.lon], { radius: 8, color: "#fff", weight: 2, fillColor: COLOR[s.chain], fillOpacity: 1 }).addTo(st.layer)
           .bindPopup(`<b>${esc(s.name)}</b><br>${esc(s.addr || s.chain)}<br>${s.d < 1 ? Math.round(s.d * 1000) + " m" : s.d.toFixed(1) + " km"} · ~${Math.max(1, Math.round(s.d * 1000 / 80))} min a pie${s.hours ? `<br><small>${esc(s.hours)}</small>` : ""}<br><a href="${dir}" target="_blank" rel="noopener">Cómo llegar ↗</a>`);
       });
-      st.map.fitBounds(L.latLng(c).toBounds(st.radius * 2), { padding: [10, 10] });
+      st.map.invalidateSize(); st.map.fitBounds(L.latLng(c).toBounds(st.radius * 2), { padding: [10, 10] });  // el contenedor cambió de alto al aparecer
       const byChain = {}; list.forEach((s) => { byChain[s.chain] = (byChain[s.chain] || 0) + 1; });
       $("#mapStatus").innerHTML = list.length ? `${list.length} sucursales a menos de ${st.radius >= 1000 ? st.radius / 1000 + " km" : st.radius + " m"}${label ? " de " + esc(label) : ""}: ${Object.entries(byChain).map(([k, v]) => `${esc(k)} ${v}`).join(" · ")}. <a href="compras.html#comparar">Comparar mi lista solo en estas cadenas →</a>`
         : `No hay sucursales de estas cadenas en ese radio. Probá con uno más grande.`;

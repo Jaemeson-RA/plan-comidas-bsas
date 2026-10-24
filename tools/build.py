@@ -416,6 +416,10 @@ sources = [
  {"t":"iProfesional — cuál es el supermercado más barato de Argentina en 2026","u":"https://www.iprofesional.com/actualidad/445916-cual-es-el-supermercado-mas-barato-de-argentina-en-2026"},
  {"t":"Fotos de las recetas: Wikimedia Commons, licencias Creative Commons indicadas en cada receta.","u":"https://commons.wikimedia.org/"},
 ]
+# utensilios de cada receta (tools/utensilios.py: se deducen de los pasos y se corrigen a mano en UT_FIX)
+from utensilios import utensilios
+for rid, r in R.items():
+    r["ut"] = utensilios(rid, r)
 # fotos: WebP en dos tamaños si existen (tools/build_webp.py); el JPG queda de respaldo
 for r in R.values():
     base = os.path.splitext(os.path.basename(r["img"]))[0]

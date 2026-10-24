@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /plan-comidas-bsas/tools/
+Sitemap: https://jaemeson-ra.github.io/plan-comidas-bsas/sitemap.xml
