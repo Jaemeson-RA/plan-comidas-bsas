@@ -1161,3 +1161,33 @@ html.is-app .buscador{padding-top:.6rem}
 @media (max-width:520px){.ps-today{grid-template-columns:minmax(0,1fr);justify-items:center}.ps-kpis{width:100%;grid-template-columns:repeat(4,minmax(0,1fr))}.ps-kpis div{padding:.5rem .35rem;text-align:center}.ps-kpis b{font-size:1rem}.ps-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ps-cfg input,.ps-form input{width:100%}.ps-cfg label,.ps-form label{flex:1 1 130px}}
 .pss-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:.8rem}
 @media (max-width:560px){.pss-row{grid-template-columns:28px minmax(0,1fr)}.pss-row .btn{grid-column:1/-1;justify-self:start}}
+
+/* ===== preferencias y alergias ===== */
+.pref-card{padding:1rem 1.1rem;margin:1rem 0}
+.pref-card h3{display:flex;align-items:center;gap:.4rem;margin:0 0 .2rem}
+.pref-g{margin:.7rem 0 0}
+.pref-g h4{font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 .4rem}
+.pref-g .chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.pref-g .pchip{font-family:inherit;cursor:pointer}
+.pref-sum{margin:.8rem 0 0;color:var(--ink2)}
+.pref-sum .ic{width:16px;height:16px;color:var(--verde);vertical-align:-3px}
+.diet-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;background:#EEF6EF;border:1.5px solid #CFE6D6;border-radius:14px;padding:.6rem .8rem;margin:0 0 .9rem;font-size:.9rem}
+.diet-bar > .ic{width:20px;height:20px;color:var(--verde);flex:none}
+.diet-bar > span{flex:1 1 200px;min-width:0}
+.diet-bar .mini-btn{font-family:inherit;cursor:pointer}
+main.diet-hide .rc.diet-x,main.diet-hide .hel-card.diet-x{display:none!important}
+.rc.diet-x{position:relative}
+.rc.diet-x::before{content:"⚠ " attr(data-diet-why);position:absolute;top:8px;left:8px;right:8px;z-index:2;background:rgba(255,244,224,.96);color:#8A5A12;border:1px solid #F2D49B;border-radius:8px;font-size:.72rem;font-weight:700;padding:.2rem .45rem;line-height:1.3}
+.rc.diet-x img{filter:grayscale(.55);opacity:.75}
+.cm.diet-x,.ap-meal.diet-x,.ap-day.diet-x,.pick.diet-x{position:relative}
+.cm.diet-x::after,.ap-meal.diet-x::after,.ap-day.diet-x::after,.pick.diet-x::after{content:"⚠";position:absolute;top:2px;right:4px;font-size:.8rem;color:#B07A1C}
+.diet-warn{display:flex;gap:.6rem;align-items:flex-start;background:#FFF4E0;border:1.5px solid #F2D49B;border-radius:12px;padding:.7rem .8rem;margin:.5rem 0 .8rem;font-size:.9rem}
+.diet-warn > .ic{width:20px;height:20px;color:#B5462A;flex:none;margin-top:.1rem}
+.diet-warn span{display:block;margin:.35rem 0 .3rem;color:var(--muted);font-size:.84rem}
+.diet-alt{display:flex;gap:.45rem;flex-wrap:wrap}
+.diet-alt button{display:flex;align-items:center;gap:.4rem;font:inherit;font-size:.82rem;font-weight:600;color:var(--ink);background:#fff;border:1.5px solid var(--border);border-radius:999px;padding:.2rem .7rem .2rem .2rem;cursor:pointer}
+.diet-alt img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.diet-ok{font-size:.86rem;color:var(--verde);font-weight:600;margin:.3rem 0 .6rem}
+.diet-ok .ic{width:16px;height:16px;vertical-align:-3px}
+.md-diet{margin:.3rem 0 .6rem}
+.pref-box [data-prefs]{margin-bottom:.4rem}

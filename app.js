@@ -98,6 +98,101 @@
     return `<button class="${cls}" data-rec="${id}"><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span>${esc(r.name)}</span></button>`;
   }
   const ic = (n, cls = "") => `<svg class="ic ${cls}"><use href="#i-${n}"/></svg>`;
+  // ---------- preferencias alimentarias y alergias ----------
+  // localStorage «prefsComida» = {dieta: "todo"|"vegetariana"|"vegana"|"pescetariana", sin: ["gluten","lactosa"], alergias: [...]}
+  // Lo que lleva cada receta se detecta en los nombres de sus ingredientes (sirve también para las recetas de la comunidad).
+  const DIET = (() => {
+    const nz = (s) => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const RULES = {
+      carne: /\b(carne|nalga|bife|picada|cuadril|vacio|osobuco|peceto|lomo|matambre|chorizo|jamon|panceta|bondiola|cerdo|salchich|hamburguesa|morcilla|bacon|carre|costilla|asado|ternera|roast)/,
+      ave: /\b(pollo|pechuga|muslo|pavo|suprema)/,
+      pescado: /\b(merluza|salmon|atun|pescado|abadejo|sardina|caballa|trucha|anchoa|bacalao|filet de)/,
+      mariscos: /\b(langostino|camaron|calamar|mejillon|marisco|pulpo|cornalito)/,
+      huevo: /\b(huevo|yema|clara de|claras|mayonesa)/,
+      lacteos: /\b(leche(?! de (coco|almendra|soja|avena|arroz))|queso|yogur(?! vegetal)|manteca|crema(?! de (coco|mani|arroz))|ricota|muzzarella|mozzarella|parmesano|reggianito|dulce de leche|provoleta|provolone)/,
+      gluten: /\b(harina(?! de (arroz|maiz|garbanzo|almendra|mandioca))|pan\b(?! de arroz)|fideo|spaghetti|espagueti|tallarin|penne|mono|noqui|tapas? (de|para) (tarta|empanada)|discos? de (tarta|empanada)|masa\b|galleta|avena|cebada|centeno|salsa de soja|cerveza|tortilla(s)? de (harina|trigo)|rapiditas|pan rallado|semola|cuscus|couscous|wrap|trigo|bulgur|seitan|rebozador)/,
+      frutos_secos: /\b(nuez(?! moscada)|nueces|almendra|avellana|castana|pistacho|frutos secos|caju)/,  // la nuez moscada es una especia
+      mani: /\bmani\b/,
+      soja: /\b(soja|tofu|edamame|tempeh)/,
+      sesamo: /\b(sesamo|tahin)/,
+      miel: /\bmiel\b/,
+    };
+    const LBL = { carne: "carne", ave: "pollo", pescado: "pescado", mariscos: "mariscos", huevo: "huevo", lacteos: "lácteos", gluten: "gluten", frutos_secos: "frutos secos", mani: "maní", soja: "soja", sesamo: "sésamo", miel: "miel" };
+    const BY_DIET = { vegana: ["carne", "ave", "pescado", "mariscos", "huevo", "lacteos", "miel"], vegetariana: ["carne", "ave", "pescado", "mariscos"], pescetariana: ["carne", "ave"] };
+    const cache = new Map();
+    const flags = (r) => {
+      if (!r) return new Set();
+      if (cache.has(r.id) && !r.custom) return cache.get(r.id);
+      const f = new Set();
+      (r.ing || []).forEach((i) => { const n = nz(i.n); if (/sin tacc|sin gluten/.test(n)) return Object.keys(RULES).forEach((k) => { if (k !== "gluten" && RULES[k].test(n)) f.add(k); }); Object.entries(RULES).forEach(([k, re]) => { if (re.test(n)) f.add(k); }); });
+      if (!r.custom) cache.set(r.id, f);
+      return f;
+    };
+    const prefs = () => { try { return Object.assign({ dieta: "todo", sin: [], alergias: [] }, JSON.parse(localStorage.getItem("prefsComida") || "{}")); } catch (e) { return { dieta: "todo", sin: [], alergias: [] }; } };
+    const banned = (P = prefs()) => { const b = new Set(BY_DIET[P.dieta] || []); if (P.sin.includes("gluten")) b.add("gluten"); if (P.sin.includes("lactosa")) b.add("lacteos"); P.alergias.forEach((a) => b.add(a)); return b; };
+    const why = (r, P) => { const b = banned(P); return [...flags(r)].filter((k) => b.has(k)).map((k) => LBL[k]); };
+    const ok = (r, P) => why(r, P).length === 0;
+    const active = (P = prefs()) => banned(P).size > 0;
+    const summary = (P = prefs()) => [P.dieta !== "todo" && P.dieta, P.sin.includes("gluten") && "sin TACC", P.sin.includes("lactosa") && "sin lactosa", ...P.alergias.map((a) => "sin " + LBL[a])].filter(Boolean).join(" · ");
+    return { flags, prefs, why, ok, active, summary, LBL };
+  })();
+  window.DIET = DIET;
+  const andList = (l) => (l.length > 1 ? l.slice(0, -1).join(", ") + " y " + l[l.length - 1] : l[0] || "");
+  function dietNote(r) {
+    if (!DIET.active()) return "";
+    const w = DIET.why(r); if (!w.length) return `<p class="diet-ok">${ic("check")} Va con tu perfil (${esc(DIET.summary())}).</p>`;
+    const same = (x) => (x.tipo === "desayuno") === (r.tipo === "desayuno");
+    const ingSet = new Set((r.ing || []).map((i) => i.n));
+    const alt = Object.values(R).filter((x) => x.id !== r.id && same(x) && DIET.ok(x)).map((x) => ({ x, sc: (x.ing || []).filter((i) => ingSet.has(i.n)).length - Math.abs((x.tiempo || 0) - (r.tiempo || 0)) / 30 })).sort((a, b) => b.sc - a.sc).slice(0, 3);
+    return `<div class="diet-warn">${ic("x")}<div><b>No va con tu perfil: lleva ${esc(andList(w))}.</b>${alt.length ? `<span>Probá en su lugar:</span><div class="diet-alt">${alt.map(({ x }) => `<button type="button" data-rec="${x.id}"><img src="${x.img}" alt="" loading="lazy">${esc(x.name)}</button>`).join("")}</div>` : ""}</div></div>`;
+  }
+  // marca en toda la página los platos que no van con el perfil (tarjetas, calendario, Hoy)
+  function markDiet(root = document) {
+    const on = DIET.active();
+    root.querySelectorAll("[data-rec]").forEach((el) => {
+      const r = R[el.dataset.rec]; if (!r) return;
+      const w = on ? DIET.why(r) : [];
+      el.classList.toggle("diet-x", w.length > 0);
+      if (w.length) el.dataset.dietWhy = "Lleva " + andList(w); else delete el.dataset.dietWhy;
+    });
+  }
+  window.markDiet = markDiet;
+  let dietPend = 0;  // una pasada por cuadro, aunque cambien muchas cosas juntas
+  new MutationObserver((ms) => { if (!dietPend && ms.some((m) => m.addedNodes.length)) dietPend = requestAnimationFrame(() => { dietPend = 0; markDiet(); }); }).observe(document.body, { childList: true, subtree: true });
+  window.addEventListener("prefs", () => markDiet());
+  setTimeout(markDiet, 0);
+  // el panel de preferencias (Nutrición, Perfil, Recetas y «Más»)
+  const DIETAS = [["todo", "Como de todo"], ["vegetariana", "Vegetariana"], ["vegana", "Vegana"], ["pescetariana", "Pescetariana"]];
+  const ALERG = [["huevo", "Huevo"], ["lacteos", "Lácteos"], ["frutos_secos", "Frutos secos"], ["mani", "Maní"], ["soja", "Soja"], ["pescado", "Pescado"], ["mariscos", "Mariscos"], ["sesamo", "Sésamo"]];
+  function prefsHTML() {
+    const P = DIET.prefs(), n = Object.values(R).filter((r) => !r.custom).length, nOk = Object.values(R).filter((r) => !r.custom && DIET.ok(r)).length;
+    const chip = (attr, val, label, on) => `<button type="button" class="pchip${on ? " on" : ""}" ${attr}="${val}" aria-pressed="${on}">${label}</button>`;
+    return `<div class="pref-g"><h4>Cómo comés</h4><div class="chips">${DIETAS.map(([v, l]) => chip("data-dieta", v, l, P.dieta === v)).join("")}</div></div>
+      <div class="pref-g"><h4>Sin…</h4><div class="chips">${chip("data-sin", "gluten", "Sin TACC (celiaquía)", P.sin.includes("gluten"))}${chip("data-sin", "lactosa", "Sin lactosa", P.sin.includes("lactosa"))}</div></div>
+      <div class="pref-g"><h4>Alergias</h4><div class="chips">${ALERG.map(([v, l]) => chip("data-alerg", v, l, P.alergias.includes(v))).join("")}</div></div>
+      <p class="pref-sum small">${DIET.active() ? `${ic("check")} <b>${nOk} de ${n} recetas</b> van con tu perfil. Recetas, Mi plan y el mes a medida usan solo esas.` : "Sin restricciones: se muestran todas las recetas."}</p>`;
+  }
+  function bindPrefs(box) {
+    box.innerHTML = prefsHTML();
+    box.onclick = (e) => {
+      const b = e.target.closest("[data-dieta],[data-sin],[data-alerg]"); if (!b) return;
+      const P = DIET.prefs();
+      if (b.dataset.dieta) P.dieta = b.dataset.dieta;
+      if (b.dataset.sin) P.sin = P.sin.includes(b.dataset.sin) ? P.sin.filter((x) => x !== b.dataset.sin) : [...P.sin, b.dataset.sin];
+      if (b.dataset.alerg) P.alergias = P.alergias.includes(b.dataset.alerg) ? P.alergias.filter((x) => x !== b.dataset.alerg) : [...P.alergias, b.dataset.alerg];
+      try { localStorage.setItem("prefsComida", JSON.stringify(P)); } catch (x) {}
+      $$("[data-prefs]").forEach(bindPrefs); window.dispatchEvent(new Event("prefs"));
+    };
+  }
+  $$("[data-prefs]").forEach(bindPrefs);
+  window.addEventListener("prefs-remote", () => $$("[data-prefs]").forEach(bindPrefs));
+  function openPrefs() {
+    let sh = $("#prefSheet"); if (!sh) { sh = document.createElement("div"); sh.id = "prefSheet"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
+    sh.innerHTML = `<div class="sh-bg" data-shx></div><div class="sh-box as-box pref-box" role="dialog" aria-modal="true" aria-labelledby="pfT"><button class="as-x" type="button" data-shx aria-label="Cerrar">×</button><h3 id="pfT">Preferencias y alergias</h3><p class="muted small">Las recetas, Mi plan y el mes a medida se arman solo con lo que podés comer.</p><div data-prefs></div><div class="as-act"><button class="btn" type="button" data-shx>Listo</button></div></div>`;
+    bindPrefs(sh.querySelector("[data-prefs]")); sh.hidden = false; document.body.classList.add("no-scroll");
+    sh.onclick = (e) => { if (e.target.closest("[data-shx]")) { sh.hidden = true; document.body.classList.remove("no-scroll"); } };
+  }
+  document.addEventListener("click", (e) => { if (e.target.closest("[data-open-prefs]")) { e.preventDefault(); $("#appMore") && ($("#appMore").hidden = true); openPrefs(); } });
   const ICON = { desayuno: ic("desayuno"), almuerzo: ic("almuerzo"), merienda: ic("merienda"), cena: ic("cena") };
 
   // ---------- modal ----------
@@ -118,6 +213,7 @@
       <img class="rm-img" src="${r.img}"${r.srcset ? ` srcset="${r.srcset}" sizes="(max-width:720px) 100vw, 640px"` : ""} alt="${esc(r.name)}">
       <div class="rm">
         <h2>${esc(r.name)}</h2>
+        ${dietNote(r)}
         ${r.custom ? `<p class="muted small">Receta de la comunidad, creada por <b>${esc(r.ownerName)}</b>.</p>` : ""}
         <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("plate")}<b>${r.porciones} ${r.porciones === 1 ? "porción" : "porciones"}</b></span>${r.cost ? `<span>${ic("tag")}<b data-ars="${r.cost}"></b> aprox./porción</span>` : ""}</div>
         ${nutLine}
@@ -382,6 +478,21 @@
     });
     renderHel();
     $("#recSections").innerHTML = CATS.map((c) => `<section class="cat" id="${c.id}"><div class="cat-head"><h2>${esc(c.t)}</h2><p class="muted">${esc(c.d)}</p></div><div class="grid">${c.ids.map((id) => card(R[id])).join("")}</div></section>`).join("");
+  }
+
+  // ---------- recetas: solo las que van con el perfil (con «ver todas») ----------
+  if (page === "recetas" && $("#dietBar")) {
+    let all = false;
+    const bar = () => {
+      const on = DIET.active(), main = $("main");
+      main.classList.toggle("diet-hide", on && !all);
+      $("#dietBar").hidden = false;
+      const n = Object.values(R).filter((r) => !r.custom).length, nOk = Object.values(R).filter((r) => !r.custom && DIET.ok(r)).length;
+      $("#dietBar").innerHTML = on ? `${ic("leaf")}<span><b>${all ? `Todas las recetas (${n})` : `${nOk} de ${n} recetas`}</b> · ${esc(DIET.summary())}</span><button type="button" class="mini-btn" data-diet-all>${all ? "Solo las que van conmigo" : "Ver todas"}</button><button type="button" class="mini-btn" data-open-prefs>Cambiar</button>`
+        : `${ic("leaf")}<span>¿Sos vegetariano/a, celíaco/a o tenés alguna alergia?</span><button type="button" class="mini-btn" data-open-prefs>Elegí tus preferencias</button>`;
+    };
+    bar(); window.addEventListener("prefs", bar);
+    $("#dietBar").addEventListener("click", (e) => { if (e.target.closest("[data-diet-all]")) { all = !all; bar(); } });
   }
 
   // ---------- recetas: búsqueda y filtros ----------
@@ -915,6 +1026,7 @@
         <span class="ap-grab" aria-hidden="true"></span>${grid()}
         <div class="ap-set">
           <button type="button" class="ap-row notif-btn">${ic("bell")}<span>Recordatorios</span>${ic("arrow")}</button>
+          <button type="button" class="ap-row" data-open-prefs>${ic("leaf")}<span>Preferencias y alergias</span>${ic("arrow")}</button>
           <div class="ap-row"><span class="ap-ri">${ic("coin")}</span><span>Moneda</span><div class="seg ap-cur">${["ARS", "USD", "EUR"].map((c) => `<button type="button" data-apcur="${c}" class="${c === cur ? "on" : ""}">${c}</button>`).join("")}</div></div>
           <button type="button" class="ap-row" data-apsug>${ic("plus")}<span>Sugerir un plato</span>${ic("arrow")}</button>
         </div>

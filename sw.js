@@ -1,5 +1,5 @@
 /* Service worker · Menuario (generado por tools/build_pwa.py, no editar a mano) */
-const V = "pc-769a8b8338";
+const V = "pc-01f017379d";
 const CORE = ["./", "index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html", "promos.html", "app.html", "pasos.html", "style.css", "motion.css", "gami.css", "app.js", "ahorro.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest", "img/icons/icon-192.png", "fonts/outfit-v15-latin_latin-ext-500.woff2", "fonts/outfit-v15-latin_latin-ext-600.woff2", "fonts/outfit-v15-latin_latin-ext-700.woff2", "fonts/outfit-v15-latin_latin-ext-regular.woff2", "fonts/young-serif-v2-latin_latin-ext-regular.woff2"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(CORE)).then(() => self.skipWaiting())); });
 const NOTIF = "menuario-notif";  // datos para los recordatorios (los escribe app.js): no se borra al actualizar

@@ -133,7 +133,7 @@ onAuthStateChanged(auth, (u) => {
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
-    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
     if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
@@ -150,6 +150,15 @@ function dayPlan(dateISO, src) {
   const h = houseDay(dateISO); return { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena };
 }
 // para los recordatorios: los próximos 14 días del calendario propio y cuántos productos tiene su lista (lo lee app.js → service worker)
+// preferencias alimentarias: viajan con la cuenta (calendars/{uid}/profile/prefs)
+let prefsPulled = false;
+function syncPrefs() {
+  if (!user || prefsPulled) return; prefsPulled = true;
+  const rem = cal?.profile?.prefs, loc = localStorage.getItem("prefsComida");
+  if (rem && !loc) { localStorage.setItem("prefsComida", JSON.stringify(rem)); window.dispatchEvent(new Event("prefs")); window.dispatchEvent(new Event("prefs-remote")); }
+  else if (loc && JSON.stringify(rem || null) !== loc) update(ref(db, `calendars/${user.uid}/profile`), { prefs: JSON.parse(loc) }).catch(() => {});
+}
+window.addEventListener("prefs", () => { if (user) { try { update(ref(db, `calendars/${user.uid}/profile`), { prefs: JSON.parse(localStorage.getItem("prefsComida") || "null") }).catch(() => {}); } catch (e) {} } if (page === "nutricion" && loadProfile()) renderMedida(); });
 // pasos: +25 XP el día que se llega al objetivo y +5 cada 2.000 pasos (hasta +20)
 const pasosXP = (p) => (!p || !(p.s > 0) ? 0 : (p.s >= (p.g || 8000) ? 25 : 0) + Math.min(20, Math.floor(p.s / 2000) * 5));
 let pasosBusy = false;
@@ -271,7 +280,7 @@ function openPicker(date, slot) {
 }
 function fillPicker(q) {
   q = norm(q);
-  const rank = (r) => (r.custom && r.owner === user?.uid ? 0 : r.tipo === (pickCtx.slot === "desayuno" ? "desayuno" : "plato") ? 1 : 2);
+  const rank = (r) => (window.DIET && !window.DIET.ok(r) ? 5 : 0) + (r.custom && r.owner === user?.uid ? 0 : r.tipo === (pickCtx.slot === "desayuno" ? "desayuno" : "plato") ? 1 : 2);  // las que no van con el perfil, al final
   const list = Object.values(R).filter((r) => !q || norm(r.name + " " + r.tags.join(" ") + " " + r.ing.map((i) => i.n).join(" ") + (r.custom ? " mi receta comunidad " + r.ownerName : "")).includes(q)).sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
   $("#pickerGrid").innerHTML = list.map((r) => `<button class="pick" data-pick="${r.id}"><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span><b>${esc(r.name)}</b><small>${r.tiempo} min · ${r.kcal} kcal${r.porciones > 1 ? " · rinde " + r.porciones : ""}${r.tipo === "desayuno" ? " · desayuno" : ""}${r.custom ? " · de " + esc(r.ownerName) : ""}</small></span></button>`).join("") || `<p class="muted">Nada con ese nombre.</p>`;
 }
@@ -1092,7 +1101,11 @@ function mdDates(per) {
 }
 function buildMonth(p, opts) {
   const T = targets(p), M = D.meriendaNut, rnd = mulberry(opts.seed);
-  const base = Object.values(R).filter((r) => !r.custom && r.nut && r.nut.kcal);
+  const all = Object.values(R).filter((r) => !r.custom && r.nut && r.nut.kcal), D0 = window.DIET;
+  const apt = D0 ? all.filter((r) => D0.ok(r)) : all;
+  // solo recetas que van con el perfil; si no alcanzan para variar (menos de 2 desayunos o 4 platos), se completa con el resto y se avisa
+  const enough = apt.filter((r) => r.tipo === "desayuno").length >= 2 && apt.filter((r) => r.tipo !== "desayuno").length >= 4;
+  const base = enough ? apt : all; buildMonth.dietFallback = !enough && apt.length < all.length;
   const BK = base.filter((r) => r.tipo === "desayuno"), PL = base.filter((r) => r.tipo !== "desayuno");
   const use = {}, last = {}, out = [];
   const N = (r, k) => (r.nut[k] == null ? 0 : r.nut[k]);
@@ -1138,6 +1151,7 @@ function buildMonth(p, opts) {
 function renderMedida() {
   const box = $("#medida"); if (!box) return;
   const p = loadProfile() || cal?.profile?.nut || null; box.hidden = !p; if (!p) return;
+  { const n = $("#mdDiet"), Dd = window.DIET; if (n && Dd) { n.hidden = !Dd.active(); if (Dd.active()) { const ap = Object.values(R).filter((r) => !r.custom && r.nut && r.nut.kcal && Dd.ok(r)); const few = ap.filter((r) => r.tipo === "desayuno").length < 2 || ap.filter((r) => r.tipo !== "desayuno").length < 4; n.textContent = few ? `Con tu perfil (${Dd.summary()}) hay pocas recetas para variar todo el mes: se completan con otras, marcadas con ⚠.` : `Solo con recetas que van con tu perfil: ${Dd.summary()}.`; } } }
   const st = (() => { try { return JSON.parse(localStorage.getItem(MD_KEY) || "null"); } catch (e) { return null; } })();
   $$("#mdPer button").forEach((b) => b.classList.toggle("on", b.dataset.p === (st?.per || "30")));
   if ($("#mdEco")) $("#mdEco").checked = !!st?.eco;

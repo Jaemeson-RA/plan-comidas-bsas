@@ -145,6 +145,12 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 - **Más**: las mismas categorías, recordatorios, moneda y sugerir un plato.
 - Lo que solo va en la web lleva `data-web`; lo que solo va en la app, `data-app`. Ojo: la clase es `is-app` porque `.app` ya existe (tarjetas de las apps de delivery) y `.today` es el pizarrón de la web.
 
+## Preferencias alimentarias y alergias (`DIET` en `app.js`)
+
+- Se eligen en Nutrición, en Perfil, en Recetas («Elegí tus preferencias») o en «Más» de la app: cómo come (de todo, vegetariana, vegana, pescetariana), sin TACC, sin lactosa y alergias (huevo, lácteos, frutos secos, maní, soja, pescado, mariscos, sésamo). Se guardan en `localStorage.prefsComida` y, con cuenta, en `calendars/{uid}/profile/prefs`.
+- Lo que lleva cada receta se **detecta en los nombres de los ingredientes** con reglas (`DIET.flags`): carne, pollo, pescado, mariscos, huevo, lácteos, gluten, frutos secos (no la nuez moscada), maní, soja, sésamo y miel (para veganos). Sirve igual para las recetas de la comunidad y las nuevas, sin etiquetarlas a mano.
+- **Recetas** muestra solo las aptas (con «Ver todas», que las marca «⚠ Lleva…»); la receta no apta avisa qué lleva y propone alternativas parecidas que sí van. **Mi plan** pone las no aptas al final del selector; **Tu mes a medida** usa solo las aptas (si no alcanzan para variar, completa y avisa). En el plan de la casa y en Hoy, los platos no aptos llevan ⚠.
+
 ## Pasos (`pasos.html`, `tools/android_native/`)
 
 - **Podómetro de la app de Android (desde la 1.0.5).** Código nativo propio que `build_android.py` vuelve a poner después de cada `bubblewrap update`: `StepStore` (pasos por día en SharedPreferences, a partir del contador `TYPE_STEP_COUNTER` que cuenta desde el reinicio), `StepReader` (una lectura), `StepWorker` (WorkManager cada ~15 min), `PasosActivity` (la abre el sitio con `intent://pasos?accion=activar|sync#Intent;scheme=menuario;package=ar.menuario.app;end`: pide el permiso de actividad física, lee y vuelve a `pasos.html?pasos=...`) y un agregado en `LauncherActivity.getLaunchingUrl()` que suma `?pasos=20261025:5234,...` (últimos 35 días) cada vez que se abre la app. Permiso `ACTIVITY_RECOGNITION`, dependencia `androidx.work:work-runtime`.
