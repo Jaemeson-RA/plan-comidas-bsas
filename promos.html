@@ -18,6 +18,9 @@
 <meta property="og:image:alt" content="Menuario: recetas, lista de compras y precios de supermercados">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%232F8F5B'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preload" href="fonts/young-serif-v2-latin_latin-ext-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/outfit-v15-latin_latin-ext-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/outfit-v15-latin_latin-ext-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2F8F5B">
 <link rel="apple-touch-icon" href="img/icons/apple-touch-180.png">
@@ -134,7 +137,7 @@
   <h1>Lo que está <mark>en oferta hoy</mark></h1>
   <p class="lead">Recorremos las góndolas online de Coto, Día, Carrefour, Jumbo, Disco, Vea y ChangoMás cada 3 horas. Arriba, las promos de lo que lleva tu lista de esta semana. Tocá una promo para ir al producto.</p>
 </section>
-<section class="card promo-plan" id="promoPlan" hidden></section>
+<section class="card promo-plan" id="promoPlan"><div class="pp-skel" aria-hidden="true"><span class="skel" style="width:38%;height:11px"></span><span class="skel" style="width:72%;height:24px"></span><span class="skel" style="width:55%;height:11px"></span><div class="pp-skel-row"><span class="skel"></span><span class="skel"></span></div></div></section>
 <div class="promo-tools">
   <input id="prQ" type="search" placeholder="Buscar en las promos: yerba, aceite, leche…" aria-label="Buscar en las promos">
   <div class="seg" id="prSort"><button data-s="pct" class="on">Mayor descuento</button><button data-s="price">Más baratas</button></div>

@@ -21,6 +21,10 @@ META = {
  "404": ("Página no encontrada · Menuario", "Esa página no existe: volvé al plan, las recetas o la lista de compras."),
 }
 SITE = "https://jaemeson-ra.github.io/plan-comidas-bsas/"
+# Firebase: se conecta y se baja el SDK en paralelo con el resto (antes esperaba a cuenta.js)
+FB = "https://www.gstatic.com/firebasejs/10.14.1/"
+FB_HINTS = ("<link rel=\"preconnect\" href=\"https://www.gstatic.com\" crossorigin>\n<link rel=\"preconnect\" href=\"https://viaje-del-amor-default-rtdb.europe-west1.firebasedatabase.app\">\n"
+            + "".join(f"<link rel=\"modulepreload\" href=\"{FB}{m}.js\">\n" for m in ("firebase-app", "firebase-auth", "firebase-database")))
 import datetime
 for page, (title, desc) in META.items():
     body = open(os.path.join(root, "tools", "pages", f"{page}.body.html"), encoding="utf-8").read()
@@ -39,13 +43,17 @@ for page, (title, desc) in META.items():
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
         f"<title>{title}</title>\n<meta name=\"description\" content=\"{desc}\">\n" + social +
         f"<link rel=\"icon\" href=\"{FAVICON}\">\n"
+        "<link rel=\"preload\" href=\"fonts/young-serif-v2-latin_latin-ext-regular.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n"
+        "<link rel=\"preload\" href=\"fonts/outfit-v15-latin_latin-ext-regular.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n"
+        "<link rel=\"preload\" href=\"fonts/outfit-v15-latin_latin-ext-600.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n"
+        + (FB_HINTS if page in ("mi-plan", "nutricion") else "") +
         "<link rel=\"manifest\" href=\"manifest.webmanifest\">\n<meta name=\"theme-color\" content=\"#2F8F5B\">\n"
         "<link rel=\"apple-touch-icon\" href=\"img/icons/apple-touch-180.png\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n"
         "<meta name=\"apple-mobile-web-app-title\" content=\"Menuario\">\n<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\">\n"
         "<script>try{if(matchMedia(\"(display-mode: standalone)\").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)||sessionStorage.getItem(\"inApp\")===\"1\"){document.documentElement.classList.add(\"is-app\");sessionStorage.setItem(\"inApp\",\"1\")}}catch(e){}</script>\n<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
     if page not in ("compras", "promos", "supermercados"):
         html = html.replace('<script src="ahorro.js" data-only="compras promos supermercados"></script>\n', "")
-    if page not in ("mi-plan", "nutricion", "compras"):
+    if page not in ("mi-plan", "nutricion"):
         html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion compras"></script>\n', "")
     open(os.path.join(root, f"{page}.html"), "w", encoding="utf-8").write(html)
     print("OK", page + ".html", len(html))

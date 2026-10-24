@@ -128,6 +128,7 @@ $("#logout")?.addEventListener("click", () => signOut(auth));
 onAuthStateChanged(auth, (u) => {
   user = u; if (unsubCal) { unsubCal(); unsubCal = null; }
   myEmailHash = null; lastXP = null; clearTimeout(syncTimer);  // al cambiar de cuenta en la misma pestaña, nada de la anterior
+  try { if (u) localStorage.setItem("acct", "1"); else localStorage.removeItem("acct"); } catch (e) {}  // Compras carga este módulo solo si hay cuenta
   if (!u) { try { localStorage.removeItem("notifMine"); localStorage.removeItem("miListas"); } catch (e) {} window.notifSnap?.(); window.dispatchEvent(new Event("milistas")); }  // sin cuenta, los recordatorios usan el plan de la casa
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
@@ -203,7 +204,8 @@ function renderMiPlan() {
     </article>`; }).join("");
   const list = aggregateShopping(days.map((dt) => cal?.days?.[dt]));
   const key = (c, n) => `myshop:${myWeek}:${c}:${n}`;
-  $("#myShop").innerHTML = list.length ? list.map((c) => `<div class="shop-cat"><h4>${esc(c.cat)} <small>${c.items.length}</small></h4>${c.items.map((i) => { const dn = localStorage.getItem(key(c.cat, i.n)) === "1"; return `<label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(c.cat, i.n))}" ${dn ? "checked" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>`; }).join("")}</div>`).join("")
+  const HL = window.Heladera, fzOf = (n) => !!HL?.has(n);
+  $("#myShop").innerHTML = list.length ? list.map((c) => `<div class="shop-cat"><h4>${esc(c.cat)} <small>${c.items.filter((i) => !fzOf(i.n)).length}</small></h4>${c.items.map((i) => { const fz = fzOf(i.n), dn = !fz && localStorage.getItem(key(c.cat, i.n)) === "1"; return `<div class="sh-row${fz ? " fz" : ""}"><label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(c.cat, i.n))}" ${dn ? "checked" : ""}${fz ? " disabled" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>${HL ? `<button type="button" class="fz-btn" data-myfz="${esc(i.n)}" aria-pressed="${fz}" aria-label="${fz ? "Sacar de la heladera" : "Lo tengo en la heladera"}">${ic("snow")}</button>` : ""}</div>`; }).join("")}</div>`).join("")
     : `<p class="muted">Todavía no elegiste platos para esta semana. Tocá «+ elegir» en un día, o copiá el plan de la casa.</p>`;
   $("#myShare").hidden = !navigator.share;
   window.dispatchEvent(new Event("scroll"));
@@ -218,7 +220,7 @@ $("#fillHouse")?.addEventListener("click", async () => {
   try { await update(ref(db, `calendars/${user.uid}/days`), upd); touched("Copié el plan de la casa: " + n + " días."); } catch (e) { toast(errMsg(e)); }
 });
 $("#clearMyWeek")?.addEventListener("click", async () => { const upd = {}; Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)).forEach((dt) => { upd[dt] = null; }); try { await update(ref(db, `calendars/${user.uid}/days`), upd); touched("Semana vaciada."); } catch (e) { toast(errMsg(e)); } });
-const myListText = () => { const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)); const lines = [`Lista de compras · ${label(myWeek)} → ${label(addDays(myWeek, 6))}`, ""]; aggregateShopping(days.map((dt) => cal?.days?.[dt])).forEach((c) => { lines.push(c.cat.toUpperCase()); c.items.forEach((i) => lines.push(`- ${i.n} · ${i.q}`)); lines.push(""); }); return lines.join("\n"); };
+const myListText = () => { const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)); const lines = [`Lista de compras · ${label(myWeek)} → ${label(addDays(myWeek, 6))}`, ""]; aggregateShopping(days.map((dt) => cal?.days?.[dt])).forEach((c) => { const its = c.items.filter((i) => !window.Heladera?.has(i.n)); if (!its.length) return; lines.push(c.cat.toUpperCase()); its.forEach((i) => lines.push(`- ${i.n} · ${i.q}`)); lines.push(""); }); return lines.join("\n"); };
 $("#myCmp")?.addEventListener("click", () => {
   const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)); const list = aggregateShopping(days.map((dt) => cal?.days?.[dt]));
   if (!list.length) { toast("Elegí platos para esta semana y después comparamos los precios."); return; }
@@ -226,6 +228,7 @@ $("#myCmp")?.addEventListener("click", () => {
   location.href = `compras.html?lista=mi#semana-${myWeek}`;
 });
 $("#myDl")?.addEventListener("click", () => { const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)); window.downloadListHtml(`Lista de compras · ${label(myWeek)} → ${label(addDays(myWeek, 6))}`, aggregateShopping(days.map((dt) => cal?.days?.[dt])), `mi-lista-${myWeek}.html`); });
+$("#myShop")?.addEventListener("click", (e) => { const f = e.target.closest("[data-myfz]"); if (!f || !window.Heladera) return; e.preventDefault(); window.Heladera.toggle(f.dataset.myfz); render(); });
 $("#myCopy")?.addEventListener("click", async () => { toast((await copyText(myListText())) ? "Lista copiada. Pegala en Notas o WhatsApp." : "No se pudo copiar."); });
 $("#myShare")?.addEventListener("click", async () => { try { await navigator.share({ title: "Mi lista de compras", text: myListText() }); } catch (e) {} });
 function touched(msg) {

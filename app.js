@@ -272,7 +272,7 @@
   // ---------- inicio ----------
   if ((page === "inicio" || page === "404") && $("#today")) {
     const vid = $("#introVideo");
-    if (vid && window.matchMedia("(max-width: 720px)").matches) { vid.poster = "media/intro-vertical-poster.jpg"; vid.querySelector("source").src = "media/intro-vertical.mp4"; vid.classList.add("vertical"); vid.load(); }
+    if (vid && !document.documentElement.classList.contains("is-app")) { const v = window.matchMedia("(max-width: 720px)").matches; vid.poster = v ? "media/intro-vertical-poster.jpg" : "media/intro-poster.jpg"; if (v) { vid.querySelector("source").src = "media/intro-vertical.mp4"; vid.classList.add("vertical"); vid.load(); } }
     const d = houseDay(todayISO);
     $("#today").innerHTML = `<div class="t-head"><p class="kicker">Menú de hoy</p><h3>${"Hoy, " + longDate(d.date)}</h3></div>
       ${["desayuno", "almuerzo", "cena"].map((m) => `<div class="t-row"><small>${ICON[m]} ${m}</small>${mealBtn(d[m])}</div>`).join("")}
@@ -413,7 +413,13 @@
   const fSame = (a, b) => a === b || a === b + "s" || a === b + "es" || b === a + "s" || b === a + "es";
   const fHas = (ing, entry) => { const iw = fWords(ing), tw = fWords(entry); return tw.length > 0 && tw.every((t) => iw.some((w) => fSame(w, t))); };
   const fGet = () => { try { return JSON.parse(localStorage.getItem(FKEY) || "[]"); } catch (e) { return []; } };
-  const fSet = (v) => { try { localStorage.setItem(FKEY, JSON.stringify(v)); } catch (e) {} };
+  const fAtGet = () => { try { return JSON.parse(localStorage.getItem("heladeraAt") || "{}"); } catch (e) { return {}; } };
+  const fSet = (v) => { try { localStorage.setItem(FKEY, JSON.stringify(v)); const at = fAtGet(), now = Date.now(), keep = {}; v.forEach((h) => { const k = fNorm(h); keep[k] = at[k] || now; }); localStorage.setItem("heladeraAt", JSON.stringify(keep)); } catch (e) {} };
+  const fAge = (h) => { const t = fAtGet()[fNorm(h)]; return t ? Math.floor((Date.now() - t) / 864e5) : null; };
+  window.Heladera = { get: fGet, has: (name) => fGet().some((h) => fHas(name, h)), toggle: (name) => { const hel = fGet(); if (hel.some((h) => fHas(name, h))) fSet(hel.filter((h) => !fHas(name, h))); else fSet([...hel, name.replace(/\s*\(.*?\)\s*/g, " ").trim()]); } };
+  const xKey = (mon) => `extras:${mon}`;  // productos que agrega cada uno a la lista de esa semana
+  const xGet = (mon) => { try { return JSON.parse(localStorage.getItem(xKey(mon)) || "[]"); } catch (e) { return []; } };
+  const xSet = (mon, v) => { try { if (v.length) localStorage.setItem(xKey(mon), JSON.stringify(v)); else localStorage.removeItem(xKey(mon)); } catch (e) {} };
   const inFridge = (name, hel) => hel.some((h) => fHas(name, h));
   const cleanName = (n) => n.replace(/\s*\(.*?\)\s*/g, " ").trim();
   const myLists = () => { try { return JSON.parse(localStorage.getItem("miListas") || "null"); } catch (e) { return null; } };
@@ -423,7 +429,8 @@
     renderWeekTabs("#shopTabs", renderShopping);
     const w = D.weeks.find((x) => x.start === state.week) || D.weeks[0], my = myLists();
     const mine = state.src === "mi" && !!my, mw = mine ? my.weeks?.[w.start] : null;  // si cuenta.js todavía no trajo el calendario, se muestra el de la casa y se cambia solo cuando llega
-    const full = mine ? (mw ? mw.list : []) : shoppingFor(w);
+    const extras = xGet(w.start);
+    const full = [...(mine ? (mw ? mw.list : []) : shoppingFor(w)), ...(extras.length ? [{ c: "otros", cat: "Otros (agregados por vos)", items: extras.map((x, k) => ({ n: x.n, q: x.q || "", extra: k })) }] : [])];
     const hel = fGet();
     // origen de la lista: solo aparece si hay un calendario propio guardado en este dispositivo
     const srcBox = $("#shopSrc");
@@ -435,7 +442,8 @@
     const n = list.reduce((a, c) => a + c.items.length, 0), nf = full.reduce((a, c) => a + c.items.length, 0) - n;
     const key = (c, nm) => `shop:${w.start}:${c}:${nm}`;
     const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
-    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</b><span class="muted"> · ${n} productos${nf ? ` · <span class="ss-fr">${ic("snow")} ${nf} en la heladera</span>` : ""} · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="${mine ? "mi-plan.html" : `plan.html?semana=${w.start}`}">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="printList">${ic("printer")} Imprimir</button><button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
+    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</b><span class="muted"> · ${n} productos${nf ? ` · <span class="ss-fr">${ic("snow")} ${nf} en la heladera</span>` : ""} · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="${mine ? "mi-plan.html" : `plan.html?semana=${w.start}`}">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="printList">${ic("printer")} Imprimir</button><button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button>${done ? `<button class="mini-btn ss-tofr" id="toFridge">${ic("snow")} Guardar lo tildado en la heladera</button>` : ""}</div></div>`;
+    $("#toFridge")?.addEventListener("click", () => { const hel = fGet(); let k = 0; list.forEach((c) => c.items.forEach((i) => { if (localStorage.getItem(key(c.cat, i.n)) === "1") { if (!inFridge(i.n, hel)) { hel.push(cleanName(i.n)); k++; } localStorage.removeItem(key(c.cat, i.n)); } })); fSet(hel); renderShopping(); toastG(k === 1 ? "1 producto guardado en la heladera." : `${k} productos guardados en la heladera.`); });
     $("#printList")?.addEventListener("click", () => window.print());
     $("#clearWeek").addEventListener("click", () => { full.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
     // texto plano de la lista (solo lo que falta comprar; si no hay nada tildado, todo) para pegar en Notas o WhatsApp
@@ -469,12 +477,14 @@
     });
     $("#shopGrid").innerHTML = full.length ? full.map((cat) => `<div class="shop-cat"><h4>${esc(cat.cat)} <small>${cat.items.filter((i) => !inFridge(i.n, hel)).length}</small></h4>
       ${cat.items.map((i) => { const fz = inFridge(i.n, hel), dn = !fz && localStorage.getItem(key(cat.cat, i.n)) === "1";
-        return `<div class="sh-row${fz ? " fz" : ""}"><label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}${fz ? " disabled" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label><button type="button" class="fz-btn" data-fz="${esc(i.n)}" aria-pressed="${fz}" title="${fz ? "Ya no lo tengo" : "Lo tengo en la heladera"}" aria-label="${fz ? `Sacar ${esc(i.n)} de la heladera` : `Tengo ${esc(i.n)} en la heladera`}">${ic("snow")}</button></div>`; }).join("")}</div>`).join("")
+        return `<div class="sh-row${fz ? " fz" : ""}"><label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}${fz ? " disabled" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>${i.extra != null ? `<button type="button" class="x-del" data-xdel="${i.extra}" aria-label="Sacar ${esc(i.n)} de la lista">×</button>` : ""}<button type="button" class="fz-btn" data-fz="${esc(i.n)}" aria-pressed="${fz}" title="${fz ? "Ya no lo tengo" : "Lo tengo en la heladera"}" aria-label="${fz ? `Sacar ${esc(i.n)} de la heladera` : `Tengo ${esc(i.n)} en la heladera`}">${ic("snow")}</button></div>`; }).join("")}</div>`).join("")
       : `<div class="card shop-empty"><p><b>Tu calendario no tiene platos esa semana.</b></p><p class="muted small">Armala en <a href="mi-plan.html">Mi plan</a> o mirá la lista del plan de la casa.</p></div>`;
+    $("#shopGrid").insertAdjacentHTML("beforeend", `<form class="card x-form" id="xForm"><label for="xQ"><b>¿Falta algo?</b> <span class="muted small">Sumalo a la lista de esta semana: se copia, se comparte y entra en el comparador.</span></label><div><input id="xQ" placeholder="Ej.: café, papel higiénico, detergente" autocomplete="off"><input id="xN" placeholder="Cantidad" autocomplete="off" aria-label="Cantidad (opcional)"><button class="btn" type="submit">Agregar</button></div></form>`);
     $("#pantryList").innerHTML = D.pantry.map((p) => `<li>${esc(p)}</li>`).join("");
     // la tarjeta de la heladera
     if ($("#frChips")) {
-      $("#frChips").innerHTML = hel.length ? hel.map((h, k) => `<button type="button" class="fr-chip" data-frdel="${k}" aria-label="Sacar ${esc(h)} de la heladera">${ic("snow")}${esc(h)}<span aria-hidden="true">×</span></button>`).join("") + `<button type="button" class="mini-btn fr-clear" data-frclear>Vaciar</button>` : `<p class="muted small fr-empty">Vacía. Tocá el ${ic("snow")} de lo que ya tenés.</p>`;
+      const old = hel.filter((h) => (fAge(h) ?? 0) >= 14).length;
+      $("#frChips").innerHTML = hel.length ? hel.map((h, k) => { const a = fAge(h); return `<button type="button" class="fr-chip${a != null && a >= 14 ? " old" : ""}" data-frdel="${k}" aria-label="Sacar ${esc(h)} de la heladera"${a != null ? ` title="Guardado hace ${a} ${a === 1 ? "día" : "días"}"` : ""}>${ic("snow")}${esc(h)}${a != null && a >= 2 ? `<small>${a} d</small>` : ""}<span aria-hidden="true">×</span></button>`; }).join("") + (old ? `<button type="button" class="mini-btn" data-frold>Sacar lo de hace +2 semanas (${old})</button>` : "") + `<button type="button" class="mini-btn fr-clear" data-frclear>Vaciar</button>` : `<p class="muted small fr-empty">Vacía. Tocá el ${ic("snow")} de lo que ya tenés.</p>`;
       $("#frList").innerHTML = [...new Set(full.flatMap((c) => c.items.map((i) => cleanName(i.n))))].sort().map((x) => `<option value="${esc(x)}">`).join("");
     }
   }
@@ -485,6 +495,8 @@
     if (!D.weeks.some((w) => w.start === state.week)) { D.weeks.push(weekAt(state.week)); D.weeks.sort((a, b) => a.start.localeCompare(b.start)); }
     renderShopping();
     window.addEventListener("milistas", () => renderShopping());  // cuenta.js trajo (o borró) el calendario propio
+    // cuenta.js (y el SDK de Firebase) solo si hay una cuenta abierta en este dispositivo: sin cuenta, Compras no baja nada de más
+    if (localStorage.getItem("acct") === "1") import("./cuenta.js").catch(() => {});
     $("#shopSrc")?.addEventListener("click", (e) => { const b = e.target.closest("[data-src]"); if (!b) return; state.src = b.dataset.src; try { localStorage.setItem("shopSrc", state.src); } catch (x) {} renderShopping(); });
     $("#shopGrid").addEventListener("click", (e) => {
       const b = e.target.closest("[data-fz]"); if (!b) return; e.preventDefault();
@@ -492,7 +504,10 @@
       if (inFridge(name, hel)) fSet(hel.filter((h) => !fHas(name, h))); else fSet([...hel, cleanName(name)]);
       renderShopping();
     });
+    $("#shopGrid").addEventListener("click", (e) => { const x = e.target.closest("[data-xdel]"); if (!x) return; e.preventDefault(); const mon = state.week, v = xGet(mon); v.splice(+x.dataset.xdel, 1); xSet(mon, v); renderShopping(); });
+    $("#shopGrid").addEventListener("submit", (e) => { if (e.target.id !== "xForm") return; e.preventDefault(); const n = $("#xQ").value.trim(), q = $("#xN").value.trim(); if (!n) return; const mon = state.week, v = xGet(mon); n.split(/[,;]/).map((x) => x.trim()).filter(Boolean).forEach((nm) => { if (!v.some((x) => fNorm(x.n) === fNorm(nm))) v.push({ n: nm, q }); }); xSet(mon, v); renderShopping(); setTimeout(() => $("#xQ")?.focus(), 0); });
     $("#fridge")?.addEventListener("click", (e) => {
+      if (e.target.closest("[data-frold]")) { fSet(fGet().filter((h) => (fAge(h) ?? 0) < 14)); renderShopping(); return; }
       const d = e.target.closest("[data-frdel]"), c = e.target.closest("[data-frclear]");
       if (d) { const hel = fGet(); hel.splice(+d.dataset.frdel, 1); fSet(hel); renderShopping(); }
       if (c) { fSet([]); renderShopping(); }

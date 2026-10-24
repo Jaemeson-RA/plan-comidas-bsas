@@ -1093,3 +1093,23 @@ html.is-app .buscador{padding-top:.6rem}
 .shop-empty{padding:1.1rem 1.2rem}
 .shop-empty p{margin:0 0 .3rem}
 @media (pointer:coarse){.fz-btn{width:40px;height:40px}}
+
+/* ===== optimización: sin saltos de diseño ===== */
+@media (max-width:720px){#introVideo{aspect-ratio:9/16;max-height:72vh;width:auto;max-width:100%;margin:0 auto}}
+.pp-skel{display:grid;gap:.55rem}
+.pp-skel-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.3rem}
+.pp-skel-row .skel{height:190px;border-radius:14px}
+
+/* lista: productos propios y heladera con antigüedad */
+.x-form{padding:.9rem 1rem;margin-top:.2rem;grid-column:1/-1}
+.x-form label{display:block;margin-bottom:.5rem}
+.x-form div{display:flex;gap:.5rem;flex-wrap:wrap}
+.x-form input{font:inherit;border:1.5px solid var(--border);border-radius:999px;padding:.55rem .85rem;background:#fff;min-width:0}
+#xQ{flex:2 1 180px}#xN{flex:1 1 90px;max-width:140px}
+.x-form .btn{font-family:inherit;cursor:pointer;padding:.55rem 1.1rem}
+.x-del{flex:none;width:30px;height:30px;border-radius:50%;border:0;background:transparent;color:var(--muted);font-size:1.15rem;cursor:pointer}
+.x-del:hover{background:#FBE4DD;color:#B5462A}
+.fr-chip small{font-size:.7rem;font-weight:700;opacity:.65;margin-left:.15rem}
+.fr-chip.old{color:#8A5A12;background:#FCEFD6;border-color:#F2D49B}
+.ss-tofr{color:#235E92;border-color:#C4DDF3;background:#EEF5FC}
+.ss-tofr .ic{color:#3B82C4}
