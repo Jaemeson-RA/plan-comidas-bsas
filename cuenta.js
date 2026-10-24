@@ -180,6 +180,7 @@ async function syncPasos() {
   } catch (e) {} finally { pasosBusy = false; }
 }
 window.addEventListener("pasos", () => setTimeout(syncPasos, 300));
+window.addEventListener("hogar", () => { if (user && cal) { render(); saveMyLists(); } });
 // para Compras: la lista de cada semana del calendario propio (la pasada, esta y las tres que vienen)
 function saveMyLists() {
   try {
@@ -205,7 +206,7 @@ function saveNotifMine() {
 }
 function aggregateShopping(days) {
   const agg = new Map();
-  days.forEach((d) => SLOTS.forEach((s) => { const r = R[d?.[s]]; if (!r) return; r.ing.forEach((i) => { if (i.c === "pantry") return; const k = `${i.c}|${i.n}|${i.u}`; agg.set(k, (agg.get(k) || 0) + i.q * (+d.x || 1)); }); }));
+  days.forEach((d) => SLOTS.forEach((s) => { const r = R[d?.[s]]; if (!r) return; r.ing.forEach((i) => { if (i.c === "pantry") return; const k = `${i.c}|${i.n}|${i.u}`; agg.set(k, (agg.get(k) || 0) + i.q * (+d.x || 1) * (window.HOG?.() || 1)); }); }));
   days.forEach((d) => { if (d?.colacion) { [["alm|frutos secos (mix)|g", 30], ["verd|fruta de estación (manzana, naranja, banana)|u", 1]].forEach(([k, q]) => agg.set(k, (agg.get(k) || 0) + q)); } });
   const CATS = { verd: "Verdulería", carne: "Carnicería y pescadería", lact: "Lácteos y huevos", alm: "Almacén", pan: "Panadería" };
   const fmtq = (q, u) => { q = Math.round(q * 10) / 10; if ((u === "g" || u === "ml") && q >= 1000) return `${q / 1000} ${u === "g" ? "kg" : "L"}`; return u === "u" ? `${q} u` : `${q} ${u}`; };

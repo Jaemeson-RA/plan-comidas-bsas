@@ -1201,3 +1201,31 @@ main{min-height:100vh}
 @media (max-width:720px){#introVideo,.hero-video video.vertical{height:min(72vh,620px);width:auto;max-width:100%;aspect-ratio:9/16}}
 .promo-plan{min-height:380px}
 @media (max-width:720px){.promo-plan{min-height:450px}}
+
+/* ===== cambiar plato, cuántos comen, voz ===== */
+.sw-btn{flex:none;width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--crema);color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.sw-btn .ic{width:16px;height:16px}
+.sw-btn:hover,.sw-btn.on{color:var(--verde);border-color:var(--verde);background:var(--ok2)}
+.dc .row{display:flex;align-items:center;gap:.4rem}.dc .row .meal{flex:1;min-width:0}
+.td-sw{display:flex;align-items:center;gap:.3rem}.td-sw .meal{flex:1;min-width:0}
+.ap-mrow{display:flex;align-items:center;border-bottom:1px solid var(--line);padding-right:.55rem}
+.ap-mrow .ap-meal{border-bottom:0;grid-template-columns:86px 52px minmax(0,1fr)}
+.ap-meals > .ap-mrow:last-of-type{border-bottom:1px solid var(--line)}
+.sw-box{max-height:88vh;display:flex;flex-direction:column}
+.sw-reset{align-self:flex-start;margin:.2rem 0 .6rem;display:inline-flex;align-items:center;gap:.35rem}
+.sw-q{font:inherit;border:1.5px solid var(--border);border-radius:999px;padding:.55rem .9rem;margin:.3rem 0 .6rem;background:#fff}
+.sw-list{overflow:auto;display:grid;gap:.4rem;padding-bottom:.4rem}
+.sw-opt{display:grid;grid-template-columns:56px minmax(0,1fr);gap:.7rem;align-items:center;text-align:left;font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--border);border-radius:12px;padding:.4rem;cursor:pointer}
+.sw-opt img{width:56px;height:56px;border-radius:9px;object-fit:cover}
+.sw-opt b{display:block;font-size:.92rem;line-height:1.25}.sw-opt small{color:var(--muted);font-size:.78rem}
+.sw-opt.diet-x{opacity:.55}
+.sw-opt[hidden]{display:none}
+.shop-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.6rem;margin:0 0 .8rem}
+.shop-top .shop-src{margin:0}
+.shop-hog{display:flex;align-items:center;gap:.5rem}
+.hog-seg button{min-width:34px;font-family:inherit}
+.cook-mic{width:42px;height:42px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:transparent;color:inherit;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-right:.4rem}
+.cook-mic .ic{width:20px;height:20px}
+.cook-mic.on{background:#E4572E;border-color:#E4572E;color:#fff;animation:micPulse 1.6s ease-in-out infinite}
+@keyframes micPulse{50%{box-shadow:0 0 0 8px rgba(228,87,46,.18)}}
+.cook-vhint{margin:.2rem 1.2rem 0;font-size:.86rem;opacity:.85}
