@@ -128,11 +128,11 @@ $("#logout")?.addEventListener("click", () => signOut(auth));
 onAuthStateChanged(auth, (u) => {
   user = u; if (unsubCal) { unsubCal(); unsubCal = null; }
   myEmailHash = null; lastXP = null; clearTimeout(syncTimer);  // al cambiar de cuenta en la misma pestaña, nada de la anterior
-  if (!u) { try { localStorage.removeItem("notifMine"); } catch (e) {} window.notifSnap?.(); }  // sin cuenta, los recordatorios usan el plan de la casa
+  if (!u) { try { localStorage.removeItem("notifMine"); localStorage.removeItem("miListas"); } catch (e) {} window.notifSnap?.(); window.dispatchEvent(new Event("milistas")); }  // sin cuenta, los recordatorios usan el plan de la casa
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
-    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
     if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
@@ -149,6 +149,19 @@ function dayPlan(dateISO, src) {
   const h = houseDay(dateISO); return { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena };
 }
 // para los recordatorios: los próximos 14 días del calendario propio y cuántos productos tiene su lista (lo lee app.js → service worker)
+// para Compras: la lista de cada semana del calendario propio (la pasada, esta y las tres que vienen)
+function saveMyLists() {
+  try {
+    const weeks = {};
+    for (let o = -1; o <= 3; o++) {
+      const mon = addDays(mondayOf(todayISO), o * 7), ds = Array.from({ length: 7 }, (_, i) => cal?.days?.[addDays(mon, i)]);
+      const set = ds.filter((d) => d && SLOTS.some((s) => d[s] && R[d[s]])).length;
+      if (set) weeks[mon] = { days: set, list: aggregateShopping(ds) };
+    }
+    localStorage.setItem("miListas", JSON.stringify({ at: Date.now(), weeks }));
+    window.dispatchEvent(new Event("milistas"));
+  } catch (e) {}
+}
 function saveNotifMine() {
   try {
     const days = {}, weeks = {};
@@ -210,7 +223,7 @@ $("#myCmp")?.addEventListener("click", () => {
   const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)); const list = aggregateShopping(days.map((dt) => cal?.days?.[dt]));
   if (!list.length) { toast("Elegí platos para esta semana y después comparamos los precios."); return; }
   try { localStorage.setItem("listaComparar", JSON.stringify({ at: Date.now(), label: `${label(myWeek)} → ${label(addDays(myWeek, 6))}`, items: list.flatMap((c) => c.items.map((i) => Object.assign({ c: c.c }, i))) })); } catch (e) {}
-  location.href = "compras.html?lista=mi#comparar";
+  location.href = `compras.html?lista=mi#semana-${myWeek}`;
 });
 $("#myDl")?.addEventListener("click", () => { const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)); window.downloadListHtml(`Lista de compras · ${label(myWeek)} → ${label(addDays(myWeek, 6))}`, aggregateShopping(days.map((dt) => cal?.days?.[dt])), `mi-lista-${myWeek}.html`); });
 $("#myCopy")?.addEventListener("click", async () => { toast((await copyText(myListText())) ? "Lista copiada. Pegala en Notas o WhatsApp." : "No se pudo copiar."); });

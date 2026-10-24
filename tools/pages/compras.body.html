@@ -4,6 +4,7 @@
   <h1>Lo que hay que comprar <mark>esta semana</mark></h1>
   <p class="lead">La lista se arma sola con las recetas de la semana elegida (la pasada, esta o las tres que vienen), más yogur, fruta y pan para las meriendas. Está ordenada por góndola para seguirla en el súper o en la app. Lo que tildás queda guardado en este dispositivo.</p>
 </section>
+<div class="shop-src" id="shopSrc" hidden></div>
 <div class="tabs" id="shopTabs"></div>
 <div class="shop-summary" id="shopSummary"></div>
 <button type="button" class="notif-cta notif-btn"><span class="hel-ico"><svg class="ic"><use href="#i-bell"/></svg></span><span><b>Recordame cuándo comprar</b><small>Elegí el día y la hora: te avisamos con tu lista ya armada. <em class="notif-state" hidden></em></small></span><svg class="ic"><use href="#i-arrow"/></svg></button>
@@ -15,6 +16,11 @@
   <button class="btn" id="cmpGo" type="button"><svg class="ic"><use href="#i-coin"/></svg> Comparar precios ahora</button>
   <div class="cmp-prog" id="cmpProg" hidden><div class="xp-bar"><i style="width:0%"></i></div><small>Buscando precios…</small></div>
   <div id="cmpRes"></div>
+</section>
+<section class="card fridge" id="fridge">
+  <div class="fr-head"><span class="fr-ico"><svg class="ic"><use href="#i-snow"/></svg></span><div><h2>Tu heladera</h2><p class="muted small">Lo que ya tenés no cuenta en la lista: aparece tachado con <svg class="ic fr-mini"><use href="#i-snow"/></svg>. Tocá el copo de cada producto o agregalo acá. Es la misma heladera de Recetas.</p></div></div>
+  <div class="fr-chips" id="frChips"></div>
+  <form class="fr-form" id="frForm"><input id="frQ" list="frList" placeholder="Ej.: huevos, arroz, cebolla" autocomplete="off" aria-label="Agregar a la heladera"><datalist id="frList"></datalist><button class="btn" type="submit">Agregar</button></form>
 </section>
 <div class="shop-grid" id="shopGrid"></div>
 <details class="pantry card">

@@ -405,21 +405,43 @@
   }
 
   // ---------- compras ----------
+  // ---------- compras: origen de la lista (plan de la casa o mi calendario) y heladera ----------
+  const FKEY = "heladera";  // la misma que «¿Qué hay en tu heladera?» de Recetas
+  const fNorm = (x) => String(x).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\(.*?\)/g, " ").replace(/[,.]/g, " ").replace(/\s+/g, " ").trim();
+  const fStop = new Set(["con", "de", "del", "la", "las", "los", "el", "para", "sin", "en", "y"]);
+  const fWords = (x) => fNorm(x).split(" ").filter((w) => w.length >= 3 && !fStop.has(w));
+  const fSame = (a, b) => a === b || a === b + "s" || a === b + "es" || b === a + "s" || b === a + "es";
+  const fHas = (ing, entry) => { const iw = fWords(ing), tw = fWords(entry); return tw.length > 0 && tw.every((t) => iw.some((w) => fSame(w, t))); };
+  const fGet = () => { try { return JSON.parse(localStorage.getItem(FKEY) || "[]"); } catch (e) { return []; } };
+  const fSet = (v) => { try { localStorage.setItem(FKEY, JSON.stringify(v)); } catch (e) {} };
+  const inFridge = (name, hel) => hel.some((h) => fHas(name, h));
+  const cleanName = (n) => n.replace(/\s*\(.*?\)\s*/g, " ").trim();
+  const myLists = () => { try { return JSON.parse(localStorage.getItem("miListas") || "null"); } catch (e) { return null; } };
+  state.src = new URLSearchParams(location.search).get("lista") === "mi" ? "mi" : (localStorage.getItem("shopSrc") || "casa");
   function renderShopping() {
     if (!$("#shopGrid")) return;
     renderWeekTabs("#shopTabs", renderShopping);
-    const w = D.weeks.find((x) => x.start === state.week) || D.weeks[0], list = shoppingFor(w);
-    window.__shop = { label: "Lista de compras · " + w.label, start: w.start, list }; window.dispatchEvent(new Event("shoplist"));
-    const n = list.reduce((a, c) => a + c.items.length, 0);
+    const w = D.weeks.find((x) => x.start === state.week) || D.weeks[0], my = myLists();
+    const mine = state.src === "mi" && !!my, mw = mine ? my.weeks?.[w.start] : null;  // si cuenta.js todavía no trajo el calendario, se muestra el de la casa y se cambia solo cuando llega
+    const full = mine ? (mw ? mw.list : []) : shoppingFor(w);
+    const hel = fGet();
+    // origen de la lista: solo aparece si hay un calendario propio guardado en este dispositivo
+    const srcBox = $("#shopSrc");
+    if (srcBox) { srcBox.hidden = !my; if (my) srcBox.innerHTML = `<span class="muted small">Lista de</span><div class="seg"><button type="button" data-src="casa" class="${mine ? "" : "on"}">Plan de la casa</button><button type="button" data-src="mi" class="${mine ? "on" : ""}">Mi calendario</button></div>`; }
+    // lo que está en la heladera no se compra: fuera de la cuenta, del comparador y del texto copiado
+    const list = full.map((c) => ({ ...c, items: c.items.filter((i) => !inFridge(i.n, hel)) })).filter((c) => c.items.length);
+    const label = (mine ? "Mi calendario · " : "Lista de compras · ") + w.label;
+    window.__shop = { label, start: w.start, list, src: state.src }; window.dispatchEvent(new Event("shoplist"));
+    const n = list.reduce((a, c) => a + c.items.length, 0), nf = full.reduce((a, c) => a + c.items.length, 0) - n;
     const key = (c, nm) => `shop:${w.start}:${c}:${nm}`;
     const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
-    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html?semana=${w.start}">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="printList">${ic("printer")} Imprimir</button><button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
+    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</b><span class="muted"> · ${n} productos${nf ? ` · <span class="ss-fr">${ic("snow")} ${nf} en la heladera</span>` : ""} · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="${mine ? "mi-plan.html" : `plan.html?semana=${w.start}`}">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="printList">${ic("printer")} Imprimir</button><button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
     $("#printList")?.addEventListener("click", () => window.print());
-    $("#clearWeek").addEventListener("click", () => { list.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
+    $("#clearWeek").addEventListener("click", () => { full.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
     // texto plano de la lista (solo lo que falta comprar; si no hay nada tildado, todo) para pegar en Notas o WhatsApp
     const listText = () => {
       const anyDone = list.some((c) => c.items.some((i) => localStorage.getItem(key(c.cat, i.n)) === "1"));
-      const lines = ["Lista de compras · " + w.label, ""];
+      const lines = [label, ""];
       list.forEach((c) => {
         const items = c.items.filter((i) => !anyDone || localStorage.getItem(key(c.cat, i.n)) !== "1");
         if (!items.length) return;
@@ -435,7 +457,7 @@
       try { await navigator.clipboard.writeText(text); return true; }
       catch (e) { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (err) {} ta.remove(); return ok; }
     };
-    $("#dlList").addEventListener("click", () => window.downloadListHtml("Lista de compras · " + w.label, list, `lista-compras-${w.start}.html`));
+    $("#dlList").addEventListener("click", () => window.downloadListHtml(label, list, `lista-compras-${w.start}.html`));
     $("#copyList").addEventListener("click", async () => {
       const { text, partial } = listText();
       const ok = await copyText(text);
@@ -443,11 +465,18 @@
     });
     $("#shareList")?.addEventListener("click", async () => {
       const { text } = listText();
-      try { await navigator.share({ title: "Lista de compras · " + w.label, text }); } catch (e) { if (e && e.name !== "AbortError") { await copyText(text); toast("Lista copiada."); } }
+      try { await navigator.share({ title: label, text }); } catch (e) { if (e && e.name !== "AbortError") { await copyText(text); toast("Lista copiada."); } }
     });
-    $("#shopGrid").innerHTML = list.map((cat) => `<div class="shop-cat"><h4>${esc(cat.cat)} <small>${cat.items.length}</small></h4>
-      ${cat.items.map((i) => { const dn = localStorage.getItem(key(cat.cat, i.n)) === "1"; return `<label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>`; }).join("")}</div>`).join("");
+    $("#shopGrid").innerHTML = full.length ? full.map((cat) => `<div class="shop-cat"><h4>${esc(cat.cat)} <small>${cat.items.filter((i) => !inFridge(i.n, hel)).length}</small></h4>
+      ${cat.items.map((i) => { const fz = inFridge(i.n, hel), dn = !fz && localStorage.getItem(key(cat.cat, i.n)) === "1";
+        return `<div class="sh-row${fz ? " fz" : ""}"><label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}${fz ? " disabled" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label><button type="button" class="fz-btn" data-fz="${esc(i.n)}" aria-pressed="${fz}" title="${fz ? "Ya no lo tengo" : "Lo tengo en la heladera"}" aria-label="${fz ? `Sacar ${esc(i.n)} de la heladera` : `Tengo ${esc(i.n)} en la heladera`}">${ic("snow")}</button></div>`; }).join("")}</div>`).join("")
+      : `<div class="card shop-empty"><p><b>Tu calendario no tiene platos esa semana.</b></p><p class="muted small">Armala en <a href="mi-plan.html">Mi plan</a> o mirá la lista del plan de la casa.</p></div>`;
     $("#pantryList").innerHTML = D.pantry.map((p) => `<li>${esc(p)}</li>`).join("");
+    // la tarjeta de la heladera
+    if ($("#frChips")) {
+      $("#frChips").innerHTML = hel.length ? hel.map((h, k) => `<button type="button" class="fr-chip" data-frdel="${k}" aria-label="Sacar ${esc(h)} de la heladera">${ic("snow")}${esc(h)}<span aria-hidden="true">×</span></button>`).join("") + `<button type="button" class="mini-btn fr-clear" data-frclear>Vaciar</button>` : `<p class="muted small fr-empty">Vacía. Tocá el ${ic("snow")} de lo que ya tenés.</p>`;
+      $("#frList").innerHTML = [...new Set(full.flatMap((c) => c.items.map((i) => cleanName(i.n))))].sort().map((x) => `<option value="${esc(x)}">`).join("");
+    }
   }
   if (page === "compras") {
     const h = location.hash.match(/semana-(\d{4}-\d{2}-\d{2})/); const base = mondayOf(todayISO);
@@ -455,10 +484,24 @@
     D.weeks = [-1, 0, 1, 2, 3].map((i) => weekAt(addDays(base, i * 7)));
     if (!D.weeks.some((w) => w.start === state.week)) { D.weeks.push(weekAt(state.week)); D.weeks.sort((a, b) => a.start.localeCompare(b.start)); }
     renderShopping();
+    window.addEventListener("milistas", () => renderShopping());  // cuenta.js trajo (o borró) el calendario propio
+    $("#shopSrc")?.addEventListener("click", (e) => { const b = e.target.closest("[data-src]"); if (!b) return; state.src = b.dataset.src; try { localStorage.setItem("shopSrc", state.src); } catch (x) {} renderShopping(); });
+    $("#shopGrid").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-fz]"); if (!b) return; e.preventDefault();
+      const name = b.dataset.fz, hel = fGet();
+      if (inFridge(name, hel)) fSet(hel.filter((h) => !fHas(name, h))); else fSet([...hel, cleanName(name)]);
+      renderShopping();
+    });
+    $("#fridge")?.addEventListener("click", (e) => {
+      const d = e.target.closest("[data-frdel]"), c = e.target.closest("[data-frclear]");
+      if (d) { const hel = fGet(); hel.splice(+d.dataset.frdel, 1); fSet(hel); renderShopping(); }
+      if (c) { fSet([]); renderShopping(); }
+    });
+    $("#frForm")?.addEventListener("submit", (e) => { e.preventDefault(); const hel = fGet(); String($("#frQ").value).split(/[,;]/).map((x) => x.trim()).filter(Boolean).forEach((v) => { if (!hel.some((h) => fNorm(h) === fNorm(v))) hel.push(v); }); fSet(hel); $("#frQ").value = ""; renderShopping(); });
     $("#shopGrid").addEventListener("change", (e) => {
       const cb = e.target; if (cb.type !== "checkbox") return;
       localStorage.setItem(cb.dataset.k, cb.checked ? "1" : "0"); cb.closest("label").classList.toggle("done", cb.checked);
-      const s = $("#shopSummary .muted"); if (s) { const w = D.weeks.find((x) => x.start === state.week); const list = shoppingFor(w); const key = (c, nm) => `shop:${w.start}:${c}:${nm}`; const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0); s.textContent = s.textContent.replace(/\d+ tildados/, done + " tildados"); }
+      const s = $("#shopSummary .muted"); if (s) { const w = D.weeks.find((x) => x.start === state.week); const list = window.__shop?.list || shoppingFor(w); const key = (c, nm) => `shop:${w.start}:${c}:${nm}`; const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0); s.textContent = s.textContent.replace(/\d+ tildados/, done + " tildados"); }
     });
   }
 

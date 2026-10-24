@@ -45,8 +45,8 @@ for page, (title, desc) in META.items():
         "<script>try{if(matchMedia(\"(display-mode: standalone)\").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)||sessionStorage.getItem(\"inApp\")===\"1\"){document.documentElement.classList.add(\"is-app\");sessionStorage.setItem(\"inApp\",\"1\")}}catch(e){}</script>\n<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
     if page not in ("compras", "promos", "supermercados"):
         html = html.replace('<script src="ahorro.js" data-only="compras promos supermercados"></script>\n', "")
-    if page not in ("mi-plan", "nutricion"):
-        html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion"></script>\n', "")
+    if page not in ("mi-plan", "nutricion", "compras"):
+        html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion compras"></script>\n', "")
     open(os.path.join(root, f"{page}.html"), "w", encoding="utf-8").write(html)
     print("OK", page + ".html", len(html))
 

@@ -121,21 +121,24 @@
   if (page === "compras" && $("#cmpBox")) {
     let src = new URLSearchParams(location.search).get("lista") === "mi" ? "mi" : "casa", last = null, showK = null;
     const mine = () => { const x = ls.get("listaComparar", null); return x && Date.now() - x.at < 14 * 864e5 ? x : null; };
+    const fGetCount = () => { try { return JSON.parse(localStorage.getItem("heladera") || "[]").length; } catch (e) { return 0; } };
     const near = () => { const x = ls.get("cercanas", null); return x && x.chains?.length ? x : null; };
     function currentList() {
-      if (src === "mi" && mine()) { const m = mine(); return { label: m.label, items: m.items }; }
-      const s = window.__shop; if (!s) return { label: "", items: [] };
+      const s = window.__shop;
+      if (!s && src === "mi" && mine()) { const m = mine(); return { label: m.label, items: m.items }; }  // respaldo: la última lista que mandó Mi plan
+      if (!s) return { label: "", items: [] };
       return { label: s.label, items: s.list.flatMap((c) => c.items.map((i) => Object.assign({ c: c.c || "" }, i, { cat: c.cat }))) };
     }
     function renderHead() {
       const m = mine(), nr = near();
-      $("#cmpSrc").innerHTML = `<button data-src="casa" class="${src === "casa" ? "on" : ""}">Semana del plan</button>${m ? `<button data-src="mi" class="${src === "mi" ? "on" : ""}">Mi plan · ${esc(m.label.replace(/^Lista de compras · /, ""))}</button>` : ""}`;
-      const L = currentList(); $("#cmpWhat").textContent = `${L.items.length} productos · ${L.label.replace(/^Lista de compras · /, "")}`;
+      // el origen se elige arriba de la lista (Plan de la casa / Mi calendario): acá solo se muestra
+      const L = currentList(); $("#cmpSrc").innerHTML = `<span class="pill-src">${window.__shop?.src === "mi" ? "Mi calendario" : "Plan de la casa"}</span>`;
+      $("#cmpWhat").textContent = `${L.items.length} productos · ${L.label.replace(/^(Lista de compras|Mi calendario) · /, "")}${fGetCount() ? " · sin lo que hay en la heladera" : ""}`;
       $("#cmpNearWrap").innerHTML = nr ? `<label class="snd"><input type="checkbox" id="cmpNear" ${ls.get("cmpNearOn", false) ? "checked" : ""}> Solo las cadenas que tengo cerca (${nr.chains.map(esc).join(", ")}) · <a href="supermercados.html#mapa">cambiar</a></label>` : `<p class="muted small">${ic("pin")} ¿Querés comparar solo las cadenas que tenés cerca? <a href="supermercados.html#mapa">Buscalas en el mapa</a>.</p>`;
     }
     $("#cmpSrc").addEventListener("click", (e) => { const b = e.target.closest("[data-src]"); if (!b) return; src = b.dataset.src; last = null; $("#cmpRes").innerHTML = ""; renderHead(); });
     $("#cmpNearWrap").addEventListener("change", (e) => { if (e.target.id === "cmpNear") { ls.set("cmpNearOn", e.target.checked); if (last) render(); } });
-    window.addEventListener("shoplist", () => { if (src === "casa") { last = null; $("#cmpRes").innerHTML = ""; } renderHead(); });
+    window.addEventListener("shoplist", () => { last = null; $("#cmpRes").innerHTML = ""; renderHead(); });
     renderHead();
     $("#cmpGo").addEventListener("click", async () => {
       if (!API) { toast("Falta configurar el proxy de precios."); return; }
