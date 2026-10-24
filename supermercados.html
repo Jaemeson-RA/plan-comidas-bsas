@@ -70,6 +70,7 @@
     <a href="recetas.html" data-nav="recetas"><svg class="ic"><use href="#i-recetas"/></svg>Recetas</a>
     <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Compras</a>
     <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Súper</a>
+    <a href="promos.html" data-nav="promos"><svg class="ic"><use href="#i-tag"/></svg>Promos</a>
     <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Estación</a>
     <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
     <a href="mi-plan.html" data-nav="miplan" class="nav-cta"><svg class="ic"><use href="#i-users"/></svg>Mi plan</a>
@@ -104,6 +105,20 @@
   <div id="alertasBox"></div>
 </section>
 
+<section class="sec mapa" id="mapa">
+  <h2><span class="num"><svg class="ic"><use href="#i-pin"/></svg></span>Sucursales cerca tuyo</h2>
+  <p class="muted">Compartí tu ubicación o escribí una dirección y te mostramos las sucursales de las siete cadenas a la vuelta, con cómo llegar a pie. Tu ubicación no se guarda en ningún servidor.</p>
+  <div class="map-tools">
+    <button class="btn" type="button" id="mapLocate"><svg class="ic"><use href="#i-pin"/></svg> Usar mi ubicación</button>
+    <form class="map-form" id="mapForm"><input id="mapAddr" placeholder="Calle y altura, barrio (ej.: Av. Corrientes 1500)" autocomplete="street-address" aria-label="Dirección"><button class="mini-btn" type="submit">Buscar</button></form>
+    <label class="map-r">Radio <select id="mapRadius"><option value="500">500 m</option><option value="1000">1 km</option><option value="1500">1,5 km</option><option value="2500">2,5 km</option><option value="5000">5 km</option></select></label>
+  </div>
+  <div class="chips" id="mapChains"></div>
+  <div class="map" id="map"><p class="muted small">El mapa aparece cuando elegís tu ubicación o una dirección.</p></div>
+  <p class="small" id="mapStatus"></p>
+  <div class="map-list" id="mapList"></div>
+</section>
+<div id="mapBox" hidden></div>
 <section class="sec">
   <h2><span class="num">1</span>La respuesta corta</h2>
   <div class="two">
@@ -138,7 +153,7 @@
 </main>
 
 <footer class="foot">
-  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
+  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="promos.html">Promos</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
   <p class="foot-legal"><a href="terminos.html">Términos de uso</a> · <a href="privacidad.html">Privacidad</a> · © 2026 Jaemeson Dieu, todos los derechos reservados</p>
   <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a> <button type="button" class="mini-btn install-btn" hidden>Instalar la app</button></p>
 </footer>
@@ -151,7 +166,8 @@
 </nav>
 <div class="more-menu" id="moreMenu" hidden>
   <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Lista de compras</a>
-  <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados</a>
+  <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados y mapa</a>
+  <a href="promos.html" data-nav="promos"><svg class="ic"><use href="#i-tag"/></svg>Promos de hoy</a>
   <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Productos de estación</a>
   <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
   <button type="button" class="more-sug install-btn" hidden><svg class="ic"><use href="#i-arrow"/></svg>Instalar la app</button>
@@ -190,5 +206,6 @@
 <script src="config.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="ahorro.js" data-only="compras promos supermercados"></script>
 </body>
 </html>

@@ -2,3 +2,11 @@ name = "plan-comidas-precios"
 main = "worker.js"
 compatibility_date = "2024-10-01"
 workers_dev = true
+
+# promos de las cadenas: las recorre el cron cada 3 horas y las guarda acá
+[[kv_namespaces]]
+binding = "PROMOS"
+id = "c2b96a8b9332429a957f2ca1e6fef89c"
+
+[triggers]
+crons = ["0 */3 * * *"]

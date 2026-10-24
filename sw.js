@@ -1,6 +1,6 @@
 /* Service worker · Plan de comidas Buenos Aires (generado por tools/build_pwa.py, no editar a mano) */
-const V = "pc-7000e18f78";
-const CORE = ["./", "index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html", "style.css", "motion.css", "gami.css", "app.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest", "img/icons/icon-192.png", "fonts/outfit-v15-latin_latin-ext-500.woff2", "fonts/outfit-v15-latin_latin-ext-600.woff2", "fonts/outfit-v15-latin_latin-ext-700.woff2", "fonts/outfit-v15-latin_latin-ext-regular.woff2", "fonts/young-serif-v2-latin_latin-ext-regular.woff2"];
+const V = "pc-8c49ddb53e";
+const CORE = ["./", "index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html", "promos.html", "style.css", "motion.css", "gami.css", "app.js", "ahorro.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest", "img/icons/icon-192.png", "fonts/outfit-v15-latin_latin-ext-500.woff2", "fonts/outfit-v15-latin_latin-ext-600.woff2", "fonts/outfit-v15-latin_latin-ext-700.woff2", "fonts/outfit-v15-latin_latin-ext-regular.woff2", "fonts/young-serif-v2-latin_latin-ext-regular.woff2"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 const STATIC = /\/(img|fonts)\/|\.(webp|jpg|jpeg|png|svg|woff2)$/i;
@@ -21,7 +21,7 @@ async function cacheFirst(req) {
   catch (err) { return new Response("", { status: 504 }); }
 }
 async function networkFirst(req) {
-  try { const res = await fetch(req); if (res.ok) (await caches.open(V)).put(req, res.clone()); return res; }
+  try { const res = await fetch(req, { cache: "no-cache" }); if (res.ok) (await caches.open(V)).put(req, res.clone()); return res; }  // no-cache: revalida siempre (304 si no cambió)
   catch (err) {
     const hit = (await caches.match(req)) || (await caches.match(req, { ignoreSearch: true }));
     if (hit) return hit;

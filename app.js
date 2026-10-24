@@ -186,7 +186,7 @@
     const out = Object.keys(SHOP_CATS).map((c) => ({ c, cat: SHOP_CATS[c], items: [] }));
     [...agg.entries()].forEach(([k, q]) => { const [c, n, u] = k.split("|"); (out.find((x) => x.c === c) || out[3]).items.push({ n, q: fmtq(q, u), raw: q, u }); });
     out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
-    return out.filter((c) => c.items.length).map(({ cat, items }) => ({ cat, items }));
+    return out.filter((c) => c.items.length).map(({ c, cat, items }) => ({ c, cat, items }));
   }
   const srcs = (r) => (r && r.srcset ? ` srcset="${r.srcset}" sizes="(max-width:720px) 46vw, 320px"` : "");
   window.PLAN = { houseDay, weekAt, monthWeeks, shoppingFor, mondayOf, addDays, lab };
@@ -314,6 +314,7 @@
     if (!$("#shopGrid")) return;
     renderWeekTabs("#shopTabs", renderShopping);
     const w = D.weeks.find((x) => x.start === state.week) || D.weeks[0], list = shoppingFor(w);
+    window.__shop = { label: "Lista de compras · " + w.label, start: w.start, list }; window.dispatchEvent(new Event("shoplist"));
     const n = list.reduce((a, c) => a + c.items.length, 0);
     const key = (c, nm) => `shop:${w.start}:${c}:${nm}`;
     const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
@@ -503,7 +504,7 @@
   // ---------- menú "Más" (móvil) ----------
   const moreBtn = $("#moreBtn"), moreMenu = $("#moreMenu");
   if (moreBtn && moreMenu) {
-    if (["compras", "supermercados", "temporada", "nutricion"].includes(page)) moreBtn.classList.add("on");
+    if (["compras", "supermercados", "promos", "temporada", "nutricion"].includes(page)) moreBtn.classList.add("on");
     moreBtn.addEventListener("click", (e) => { e.stopPropagation(); moreMenu.hidden = !moreMenu.hidden; moreBtn.setAttribute("aria-expanded", !moreMenu.hidden); });
     document.addEventListener("click", (e) => { if (!moreMenu.hidden && !e.target.closest("#moreMenu")) moreMenu.hidden = true; });
   }
@@ -639,6 +640,7 @@
   top.addEventListener("click", () => window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
   window.addEventListener("scroll", () => { const on = window.scrollY > 1400; if (top.hidden === on) top.hidden = !on; }, { passive: true });
 
+  window.renderMoney = renderMoney; window.toastG = toastG;
   renderMoney(); liveRates(); animateIn();
   new MutationObserver(() => { clearTimeout(window.__ai); window.__ai = setTimeout(animateIn, 30); }).observe(document.body, { childList: true, subtree: true });
 })();

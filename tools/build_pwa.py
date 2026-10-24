@@ -46,8 +46,8 @@ MANIFEST = {
                   {"name": "Mi plan", "url": "./mi-plan.html?app=1", "icons": [{"src": "img/icons/icon-192.png", "sizes": "192x192"}]}],
 }
 
-PAGES = ["index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html"]
-CORE = ["./"] + PAGES + ["style.css", "motion.css", "gami.css", "app.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest",
+PAGES = ["index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html", "promos.html"]
+CORE = ["./"] + PAGES + ["style.css", "motion.css", "gami.css", "app.js", "ahorro.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest",
         "img/icons/icon-192.png"] + sorted("fonts/" + os.path.basename(f) for f in glob.glob(os.path.join(ROOT, "fonts", "*.woff2")))
 
 SW = r"""/* Service worker · Plan de comidas Buenos Aires (generado por tools/build_pwa.py, no editar a mano) */
@@ -73,7 +73,7 @@ async function cacheFirst(req) {
   catch (err) { return new Response("", { status: 504 }); }
 }
 async function networkFirst(req) {
-  try { const res = await fetch(req); if (res.ok) (await caches.open(V)).put(req, res.clone()); return res; }
+  try { const res = await fetch(req, { cache: "no-cache" }); if (res.ok) (await caches.open(V)).put(req, res.clone()); return res; }  // no-cache: revalida siempre (304 si no cambió)
   catch (err) {
     const hit = (await caches.match(req)) || (await caches.match(req, { ignoreSearch: true }));
     if (hit) return hit;

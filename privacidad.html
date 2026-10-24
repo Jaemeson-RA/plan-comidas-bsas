@@ -70,6 +70,7 @@
     <a href="recetas.html" data-nav="recetas"><svg class="ic"><use href="#i-recetas"/></svg>Recetas</a>
     <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Compras</a>
     <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Súper</a>
+    <a href="promos.html" data-nav="promos"><svg class="ic"><use href="#i-tag"/></svg>Promos</a>
     <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Estación</a>
     <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
     <a href="mi-plan.html" data-nav="miplan" class="nav-cta"><svg class="ic"><use href="#i-users"/></svg>Mi plan</a>
@@ -109,7 +110,7 @@
   <p>Tu nombre de usuario, tu foto, tu nivel, tu XP, tu racha, tus insignias, tu progreso de la semana, tu puesto en el ranking y las recetas e ingredientes que publicás (con tu nombre). <b>Tu correo nunca se publica</b>: solo se guarda una huella cifrada (SHA-256) para que tus amigos te encuentren si ya lo conocen.</p>
 
   <h2 id="p4">4. Lo que queda solo en tu dispositivo</h2>
-  <p>El navegador guarda en tu teléfono o computadora (almacenamiento local, no cookies): la moneda elegida, lo que tildaste en las listas, lo que cargaste en «la heladera», tus alertas de precio, el recordatorio, el perfil de Nutrición si no tenés cuenta y la copia sin conexión del sitio. Nada de eso nos llega. Lo borrás limpiando los datos del sitio en tu navegador.</p>
+  <p>El navegador guarda en tu teléfono o computadora (almacenamiento local, no cookies): la moneda elegida, lo que tildaste en las listas, lo que cargaste en «la heladera», tus alertas de precio, el recordatorio, las cadenas que tenés cerca, los precios ya consultados para el comparador, el perfil de Nutrición si no tenés cuenta y la copia sin conexión del sitio. Nada de eso nos llega. Lo borrás limpiando los datos del sitio en tu navegador.</p>
   <p>No usamos cookies publicitarias, analítica ni seguimiento.</p>
 
   <h2 id="p5">5. Para qué los usamos</h2>
@@ -126,6 +127,7 @@
     <li><b>Google reCAPTCHA</b>, al crear una cuenta, para frenar registros automáticos. Se aplican la <a href="https://policies.google.com/privacy?hl=es-419" target="_blank" rel="noopener">política de privacidad</a> y las <a href="https://policies.google.com/terms?hl=es-419" target="_blank" rel="noopener">condiciones</a> de Google.</li>
     <li><b>Cloudflare</b> (proxy de precios y verificación del reCAPTCHA): recibe tus búsquedas de productos y tu dirección IP, sin guardarlas a nuestro nombre.</li>
     <li><b>GitHub Pages</b> (alojamiento del sitio), que registra datos técnicos de acceso.</li>
+    <li><b>OpenStreetMap</b> (mapa de sucursales): si tocás «Usar mi ubicación» o escribís una dirección, las coordenadas o la dirección se envían a Overpass y Nominatim (OpenStreetMap) para buscar las sucursales, y el mapa se dibuja con los mosaicos de OpenStreetMap. Tu ubicación no se guarda en ningún servidor nuestro; solo queda en tu dispositivo qué cadenas tenés cerca.</li>
     <li><b>YouTube</b> (modo de privacidad mejorada, solo cuando tocás un video), <b>DolarApi</b> (cotizaciones) y <b>Open Food Facts</b> (cuando buscás o escaneás un producto).</li>
   </ul>
   <p>Algunos de estos servicios guardan datos fuera de la Argentina (Unión Europea y Estados Unidos). Al crear tu cuenta prestás tu consentimiento para esa transferencia.</p>
@@ -145,7 +147,7 @@
 </main>
 
 <footer class="foot">
-  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
+  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="promos.html">Promos</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
   <p class="foot-legal"><a href="terminos.html">Términos de uso</a> · <a href="privacidad.html">Privacidad</a> · © 2026 Jaemeson Dieu, todos los derechos reservados</p>
   <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a> <button type="button" class="mini-btn install-btn" hidden>Instalar la app</button></p>
 </footer>
@@ -158,7 +160,8 @@
 </nav>
 <div class="more-menu" id="moreMenu" hidden>
   <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Lista de compras</a>
-  <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados</a>
+  <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados y mapa</a>
+  <a href="promos.html" data-nav="promos"><svg class="ic"><use href="#i-tag"/></svg>Promos de hoy</a>
   <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Productos de estación</a>
   <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
   <button type="button" class="more-sug install-btn" hidden><svg class="ic"><use href="#i-arrow"/></svg>Instalar la app</button>

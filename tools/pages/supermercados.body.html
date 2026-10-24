@@ -19,6 +19,20 @@
   <div id="alertasBox"></div>
 </section>
 
+<section class="sec mapa" id="mapa">
+  <h2><span class="num"><svg class="ic"><use href="#i-pin"/></svg></span>Sucursales cerca tuyo</h2>
+  <p class="muted">Compartí tu ubicación o escribí una dirección y te mostramos las sucursales de las siete cadenas a la vuelta, con cómo llegar a pie. Tu ubicación no se guarda en ningún servidor.</p>
+  <div class="map-tools">
+    <button class="btn" type="button" id="mapLocate"><svg class="ic"><use href="#i-pin"/></svg> Usar mi ubicación</button>
+    <form class="map-form" id="mapForm"><input id="mapAddr" placeholder="Calle y altura, barrio (ej.: Av. Corrientes 1500)" autocomplete="street-address" aria-label="Dirección"><button class="mini-btn" type="submit">Buscar</button></form>
+    <label class="map-r">Radio <select id="mapRadius"><option value="500">500 m</option><option value="1000">1 km</option><option value="1500">1,5 km</option><option value="2500">2,5 km</option><option value="5000">5 km</option></select></label>
+  </div>
+  <div class="chips" id="mapChains"></div>
+  <div class="map" id="map"><p class="muted small">El mapa aparece cuando elegís tu ubicación o una dirección.</p></div>
+  <p class="small" id="mapStatus"></p>
+  <div class="map-list" id="mapList"></div>
+</section>
+<div id="mapBox" hidden></div>
 <section class="sec">
   <h2><span class="num">1</span>La respuesta corta</h2>
   <div class="two">
