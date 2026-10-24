@@ -84,7 +84,8 @@
     const r = R[id];
     return `<button class="${cls}" data-rec="${id}"><img src="${r.img}" alt="" loading="lazy"><span>${esc(r.name)}</span></button>`;
   }
-  const ICON = { desayuno: "🌅", almuerzo: "☀️", merienda: "🧉", cena: "🌙" };
+  const ic = (n, cls = "") => `<svg class="ic ${cls}"><use href="#i-${n}"/></svg>`;
+  const ICON = { desayuno: ic("desayuno"), almuerzo: ic("almuerzo"), merienda: ic("merienda"), cena: ic("cena") };
 
   // ---------- modal ----------
   const modal = $("#modal");
@@ -98,10 +99,10 @@
       <img class="rm-img" src="${r.img}" alt="${esc(r.name)}">
       <div class="rm">
         <h2>${esc(r.name)}</h2>
-        <div class="meta"><span>⏱ <b>${r.tiempo} min</b></span><span>🍽 <b>${r.porciones} porciones</b></span><span>🔥 <b>${r.kcal} kcal</b> aprox./porción</span><span>💸 <b data-ars="${r.cost}"></b> aprox./porción</span></div>
+        <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("plate")}<b>${r.porciones} porciones</b></span><span>${ic("flame")}<b>${r.kcal} kcal</b> aprox./porción</span><span>${ic("tag")}<b data-ars="${r.cost}"></b> aprox./porción</span></div>
         <div class="rm-cols">
           <div><h3>Ingredientes</h3><ul>${r.ing.map((i) => `<li>${qty(i) ? `<b>${qty(i)}</b> ` : ""}${esc(i.n)}</li>`).join("")}</ul></div>
-          <div><h3>Preparación</h3><ol>${r.pasos.map((p) => `<li>${esc(p)}</li>`).join("")}</ol><div class="tip">💡 ${esc(r.tip)}</div></div>
+          <div><h3>Preparación</h3><ol>${r.pasos.map((p) => `<li>${esc(p)}</li>`).join("")}</ol><div class="tip">${ic("bulb")} ${esc(r.tip)}</div></div>
         </div>
         <div class="yt"><h3>Video</h3><button class="yt-thumb" data-yt="${r.yt}" aria-label="Reproducir video"><img src="https://i.ytimg.com/vi/${r.yt}/hqdefault.jpg" alt="" loading="lazy"></button></div>
         <p class="credit">Foto: <a href="${r.credit.page}" target="_blank" rel="noopener">${esc(r.credit.title)}</a> · ${esc(r.credit.artist || "Wikimedia Commons")} · ${esc(r.credit.license)} (Wikimedia Commons). El costo se calcula con precios de supermercados online de Buenos Aires de octubre 2026 y es orientativo.</p>
@@ -128,7 +129,7 @@
   function showPop(el) {
     if (!pop || window.matchMedia("(hover: none)").matches) return;
     const r = R[el.dataset.rec]; if (!r) return;
-    pop.innerHTML = `<img src="${r.img}" alt=""><div class="pb"><b>${esc(r.name)}</b><span>⏱ ${r.tiempo} min · 🔥 ${r.kcal} kcal · 💸 ${fmt(r.cost)}/porción</span><em>${r.tags.slice(0, 3).map(esc).join(" · ")}</em><small>clic para abrir la receta</small></div>`;
+    pop.innerHTML = `<img src="${r.img}" alt=""><div class="pb"><b>${esc(r.name)}</b><span>${ic("clock")} ${r.tiempo} min · ${ic("flame")} ${r.kcal} kcal · ${ic("tag")} ${fmt(r.cost)}/porción</span><em>${r.tags.slice(0, 3).map(esc).join(" · ")}</em><small>clic para abrir la receta</small></div>`;
     pop.hidden = false;
     const b = el.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
     let x = b.left + b.width / 2 - pw / 2, y = b.top - ph - 10;
@@ -157,7 +158,7 @@
     const title = day ? "Hoy, " + longDate(d.date) : "El plan arranca el " + longDate(first.date);
     $("#today").innerHTML = `<p class="kicker">${day ? "Menú de hoy" : "Primer día del plan"}</p><h3>${title}</h3>
       ${["desayuno", "almuerzo", "cena"].map((m) => `<div class="t-row"><small>${ICON[m]} ${m}</small>${mealBtn(d[m])}</div>`).join("")}
-      <div class="t-row"><small>🧉 merienda</small><span class="muted">${esc(d.merienda)}</span></div>
+      <div class="t-row"><small>${ICON.merienda} merienda</small><span class="muted">${esc(d.merienda)}</span></div>
       <a class="btn small-btn" href="plan.html">Ver toda la semana →</a>`;
   }
 
@@ -174,14 +175,14 @@
     const dows = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
     let html = `<div class="cal-head">${dows.map((d) => `<div>${d}</div>`).join("")}</div>`;
     D.weeks.forEach((w) => {
-      html += `<div class="cal-week-label"><span>${esc(w.label)}</span><a class="mini-btn" href="compras.html#semana-${w.n}">🛒 Lista de compras de la semana ${w.n}</a></div>`;
+      html += `<div class="cal-week-label"><span>${esc(w.label)}</span><a class="mini-btn" href="compras.html#semana-${w.n}">${ic("compras")} Lista de compras de la semana ${w.n}</a></div>`;
       html += `<div class="cal-row">` + w.days.map((d) => {
         const n = +d.date.slice(8), m = +d.date.slice(5, 7);
         const first = n === 1 || d === D.weeks[0].days[0];
         return `<div class="cal-cell${d.date === todayISO ? " today" : ""}${d.dow === "Sábado" || d.dow === "Domingo" ? " wk" : ""}">
           <div class="cal-date"><b>${n}</b>${first ? `<span>${MESES[m - 1].slice(0, 3)}</span>` : ""}${d.date === todayISO ? `<span class="hoy">hoy</span>` : ""}</div>
           ${["desayuno", "almuerzo", "cena"].map((k) => `<button class="cm" data-rec="${d[k]}" title="${esc(R[d[k]].name)}"><i>${ICON[k]}</i><img src="${R[d[k]].img}" alt="" loading="lazy"><span>${esc(R[d[k]].name)}</span></button>`).join("")}
-          <div class="cm mer"><i>🧉</i><span>${esc(d.merienda)}</span></div>
+          <div class="cm mer"><i>${ICON.merienda}</i><span>${esc(d.merienda)}</span></div>
         </div>`; }).join("") + `</div>`;
     });
     c.innerHTML = html;
@@ -218,7 +219,7 @@
   ];
   function card(r) {
     return `<button class="rc" data-rec="${r.id}"><img src="${r.img}" alt="${esc(r.name)}" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4>
-      <div class="meta"><span>⏱ <b>${r.tiempo} min</b></span><span>🔥 <b>${r.kcal}</b> kcal</span><span>💸 <b data-ars="${r.cost}"></b>/porción</span></div>
+      <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("flame")}<b>${r.kcal}</b> kcal</span><span>${ic("tag")}<b data-ars="${r.cost}"></b>/porción</span></div>
       <div>${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div></div></button>`;
   }
   if (page === "recetas") {
@@ -234,7 +235,7 @@
     const n = list.reduce((a, c) => a + c.items.length, 0);
     const key = (c, nm) => `shop:${state.week}:${c}:${nm}`;
     const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
-    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html">📅 ver esa semana</a><a class="mini-btn" href="supermercados.html">🚚 dónde pedir</a><button class="mini-btn" id="clearWeek">↺ destildar todo</button></div></div>`;
+    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
     $("#clearWeek").addEventListener("click", () => { list.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
     $("#shopGrid").innerHTML = list.map((cat) => `<div class="shop-cat"><h4>${esc(cat.cat)} <small>${cat.items.length}</small></h4>
       ${cat.items.map((i) => { const dn = localStorage.getItem(key(cat.cat, i.n)) === "1"; return `<label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>`; }).join("")}</div>`).join("");

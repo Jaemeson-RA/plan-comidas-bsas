@@ -71,9 +71,10 @@ button:active, .btn:active, .mini-btn:active { transform: scale(.97); }
   .seg button { padding: .3rem .6rem; font-size: .85rem; }
   .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding: .35rem .3rem calc(.35rem + env(safe-area-inset-bottom)); }
   .tabbar a { display: flex; flex-direction: column; align-items: center; gap: .1rem; text-decoration: none; color: var(--muted); font-size: .68rem; font-weight: 700; padding: .3rem 0; border-radius: 10px; transition: color .2s, background .2s; }
-  .tabbar a i { font-style: normal; font-size: 1.25rem; line-height: 1.2; transition: transform .2s; }
-  .tabbar a.on { color: var(--ink); background: var(--sol2); }
-  .tabbar a.on i { transform: translateY(-2px) scale(1.08); }
+  .tabbar a .ic { transition: transform .2s; }
+  .tabbar a.on { color: var(--ink); background: var(--oro2); }
+  .tabbar a.on .ic { transform: translateY(-2px) scale(1.08); }
+  .tabbar a:not(.on) .ic .sh { stroke: transparent; }
   .foot-nav { display: none; }
   .foot { padding-bottom: 1.5rem; }
 

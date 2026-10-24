@@ -277,6 +277,31 @@ table.basket tfoot td.best{background:var(--ok);color:#fff}
 .yt iframe{width:100%;aspect-ratio:16/9;border:1.5px solid var(--ink);border-radius:10px}
 .credit{margin-top:1rem;font-size:.76rem;color:var(--muted)}
 
+/* ---------- íconos (sprite inline, trazo tinta + sombra dorada) ---------- */
+.ic{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.2em;flex:none;overflow:visible}
+.ic.duo{overflow:visible}
+.ic.duo .sh{stroke:var(--oro);transform:translate(1.4px,1.4px)}
+.nav a{display:inline-flex;align-items:center;gap:.4rem}
+.nav a .ic{width:1.05em;height:1.05em}
+.brand-ico .ic{width:19px;height:19px;stroke-width:2.2}
+.stamp{display:inline-flex;width:56px;height:56px;align-items:center;justify-content:center;border-radius:50%;background:var(--crema);border:1.5px solid var(--ink);box-shadow:var(--hard-sm);color:var(--ink);margin-bottom:.3rem}
+.stamp .ic{width:28px;height:28px;stroke-width:1.9}
+.entry:hover .stamp{background:var(--oro2)}
+.legend span{display:inline-flex;align-items:center;gap:.35rem}
+.legend .ic{width:1.1em;height:1.1em;color:var(--rojo)}
+.rc .meta span,.rm .meta span,.popover span{display:inline-flex;align-items:center;gap:.3rem}
+.rc .meta .ic,.rm .meta .ic,.popover .ic{color:var(--rojo);width:1.05em;height:1.05em}
+.cm i{display:inline-flex;color:var(--rojo)}
+.cm i .ic{width:.95em;height:.95em}
+.cm.mer i{color:var(--muted)}
+.t-row small{display:inline-flex;align-items:center;gap:.3rem}
+.t-row small .ic{width:1.1em;height:1.1em;color:var(--oro)}
+.tabbar .ic{width:24px;height:24px;stroke-width:1.9}
+.sug-fab i .ic{width:16px;height:16px;stroke-width:2.6}
+.mini-btn .ic{width:1em;height:1em}
+.rm .tip .ic{color:var(--rojo);width:1.1em;height:1.1em;margin-right:.1rem}
+.v-list li::before{content:"";width:14px;height:14px;top:.3rem;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F7D4F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5l10 -10'/></svg>") no-repeat center/contain}
+
 /* ---------- sugerencias (botón flotante + panel) ---------- */
 .sug-fab{position:fixed;right:1.1rem;bottom:1.1rem;z-index:90;display:inline-flex;align-items:center;gap:.5rem;background:var(--rojo);color:var(--crema);border:1.5px solid var(--ink);border-radius:999px;padding:.7rem 1.1rem .7rem .9rem;font:inherit;font-weight:800;cursor:pointer;box-shadow:var(--hard);transition:transform .15s,box-shadow .15s}
 .sug-fab:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
