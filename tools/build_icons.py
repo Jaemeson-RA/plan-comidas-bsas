@@ -9,7 +9,7 @@ T = {
  "desayuno": "sunrise", "almuerzo": "sun", "cena": "moon-stars", "clock": "clock", "flame": "flame", "tag": "tag", "users": "users",
  "bulb": "bulb", "plus": "plus", "play": "player-play", "mail": "mail", "copy": "copy", "refresh": "refresh", "check": "check",
  "arrow": "arrow-right", "external": "external-link", "pin": "map-pin", "bolt": "bolt", "leaf": "leaf", "coin": "coin",
- "droplet": "droplet", "trophy": "trophy", "award": "award", "camera": "camera", "lock": "lock", "settings": "settings", "userplus": "user-plus", "share": "share", "star": "star", "medal": "medal", "printer": "printer", "chart": "chart-bar", "receipt": "receipt", "bell": "bell", "fridge": "fridge", "arrowup": "arrow-up", "logout": "logout", "heart": "heart", "x": "x",
+ "droplet": "droplet", "trophy": "trophy", "award": "award", "camera": "camera", "lock": "lock", "settings": "settings", "userplus": "user-plus", "share": "share", "star": "star", "medal": "medal", "printer": "printer", "chart": "chart-bar", "receipt": "receipt", "bell": "bell", "fridge": "fridge", "arrowup": "arrow-up", "logout": "logout", "heart": "heart", "x": "x", "phone": "device-mobile", "android": "brand-android", "apple": "brand-apple", "qr": "qrcode", "download": "download",
 }
 def inner(path):
     s = open(path, encoding="utf-8").read()

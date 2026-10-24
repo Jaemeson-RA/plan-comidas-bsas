@@ -1,5 +1,5 @@
-/*! Plan de comidas Buenos Aires · © 2026 Jaemeson Dieu · Todos los derechos reservados · ver LICENSE */
-/* Plan de comidas · Buenos Aires — lógica compartida por todas las páginas */
+/*! Menuario · © 2026 Jaemeson Dieu · Todos los derechos reservados · ver LICENSE */
+/* Menuario — lógica compartida por todas las páginas */
 (function () {
   const D = window.DATA;
   const R = D.recipes;
@@ -425,7 +425,7 @@
         items.forEach((i) => lines.push("- " + i.n + " · " + i.q));
         lines.push("");
       });
-      lines.push("Plan de comidas Buenos Aires · " + location.origin + location.pathname.replace(/[^/]*$/, "compras.html#semana-" + w.start));
+      lines.push("Menuario · " + location.origin + location.pathname.replace(/[^/]*$/, "compras.html#semana-" + w.start));
       return { text: lines.join("\n"), partial: anyDone };
     };
     const toast = (msg) => { let t = $("#toast"); if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); };
@@ -567,7 +567,7 @@
   }
   window.buildListHtml = (title, list) => {
     const rows = list.map((c) => `<h2>${esc(c.cat)}</h2><ul>${c.items.map((i) => { const h = cheapestFor(i.n); return `<li><a href="${h.link}" target="_blank" rel="noopener">${esc(i.n)}</a> <b>${esc(i.q)}</b> <small>· ${h.exact ? `${esc(h.store)} · $ ${Math.round(h.price).toLocaleString("es-AR")} ${esc(h.ulab)} · ${esc(h.product)}` : `buscar en ${esc(h.store)}`}</small></li>`; }).join("")}</ul>`).join("");
-    return `<!DOCTYPE html><html lang="es-AR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>body{font-family:system-ui,sans-serif;max-width:720px;margin:1.5rem auto;padding:0 1rem;color:#1F2D2A;background:#FBF7F0}h1{font-size:1.5rem}h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:#2F8F5B;margin:1.4rem 0 .4rem;border-bottom:1px dashed #E2D8C6;padding-bottom:.2rem}ul{list-style:none;padding:0;margin:0}li{padding:.4rem 0;border-bottom:1px solid #EFE7D8}a{color:#1F2D2A;font-weight:600}small{color:#6B7772;display:block}b{color:#2F8F5B}p.note{font-size:.8rem;color:#6B7772;margin-top:1.5rem}</style></head><body><h1>${esc(title)}</h1><p>Cada ingrediente lleva al producto más barato de las siete cadenas según los precios del ${esc(B0.date.split("-").reverse().join("/"))} (o a la búsqueda en ${esc(cheapestStore)}, la cadena más barata del changuito). Tocá el nombre para abrirlo.</p>${rows}<p class="note">Generado por Plan de comidas Buenos Aires · jaemeson-ra.github.io/plan-comidas-bsas · los precios cambian seguido: verificá en el carrito.</p></body></html>`;
+    return `<!DOCTYPE html><html lang="es-AR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>body{font-family:system-ui,sans-serif;max-width:720px;margin:1.5rem auto;padding:0 1rem;color:#1F2D2A;background:#FBF7F0}h1{font-size:1.5rem}h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:#2F8F5B;margin:1.4rem 0 .4rem;border-bottom:1px dashed #E2D8C6;padding-bottom:.2rem}ul{list-style:none;padding:0;margin:0}li{padding:.4rem 0;border-bottom:1px solid #EFE7D8}a{color:#1F2D2A;font-weight:600}small{color:#6B7772;display:block}b{color:#2F8F5B}p.note{font-size:.8rem;color:#6B7772;margin-top:1.5rem}</style></head><body><h1>${esc(title)}</h1><p>Cada ingrediente lleva al producto más barato de las siete cadenas según los precios del ${esc(B0.date.split("-").reverse().join("/"))} (o a la búsqueda en ${esc(cheapestStore)}, la cadena más barata del changuito). Tocá el nombre para abrirlo.</p>${rows}<p class="note">Generado por Menuario · jaemeson-ra.github.io/plan-comidas-bsas · los precios cambian seguido: verificá en el carrito.</p></body></html>`;
   };
   window.downloadListHtml = (title, list, filename) => { const blob = new Blob([window.buildListHtml(title, list)], { type: "text/html;charset=utf-8" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
 
@@ -628,6 +628,14 @@
   window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; showInstall(true); });
   window.addEventListener("appinstalled", () => { installEvt = null; showInstall(false); toastG("¡Listo! La app quedó en tu pantalla de inicio."); });
   if (!standalone && isIOS) showInstall(true);
+  // dentro de la app (TWA de Android o instalada) no tiene sentido ofrecer bajarla
+  const inApp = standalone || /^android-app:/.test(document.referrer) || /[?&]app=1/.test(location.search) || sessionStorage.getItem("inApp") === "1";
+  if (inApp) { try { sessionStorage.setItem("inApp", "1"); } catch (e) {} $$(".app-link").forEach((a) => a.remove()); }
+  if (page === "app") {
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid) $("#appAndroid")?.classList.add("hl"); else if (isIOS) $("#appIos")?.classList.add("hl");
+    fetch("descargas/menuario.apk", { method: "HEAD" }).then((r) => { const n = +r.headers.get("content-length"); if (r.ok && n) $("#apkSize").textContent = "· " + (n / 1048576).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " MB"; }).catch(() => {});
+  }
   document.addEventListener("click", async (e) => {
     if (!e.target.closest(".install-btn")) return;
     $("#moreMenu") && ($("#moreMenu").hidden = true);
@@ -645,12 +653,12 @@
   const remGet = () => { try { return JSON.parse(localStorage.getItem(REM) || "null"); } catch (e) { return null; } };
   function downloadIcs(hora) {
     const [h, m] = hora.split(":"); const d = todayISO.replace(/-/g, ""); const url = location.origin + location.pathname.replace(/[^/]*$/, "mi-plan.html");
-    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Plan de comidas Buenos Aires//ES", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Menuario//ES", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
       "BEGIN:VTIMEZONE", "TZID:America/Argentina/Buenos_Aires", "BEGIN:STANDARD", "DTSTART:19700101T000000", "TZOFFSETFROM:-0300", "TZOFFSETTO:-0300", "TZNAME:-03", "END:STANDARD", "END:VTIMEZONE",
       "BEGIN:VEVENT", "UID:recordatorio-diario@plan-comidas-bsas", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g, "").slice(0, 15) + "Z",
       `DTSTART;TZID=America/Argentina/Buenos_Aires:${d}T${h}${m}00`, "DURATION:PT10M", "RRULE:FREQ=DAILY",
-      "SUMMARY:Marcá tu día · Plan de comidas", `DESCRIPTION:¿Comiste lo que planeaste? Marcalo y sumá XP sin cortar la racha: ${url}`, `URL:${url}`,
-      "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:Marcá tu día en Plan de comidas", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+      "SUMMARY:Marcá tu día · Menuario", `DESCRIPTION:¿Comiste lo que planeaste? Marcalo y sumá XP sin cortar la racha: ${url}`, `URL:${url}`,
+      "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:Marcá tu día en Menuario", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" })); a.download = "recordatorio-plan-comidas.ics"; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     toastG("Abrí el archivo descargado: tu calendario lo agrega como evento diario con alarma.");

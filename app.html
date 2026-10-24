@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La app · Menuario</title>
+<meta name="description" content="Bajá la app para Android o agregala al inicio del iPhone: el plan, las recetas y la lista de compras a pantalla completa y sin conexión.">
+<link rel="canonical" href="https://jaemeson-ra.github.io/plan-comidas-bsas/app.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta property="og:site_name" content="Menuario">
+<meta property="og:title" content="La app · Menuario">
+<meta property="og:description" content="Bajá la app para Android o agregala al inicio del iPhone: el plan, las recetas y la lista de compras a pantalla completa y sin conexión.">
+<meta property="og:url" content="https://jaemeson-ra.github.io/plan-comidas-bsas/app.html">
+<meta property="og:image" content="https://jaemeson-ra.github.io/plan-comidas-bsas/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Menuario: recetas, lista de compras y precios de supermercados">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%232F8F5B'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2F8F5B">
+<link rel="apple-touch-icon" href="img/icons/apple-touch-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Menuario">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="motion.css">
+<link rel="stylesheet" href="gami.css">
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0" /> <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /> <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" /> <path d="M16 3l0 4" /> <path d="M8 3l0 4" /> <path d="M4 11l16 0" /> <path d="M8 15h2v2h-2l0 -2" /></symbol>
+<symbol id="i-recetas" viewBox="0 0 24 24"><path d="M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12m0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3" /></symbol>
+<symbol id="i-compras" viewBox="0 0 24 24"><path d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M15 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M17 17h-11v-14h-2" /> <path d="M6 5l14 1l-1 7h-13" /></symbol>
+<symbol id="i-super" viewBox="0 0 24 24"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /> <path d="M3 9l4 0" /></symbol>
+<symbol id="i-desayuno" viewBox="0 0 24 24"><path d="M3 17h1m16 0h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7m-9.7 5.7a4 4 0 0 1 8 0" /> <path d="M3 21l18 0" /> <path d="M12 9v-6l3 3m-6 0l3 -3" /></symbol>
+<symbol id="i-almuerzo" viewBox="0 0 24 24"><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /> <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></symbol>
+<symbol id="i-cena" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008" /> <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" /> <path d="M19 11h2m-1 -1v2" /></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /> <path d="M12 7v5l3 3" /></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235" /></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M6.5 7.5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /> <path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3" /></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /> <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /> <path d="M16 3.13a4 4 0 0 1 0 7.75" /> <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7" /> <path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3" /> <path d="M9.7 17l4.6 0" /></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5l0 14" /> <path d="M5 12l14 0" /></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13 -8l-13 -8" /></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10" /> <path d="M3 7l9 6l9 -6" /></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" /> <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /> <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" /></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12l14 0" /> <path d="M13 18l6 -6" /> <path d="M13 6l6 6" /></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /> <path d="M11 13l9 -9" /> <path d="M15 4h5v5" /></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /> <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0" /></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11" /></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 21c.5 -4.5 2.5 -8 7 -10" /> <path d="M9 18c6.218 0 10.5 -3.288 11 -12v-2h-4.014c-9 0 -11.986 4 -12 9c0 1 0 3 2 5h3l.014 0" /></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1" /> <path d="M12 7v10" /></symbol>
+<symbol id="i-droplet" viewBox="0 0 24 24"><path d="M7.502 19.423c2.602 2.105 6.395 2.105 8.996 0c2.602 -2.105 3.262 -5.708 1.566 -8.546l-4.89 -7.26c-.42 -.625 -1.287 -.803 -1.936 -.397a1.376 1.376 0 0 0 -.41 .397l-4.893 7.26c-1.695 2.838 -1.035 6.441 1.567 8.546" /></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21l8 0" /> <path d="M12 17l0 4" /> <path d="M7 4l10 0" /> <path d="M17 4v8a5 5 0 0 1 -10 0v-8" /> <path d="M3 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M17 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /></symbol>
+<symbol id="i-award" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 0 12 0a6 6 0 1 0 -12 0" /> <path d="M12 15l3.4 5.89l1.598 -3.233l3.598 .232l-3.4 -5.889" /> <path d="M6.802 12l-3.4 5.89l3.598 -.233l1.598 3.232l3.4 -5.889" /></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" /> <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /> <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /> <path d="M8 11v-4a4 4 0 1 1 8 0v4" /></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065" /> <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></symbol>
+<symbol id="i-userplus" viewBox="0 0 24 24"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /> <path d="M16 19h6" /> <path d="M19 16v6" /> <path d="M6 21v-2a4 4 0 0 1 4 -4h4" /></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M8.7 10.7l6.6 -3.4" /> <path d="M8.7 13.3l6.6 3.4" /></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873l-6.158 -3.245" /></symbol>
+<symbol id="i-medal" viewBox="0 0 24 24"><path d="M12 4v3m-4 -3v6m8 -6v6" /> <path d="M12 18.5l-3 1.5l.5 -3.5l-2 -2l3 -.5l1.5 -3l1.5 3l3 .5l-2 2l.5 3.5l-3 -1.5" /></symbol>
+<symbol id="i-printer" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /> <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /> <path d="M7 15a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2l0 -4" /></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -6" /> <path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -10" /> <path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -14" /> <path d="M4 20h14" /></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2m4 -14h6m-6 4h6m-2 4h2" /></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /> <path d="M9 17v1a3 3 0 0 0 6 0v-1" /></symbol>
+<symbol id="i-fridge" viewBox="0 0 24 24"><path d="M5 5a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -14" /> <path d="M5 10h14" /> <path d="M9 13v3" /> <path d="M9 6v1" /></symbol>
+<symbol id="i-arrowup" viewBox="0 0 24 24"><path d="M12 5l0 14" /> <path d="M18 11l-6 -6" /> <path d="M6 11l6 -6" /></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /> <path d="M9 12h12l-3 -3" /> <path d="M18 15l3 -3" /></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6l-12 12" /> <path d="M6 6l12 12" /></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14" /> <path d="M11 4h2" /> <path d="M12 17v.01" /></symbol>
+<symbol id="i-android" viewBox="0 0 24 24"><path d="M4 10l0 6" /> <path d="M20 10l0 6" /> <path d="M7 9h10v8a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-8a5 5 0 0 1 10 0" /> <path d="M8 3l1 2" /> <path d="M16 3l-1 2" /> <path d="M9 18l0 3" /> <path d="M15 18l0 3" /></symbol>
+<symbol id="i-apple" viewBox="0 0 24 24"><path d="M8.286 7.008c-3.216 0 -4.286 3.23 -4.286 5.92c0 3.229 2.143 8.072 4.286 8.072c1.165 -.05 1.799 -.538 3.214 -.538c1.406 0 1.607 .538 3.214 .538s4.286 -3.229 4.286 -5.381c-.03 -.011 -2.649 -.434 -2.679 -3.23c-.02 -2.335 2.589 -3.179 2.679 -3.228c-1.096 -1.606 -3.162 -2.113 -3.75 -2.153c-1.535 -.12 -3.032 1.077 -3.75 1.077c-.729 0 -2.036 -1.077 -3.214 -1.077" /> <path d="M12 4a2 2 0 0 0 2 -2a2 2 0 0 0 -2 2" /></symbol>
+<symbol id="i-qr" viewBox="0 0 24 24"><path d="M4 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4" /> <path d="M7 17l0 .01" /> <path d="M14 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4" /> <path d="M7 7l0 .01" /> <path d="M4 15a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4" /> <path d="M17 7l0 .01" /> <path d="M14 14l3 0" /> <path d="M20 14l0 .01" /> <path d="M14 14l0 3" /> <path d="M14 20l3 0" /> <path d="M17 17l3 0" /> <path d="M20 17l0 3" /></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /> <path d="M7 11l5 5l5 -5" /> <path d="M12 4l0 12" /></symbol>
+<symbol id="i-u-horno" viewBox="0 0 24 24"><path d="M3 7a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1l0 -10" /> <path d="M15 6v12" /> <path d="M18 12h.01" /> <path d="M18 15h.01" /> <path d="M18 9h.01" /> <path d="M6.5 10.5c1 -.667 1.5 -.667 2.5 0c.833 .347 1.667 .926 2.5 0" /> <path d="M6.5 13.5c1 -.667 1.5 -.667 2.5 0c.833 .347 1.667 .926 2.5 0" /></symbol>
+<symbol id="i-u-wok" viewBox="0 0 24 24"><path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1" /> <path d="M19 7l-14 1" /> <path d="M19 2l-14 3" /></symbol>
+<symbol id="i-u-plancha" viewBox="0 0 24 24"><path d="M19 8h-14a6 6 0 0 0 6 6h2a6 6 0 0 0 6 -5.775l0 -.225" /> <path d="M17 20a2 2 0 1 1 0 -4a2 2 0 0 1 0 4" /> <path d="M15 14l1 2" /> <path d="M9 14l-3 6" /> <path d="M15 18h-8" /> <path d="M15 5v-1" /> <path d="M12 5v-1" /> <path d="M9 5v-1" /></symbol>
+<symbol id="i-u-cacerola" viewBox="0 0 24 24"><path d="M12 7h.01" /> <path d="M15 7h.01" /> <path d="M9 7h.01" /> <path d="M5 5a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -14" /> <path d="M9 15h6" /> <path d="M5 11h14" /></symbol>
+<symbol id="i-u-licuadora" viewBox="0 0 24 24"><path d="M9 10h-3a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h10.802a1 1 0 0 1 .984 1.179l-1.786 9.821" /> <path d="M8 4l2 11" /> <path d="M11 15h4a3 3 0 0 1 3 3v2a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-2a3 3 0 0 1 3 -3" /> <path d="M12 4v-1h2v1" /> <path d="M13 18v.01" /></symbol>
+<symbol id="i-u-bowl" viewBox="0 0 24 24"><path d="M4 8h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1" /></symbol>
+<symbol id="i-u-batidor" viewBox="0 0 24 24"><path d="M21.015 3.035l-16.515 16.465" /> <path d="M3.173 17.619a4.63 4.63 0 0 0 3.284 3.26a4.67 4.67 0 0 0 4.487 -1.194c1.85 -1.836 4.07 -10.65 4.07 -10.65s-8.88 2.296 -10.639 4.132a4.59 4.59 0 0 0 -1.202 4.452" /></symbol>
+<symbol id="i-u-cafetera" viewBox="0 0 24 24"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1" /> <path d="M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2" /> <path d="M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2" /> <path d="M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5" /> <path d="M16.746 16.726a3 3 0 1 0 .252 -5.555" /></symbol>
+<symbol id="i-u-espumadera" viewBox="0 0 24 24"><path d="M3 14v1a6 6 0 1 0 12 0v-9a3 3 0 0 1 6 0" /> <path d="M9 16c-.663 0 -1.3 -.036 -1.896 -.102l-.5 -.064c-2.123 -.308 -3.604 -1.013 -3.604 -1.834c0 -.82 1.482 -1.526 3.603 -1.834l.5 -.064a17.27 17.27 0 0 1 1.897 -.102c.663 0 1.3 .036 1.896 .102l.5 .064c2.123 .308 3.604 1.013 3.604 1.834c0 .82 -1.482 1.526 -3.603 1.834l-.5 .064a17.27 17.27 0 0 1 -1.897 .102" /></symbol>
+<symbol id="i-u-olla" viewBox="0 0 24 24"><path d="M2 12h20" /> <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" /> <path d="m4 8 16-4" /> <path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8" /></symbol>
+<symbol id="i-u-papel" viewBox="0 0 24 24"><path d="M19 17V5a2 2 0 0 0-2-2H4" /> <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3" /></symbol>
+<symbol id="i-u-tabla" viewBox="0 0 24 24"><path d="M11 16.586V19a1 1 0 0 1-1 1H2L18.37 3.63a1 1 0 1 1 3 3l-9.663 9.663a1 1 0 0 1-1.414 0L8 14" /></symbol>
+<symbol id="i-merienda" viewBox="0 0 24 24"><path d="M7.5 10.5c-1 0-1.5 .7-1.5 1.8v2.2a5 5 0 0 0 5 5h2a5 5 0 0 0 5-5v-2.2c0-1.1-.5-1.8-1.5-1.8z"/><path d="M6.5 12.5h11"/><path d="M13 10.5l4.5-7"/><path d="M16.3 3.6l1.8 1.2"/><path d="M9.5 15.5c1.6 1 3.4 1 5 0"/></symbol>
+<symbol id="i-pot" viewBox="0 0 24 24"><path d="M4.5 10.5h15"/><path d="M5.5 10.5v5a3.5 3.5 0 0 0 3.5 3.5h6a3.5 3.5 0 0 0 3.5-3.5v-5"/><path d="M2.5 12.5h3M18.5 12.5h3"/><path d="M12 7.5v3M10 7.5h4"/><path d="M9.5 4.5c0-1 1-1 1-2M13.5 4.5c0-1 1-1 1-2"/></symbol>
+<symbol id="i-plate" viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 14 0a7 7 0 1 0-14 0"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0"/><path d="M2 8v8M22 8c-1.5 1-1.5 7 0 8"/></symbol>
+<symbol id="i-u-fuente" viewBox="0 0 24 24"><path d="M4 10.5h16v3.5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 11h2M20 11h2"/><path d="M8.5 7.5c0-1 1-1 1-2M12 7.5c0-1 1-1 1-2M15.5 7.5c0-1 1-1 1-2"/></symbol>
+<symbol id="i-u-placa" viewBox="0 0 24 24"><path d="M3 10h18l-1.4 6.2a2 2 0 0 1-2 1.6H6.4a2 2 0 0 1-2-1.6z"/><path d="M8 13.5h.01M12 13.5h.01M16 13.5h.01"/></symbol>
+<symbol id="i-u-molde" viewBox="0 0 24 24"><path d="M3 11h18l-1.8 5.5a2 2 0 0 1-1.9 1.5H6.7a2 2 0 0 1-1.9-1.5z"/><path d="M6 11l1-2.5M10 11l.5-2.5M14 11l-.5-2.5M18 11l-1-2.5"/></symbol>
+<symbol id="i-u-sarten" viewBox="0 0 24 24"><path d="M3 12a6 6 0 1 0 12 0a6 6 0 1 0-12 0"/><path d="M15 12h6.5"/><path d="M6.5 10.5c.8-1 2.2-1.3 3.4-.7"/></symbol>
+<symbol id="i-u-tostadora" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="11" rx="3"/><path d="M8 9V5.5h3V9M13 9V5.5h3V9"/><path d="M7 15h10"/></symbol>
+<symbol id="i-u-rallador" viewBox="0 0 24 24"><path d="M8 4h8l2 17H6z"/><path d="M10 9h.01M14 9h.01M10 13h.01M14 13h.01M10 17h.01M14 17h.01"/><path d="M10 4V2.5h4V4"/></symbol>
+<symbol id="i-u-colador" viewBox="0 0 24 24"><path d="M3 10h14a7 7 0 0 1-14 0z"/><path d="M17 10.5l4.5-2"/><path d="M7 13.5h.01M10 15.5h.01M13 13.5h.01"/></symbol>
+<symbol id="i-u-pisapapas" viewBox="0 0 24 24"><path d="M12 2.5v10"/><path d="M5 12.5h14"/><path d="M5.5 12.5l1.5 7h10l1.5-7"/><path d="M9 16h6"/></symbol>
+<symbol id="i-u-palo" viewBox="0 0 24 24"><path d="M6 15l9-9a2.1 2.1 0 0 1 3 3l-9 9a2.1 2.1 0 0 1-3-3z"/><path d="M2.5 21.5l3-3M18.5 5.5l3-3"/></symbol>
+</svg>
+<header class="top">
+  <a class="brand" href="index.html"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span><span>Menu<em>ario</em></span></a>
+  <nav class="nav">
+    <a href="plan.html" data-nav="plan"><svg class="ic"><use href="#i-calendar"/></svg>Plan</a>
+    <a href="recetas.html" data-nav="recetas"><svg class="ic"><use href="#i-recetas"/></svg>Recetas</a>
+    <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Compras</a>
+    <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Súper</a>
+    <a href="promos.html" data-nav="promos"><svg class="ic"><use href="#i-tag"/></svg>Promos</a>
+    <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Estación</a>
+    <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
+    <a href="mi-plan.html" data-nav="miplan" class="nav-cta"><svg class="ic"><use href="#i-users"/></svg>Mi plan</a>
+  </nav>
+  <div class="money-ctl" title="Moneda en la que se muestran todos los precios del sitio">
+    <div class="seg" id="curSeg">
+      <button data-cur="ARS" class="on">ARS</button>
+      <button data-cur="USD">USD</button>
+      <button data-cur="EUR">EUR</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" data-page="app">
+<section class="page-head">
+  <p class="kicker">La app</p>
+  <h1>Llevá el plan <mark>en el bolsillo</mark></h1>
+  <p class="lead">Es el mismo plan, con tu cuenta y tus datos, pero se abre a pantalla completa desde el ícono del teléfono y funciona sin conexión para ver el menú, las recetas y la lista.</p>
+</section>
+<div class="app-grid">
+  <section class="card app-card reveal" id="appAndroid">
+    <p class="app-os"><svg class="ic"><use href="#i-android"/></svg> Android</p>
+    <h2>Bajala gratis</h2>
+    <a class="btn primary app-dl" href="descargas/menuario.apk" download><svg class="ic"><use href="#i-download"/></svg> Bajar la app <small id="apkSize"></small></a>
+    <ol class="app-steps">
+      <li>Tocá el botón y abrí el archivo cuando termine de bajar.</li>
+      <li>Si el teléfono pide permiso para «instalar apps desconocidas», dáselo al navegador: es solo para esta instalación.</li>
+      <li>Tocá «Instalar» y buscá el ícono en tu pantalla de inicio.</li>
+    </ol>
+    <p class="muted small">Muy pronto también en Google Play.</p>
+  </section>
+  <section class="card app-card reveal" id="appIos" style="--d: 80ms">
+    <p class="app-os"><svg class="ic"><use href="#i-apple"/></svg> iPhone</p>
+    <h2>Agregala al inicio</h2>
+    <ol class="app-steps">
+      <li>Abrí este sitio en <b>Safari</b>.</li>
+      <li>Tocá <b>Compartir</b>, el cuadrado con la flecha para arriba.</li>
+      <li>Elegí <b>«Agregar a inicio»</b>. Queda como una app más.</li>
+    </ol>
+    <p class="muted small">La versión para App Store está en camino.</p>
+  </section>
+  <section class="card app-card app-qr reveal" style="--d: 160ms">
+    <p class="app-os"><svg class="ic"><use href="#i-qr"/></svg> Desde la compu</p>
+    <h2>Escaneá con el teléfono</h2>
+    <img src="img/qr-app.svg" width="180" height="180" alt="Código QR que abre esta página en el teléfono">
+    <p class="muted small">Apuntá la cámara al código: abre esta página en el teléfono para bajar la app.</p>
+  </section>
+</div>
+</main>
+
+<footer class="foot">
+  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="promos.html">Promos</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="app.html" class="app-link">La app</a><a href="mi-plan.html">Mi plan</a></nav>
+  <p class="foot-legal"><a href="terminos.html">Términos de uso</a> · <a href="privacidad.html">Privacidad</a> · © 2026 Jaemeson Dieu, todos los derechos reservados</p>
+  <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a> <button type="button" class="mini-btn install-btn" hidden>Instalar la app</button></p>
+</footer>
+<nav class="tabbar" aria-label="Secciones">
+  <a href="index.html" data-nav="inicio"><svg class="ic duo"><use href="#i-home" class="sh"/><use href="#i-home"/></svg>Inicio</a>
+  <a href="plan.html" data-nav="plan"><svg class="ic duo"><use href="#i-calendar" class="sh"/><use href="#i-calendar"/></svg>Plan</a>
+  <a href="recetas.html" data-nav="recetas"><svg class="ic duo"><use href="#i-recetas" class="sh"/><use href="#i-recetas"/></svg>Recetas</a>
+  <a href="mi-plan.html" data-nav="miplan"><svg class="ic duo"><use href="#i-users" class="sh"/><use href="#i-users"/></svg>Mi plan</a>
+  <button type="button" id="moreBtn" aria-expanded="false" aria-controls="moreMenu"><svg class="ic duo"><use href="#i-plus" class="sh"/><use href="#i-plus"/></svg>Más</button>
+</nav>
+<div class="more-menu" id="moreMenu" hidden>
+  <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Lista de compras</a>
+  <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados y mapa</a>
+  <a href="promos.html" data-nav="promos"><svg class="ic"><use href="#i-tag"/></svg>Promos de hoy</a>
+  <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Productos de estación</a>
+  <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
+  <a href="app.html" data-nav="app" class="app-link"><svg class="ic"><use href="#i-phone"/></svg>Bajar la app</a>
+  <button type="button" class="more-sug install-btn" hidden><svg class="ic"><use href="#i-arrow"/></svg>Instalar la app</button>
+  <button type="button" id="moreSug" class="more-sug"><svg class="ic"><use href="#i-plus"/></svg>Sugerir un plato</button>
+</div>
+<button class="sug-fab" id="sugFab" aria-expanded="false" aria-controls="sugPanel" aria-label="Sugerir un plato"><i><svg class="ic"><use href="#i-plus"/></svg></i><span>Sugerir un plato</span></button>
+<aside class="sug-panel" id="sugPanel" hidden aria-label="Sugerir un plato">
+  <button class="sug-close" id="sugClose" aria-label="Cerrar">×</button>
+  <h3>¿Qué plato falta?</h3>
+  <p class="muted">Mandá la receta que querés sumar al plan. Se abre tu correo con todo ya escrito; si preferís, copiá el texto y pasalo por WhatsApp.</p>
+  <form id="sugForm">
+    <label for="sugNombre">Nombre del plato</label>
+    <input id="sugNombre" required placeholder="Ej.: ñoquis de calabaza">
+    <label for="sugLink">Link de la receta (video o página)</label>
+    <input id="sugLink" type="url" placeholder="https://…">
+    <label for="sugIng">Ingredientes</label>
+    <textarea id="sugIng" placeholder="Uno por línea, con cantidades si las sabés"></textarea>
+    <label for="sugTips">Tips para que salga bien</label>
+    <textarea id="sugTips" placeholder="Trucos, tiempos, qué no hacer…"></textarea>
+    <label for="sugDe">Tu nombre</label>
+    <input id="sugDe" placeholder="Para saber a quién agradecerle">
+    <div class="sug-actions">
+      <button class="btn" type="submit"><svg class="ic"><use href="#i-mail"/></svg> Enviar por correo</button>
+      <button class="mini-btn" type="button" id="sugCopy"><svg class="ic"><use href="#i-copy"/></svg> Copiar texto</button>
+    </div>
+    <p class="sug-ok" id="sugOk" hidden>Listo: se abrió tu correo con la sugerencia. Si no se abrió, usá «Copiar texto».</p>
+  </form>
+</aside>
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close></div>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-x" data-close aria-label="Cerrar">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

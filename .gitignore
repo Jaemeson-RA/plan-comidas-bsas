@@ -10,3 +10,6 @@ tools/worker/dist/
 tools/worker/node_modules/
 tools/worker/.wrangler/
 media/qa/
+
+# recursos para tiendas (se generan con tools/build_store.py)
+store/

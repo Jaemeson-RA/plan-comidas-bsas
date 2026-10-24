@@ -27,7 +27,7 @@ h1 mark{{background:linear-gradient(transparent 60%,#F2B544 60%,#F2B544 92%,tran
 .p3{{right:40px;top:350px;width:250px;height:210px;transform:rotate(5deg)}}
 .url{{position:absolute;left:70px;bottom:46px;font-weight:600;font-size:22px;color:#23704A}}
 </style></head><body>
-<div class="l"><div class="brand"><i><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFF9EE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 10.5h13"/><path d="M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5"/><path d="M12 7.5v3M10.2 7.5h3.6"/><path d="M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2"/></svg></i><span>Plan de comidas <em>Buenos Aires</em></span></div>
+<div class="l"><div class="brand"><i><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFF9EE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 10.5h13"/><path d="M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5"/><path d="M12 7.5v3M10.2 7.5h3.6"/><path d="M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2"/></svg></i><span>Menu<em>ario</em></span></div>
 <h1>Comé rico, <mark>gastá menos</mark>, sin pensar qué cocinar</h1>
 <div class="chips"><span class="g">30 recetas con video</span><span>Lista de compras</span><span>7 súper comparados</span><span>Tu mes a medida</span></div></div>
 <img class="ph p1" src="{u('img/w/empanadas-900.webp')}"><img class="ph p2" src="{u('img/w/pollohorno-900.webp')}"><img class="ph p3" src="{u('img/w/lentejas-900.webp')}">

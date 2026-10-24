@@ -834,3 +834,19 @@ table.ladder tr.me td{background:var(--oro2)}
   .pchip { min-height: 36px; }
   .rm-porc button { width: 34px; height: 34px; }
 }
+
+/* ===== la app (descarga) ===== */
+.app-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem;margin-bottom:2.4rem}
+.app-card{padding:1.4rem 1.4rem 1.2rem;display:flex;flex-direction:column;gap:.7rem}
+.app-card h2{font-size:1.45rem;margin:0}
+.app-card.hl{border-color:var(--verde);box-shadow:0 0 0 3px rgba(47,143,91,.16)}
+.app-os{display:flex;align-items:center;gap:.45rem;margin:0;font-weight:600;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#5d6b66)}
+.app-os .ic{width:20px;height:20px}
+.app-dl{align-self:flex-start;display:inline-flex;align-items:center;gap:.5rem}
+.app-dl small{font-weight:400;opacity:.85}
+.app-steps{margin:.2rem 0 0;padding-left:1.2rem;line-height:1.55}
+.app-steps li{margin:.25rem 0}
+.app-qr{align-items:flex-start}
+.app-qr img{width:180px;height:180px;background:#fff;border-radius:14px;padding:8px;border:1px solid var(--border,#E2D8C6)}
+@media (max-width:960px){.app-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.app-qr{grid-column:1/-1}}
+@media (max-width:720px){.app-grid{grid-template-columns:minmax(0,1fr)}.app-qr{display:none}}

@@ -1,4 +1,4 @@
-/*! Plan de comidas Buenos Aires · © 2026 Jaemeson Dieu · Todos los derechos reservados · ver LICENSE */
+/*! Menuario · © 2026 Jaemeson Dieu · Todos los derechos reservados · ver LICENSE */
 /* Cuenta, calendario personal, recetas e ingredientes de la comunidad, nutrición.
    Firebase Auth (email + contraseña) + Realtime Database. Páginas: mi-plan.html y nutricion.html. */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -748,7 +748,7 @@ function checkBadges() {
 function badgeHtml(b, on, shareable) { return `<div class="badge${on ? " on" : ""}" title="${esc(b.d)}">${medalSvg(b, on)}<b>${esc(b.t)}</b><small>${esc(b.d)}</small><em class="tier t${b.tier || 1}">${TIER[b.tier || 1]}</em>${on && shareable ? `<button class="mini-btn share" data-share="${b.id}">${ic("share")} Compartir</button>` : ""}</div>`; }
 async function shareBadge(id, fmt = "post") {
   const b = BADGES.find((x) => x.id === id); const url = "https://jaemeson-ra.github.io/plan-comidas-bsas/";
-  const text = `Conseguí la insignia «${b.t}» (${b.d}) en Plan de comidas Buenos Aires. ${url}`;
+  const text = `Conseguí la insignia «${b.t}» (${b.d}) en Menuario. ${url}`;
   // tarjeta para compartir (canvas)
   const story = fmt === "story", W = 1080, H = story ? 1920 : 1080, x = myXP();
   const cv = document.createElement("canvas"); cv.width = W; cv.height = H; const g = cv.getContext("2d");
@@ -766,10 +766,10 @@ async function shareBadge(id, fmt = "post") {
   g.fillStyle = "#1F2D2A"; g.font = `400 ${story ? 88 : 76}px 'Young Serif', Georgia, serif`; g.fillText(b.t, W / 2, L.t);
   g.fillStyle = "#3C4A46"; g.font = `500 ${story ? 44 : 40}px Outfit, sans-serif`; g.fillText(b.d, W / 2, L.d);
   if (story) { g.fillStyle = "#8a6410"; g.font = "700 36px Outfit, sans-serif"; g.fillText("Medalla de " + TIER[b.tier || 1], W / 2, L.tier); }
-  g.fillStyle = "#3C4A46"; g.font = `500 ${story ? 42 : 40}px Outfit, sans-serif`; g.fillText(story ? `${myName()} · nivel ${x.level} · racha ${x.st.streak}` : `${myName()} · Plan de comidas Buenos Aires`, W / 2, L.who);
+  g.fillStyle = "#3C4A46"; g.font = `500 ${story ? 42 : 40}px Outfit, sans-serif`; g.fillText(story ? `${myName()} · nivel ${x.level} · racha ${x.st.streak}` : `${myName()} · Menuario`, W / 2, L.who);
   if (story) {
     g.fillStyle = "#2F8F5B"; g.fillRect(0, 1690, W, 230);
-    g.fillStyle = "#FFFDF9"; g.font = "400 56px 'Young Serif', Georgia, serif"; g.fillText("Plan de comidas Buenos Aires", W / 2, 1790);
+    g.fillStyle = "#FFFDF9"; g.font = "400 56px 'Young Serif', Georgia, serif"; g.fillText("Menuario", W / 2, 1790);
     g.font = "600 36px Outfit, sans-serif"; g.fillText("jaemeson-ra.github.io/plan-comidas-bsas", W / 2, 1855);
   } else { g.fillStyle = "#2F8F5B"; g.font = "600 34px Outfit, sans-serif"; g.fillText("jaemeson-ra.github.io/plan-comidas-bsas", W / 2, 980); }
   const blob = await new Promise((r) => cv.toBlob(r, "image/png")); const file = new File([blob], `insignia-${b.id}${fmt === "story" ? "-historia" : ""}.png`, { type: "image/png" });

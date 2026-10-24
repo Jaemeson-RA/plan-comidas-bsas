@@ -34,7 +34,7 @@ def render_icons():
     print("íconos:", ", ".join(ICONS))
 
 MANIFEST = {
-    "name": "Plan de comidas · Buenos Aires", "short_name": "Plan BA", "lang": "es-AR",
+    "name": "Menuario · Plan de comidas", "short_name": "Menuario", "lang": "es-AR",
     "description": "Tu plan de comidas, recetas, lista de compras y precios de supermercados de Buenos Aires.",
     "start_url": "./index.html?app=1", "scope": "./", "display": "standalone", "orientation": "portrait",
     "background_color": "#FBF7F0", "theme_color": "#2F8F5B",
@@ -46,11 +46,11 @@ MANIFEST = {
                   {"name": "Mi plan", "url": "./mi-plan.html?app=1", "icons": [{"src": "img/icons/icon-192.png", "sizes": "192x192"}]}],
 }
 
-PAGES = ["index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html", "promos.html"]
+PAGES = ["index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html", "promos.html", "app.html"]
 CORE = ["./"] + PAGES + ["style.css", "motion.css", "gami.css", "app.js", "ahorro.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest",
         "img/icons/icon-192.png"] + sorted("fonts/" + os.path.basename(f) for f in glob.glob(os.path.join(ROOT, "fonts", "*.woff2")))
 
-SW = r"""/* Service worker · Plan de comidas Buenos Aires (generado por tools/build_pwa.py, no editar a mano) */
+SW = r"""/* Service worker · Menuario (generado por tools/build_pwa.py, no editar a mano) */
 const V = "pc-__V__";
 const CORE = __CORE__;
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(CORE)).then(() => self.skipWaiting())); });

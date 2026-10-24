@@ -6,18 +6,19 @@ head = open(os.path.join(root, "icons.svg"), encoding="utf-8").read() + "\n" + o
 FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%232F8F5B'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E"
 foot = open(os.path.join(root, "_foot.html"), encoding="utf-8").read()
 META = {
- "index": ("Plan de comidas · Buenos Aires", "Plan de comidas continuo para Buenos Aires: recetas fáciles, lista de compras, precios de supermercados con envío y alertas. Se instala como app."),
- "plan": ("Calendario · Plan de comidas Buenos Aires", "Qué se come cada día: plan continuo mes por mes, con recetas, fotos y videos."),
- "recetas": ("Recetas · Plan de comidas Buenos Aires", "30 recetas fáciles para una persona, con foto, video, nutrición y costo, y un buscador por lo que hay en tu heladera."),
- "compras": ("Lista de compras · Plan de comidas Buenos Aires", "Lista de compras semanal armada por góndola a partir de las recetas del plan."),
- "supermercados": ("Supermercados · Plan de comidas Buenos Aires", "Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR."),
- "temporada": ("Productos de estación · Plan de comidas Buenos Aires", "Frutas y verduras de estación en Argentina, mes por mes, y los platos del plan que las aprovechan."),
- "nutricion": ("Nutrición · Plan de comidas Buenos Aires", "Calorías, proteínas, fibra y sal de tu calendario por semana y por mes, con aportes recomendados y nota sobre 10."),
- "promos": ("Promos de hoy · Plan de comidas Buenos Aires", "Ofertas en góndola de Coto, Día, Carrefour, Jumbo, Disco, Vea y ChangoMás, actualizadas cada 3 horas."),
- "terminos": ("Términos de uso · Plan de comidas Buenos Aires", "Condiciones de uso del sitio: salud, precios, cuentas, contenido de usuarios y propiedad intelectual."),
- "privacidad": ("Política de privacidad · Plan de comidas Buenos Aires", "Qué datos se guardan, para qué, quién los procesa y cómo borrarlos, según la Ley 25.326."),
- "mi-plan": ("Mi plan · Plan de comidas Buenos Aires", "Creá tu cuenta y armá tu propio calendario de comidas eligiendo las recetas que quieras."),
- "404": ("Página no encontrada · Plan de comidas Buenos Aires", "Esa página no existe: volvé al plan, las recetas o la lista de compras."),
+ "index": ("Menuario · Plan de comidas en Buenos Aires", "Menuario: plan de comidas continuo para Buenos Aires: recetas fáciles, lista de compras, precios de supermercados con envío y alertas. Se instala como app."),
+ "plan": ("Calendario · Menuario", "Qué se come cada día: plan continuo mes por mes, con recetas, fotos y videos."),
+ "recetas": ("Recetas · Menuario", "30 recetas fáciles para una persona, con foto, video, nutrición y costo, y un buscador por lo que hay en tu heladera."),
+ "compras": ("Lista de compras · Menuario", "Lista de compras semanal armada por góndola a partir de las recetas del plan."),
+ "supermercados": ("Supermercados · Menuario", "Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR."),
+ "temporada": ("Productos de estación · Menuario", "Frutas y verduras de estación en Argentina, mes por mes, y los platos del plan que las aprovechan."),
+ "nutricion": ("Nutrición · Menuario", "Calorías, proteínas, fibra y sal de tu calendario por semana y por mes, con aportes recomendados y nota sobre 10."),
+ "promos": ("Promos de hoy · Menuario", "Ofertas en góndola de Coto, Día, Carrefour, Jumbo, Disco, Vea y ChangoMás, actualizadas cada 3 horas."),
+ "terminos": ("Términos de uso · Menuario", "Condiciones de uso del sitio: salud, precios, cuentas, contenido de usuarios y propiedad intelectual."),
+ "privacidad": ("Política de privacidad · Menuario", "Qué datos se guardan, para qué, quién los procesa y cómo borrarlos, según la Ley 25.326."),
+ "mi-plan": ("Mi plan · Menuario", "Creá tu cuenta y armá tu propio calendario de comidas eligiendo las recetas que quieras."),
+ "app": ("La app · Menuario", "Bajá la app para Android o agregala al inicio del iPhone: el plan, las recetas y la lista de compras a pantalla completa y sin conexión."),
+ "404": ("Página no encontrada · Menuario", "Esa página no existe: volvé al plan, las recetas o la lista de compras."),
 }
 SITE = "https://jaemeson-ra.github.io/plan-comidas-bsas/"
 import datetime
@@ -27,10 +28,10 @@ for page, (title, desc) in META.items():
     url = SITE + ("" if page == "index" else f"{page}.html")
     social = (  # vista previa al compartir en WhatsApp, redes y buscadores
         f"<link rel=\"canonical\" href=\"{url}\">\n"
-        "<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:locale\" content=\"es_AR\">\n<meta property=\"og:site_name\" content=\"Plan de comidas Buenos Aires\">\n"
+        "<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:locale\" content=\"es_AR\">\n<meta property=\"og:site_name\" content=\"Menuario\">\n"
         f"<meta property=\"og:title\" content=\"{title}\">\n<meta property=\"og:description\" content=\"{desc}\">\n<meta property=\"og:url\" content=\"{url}\">\n"
         f"<meta property=\"og:image\" content=\"{SITE}img/og.jpg\">\n<meta property=\"og:image:width\" content=\"1200\">\n<meta property=\"og:image:height\" content=\"630\">\n"
-        "<meta property=\"og:image:alt\" content=\"Plan de comidas Buenos Aires: recetas, lista de compras y precios de supermercados\">\n"
+        "<meta property=\"og:image:alt\" content=\"Menuario: recetas, lista de compras y precios de supermercados\">\n"
         "<meta name=\"twitter:card\" content=\"summary_large_image\">\n")
     if page == "404": social = "<base href=\"/plan-comidas-bsas/\">\n<meta name=\"robots\" content=\"noindex\">\n"
     html = (
@@ -40,7 +41,7 @@ for page, (title, desc) in META.items():
         f"<link rel=\"icon\" href=\"{FAVICON}\">\n"
         "<link rel=\"manifest\" href=\"manifest.webmanifest\">\n<meta name=\"theme-color\" content=\"#2F8F5B\">\n"
         "<link rel=\"apple-touch-icon\" href=\"img/icons/apple-touch-180.png\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n"
-        "<meta name=\"apple-mobile-web-app-title\" content=\"Plan BA\">\n<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\">\n"
+        "<meta name=\"apple-mobile-web-app-title\" content=\"Menuario\">\n<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\">\n"
         "<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
     if page not in ("compras", "promos", "supermercados"):
         html = html.replace('<script src="ahorro.js" data-only="compras promos supermercados"></script>\n', "")
@@ -52,7 +53,7 @@ for page, (title, desc) in META.items():
 # buscadores: robots.txt y sitemap.xml
 hoy = datetime.date.today().isoformat()
 pages = [p for p in META if p != "404"]
-prio = {"index": "1.0", "plan": "0.9", "recetas": "0.9", "compras": "0.8", "promos": "0.8", "supermercados": "0.8", "nutricion": "0.7", "temporada": "0.6", "mi-plan": "0.6", "terminos": "0.2", "privacidad": "0.2"}
+prio = {"index": "1.0", "plan": "0.9", "recetas": "0.9", "compras": "0.8", "promos": "0.8", "supermercados": "0.8", "nutricion": "0.7", "temporada": "0.6", "mi-plan": "0.6", "app": "0.7", "terminos": "0.2", "privacidad": "0.2"}
 open(os.path.join(root, "sitemap.xml"), "w", encoding="utf-8").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
     f"  <url><loc>{SITE}{'' if p == 'index' else p + '.html'}</loc><lastmod>{hoy}</lastmod><changefreq>{'daily' if p in ('promos', 'plan') else 'weekly'}</changefreq><priority>{prio.get(p, '0.5')}</priority></url>\n" for p in pages) + "</urlset>\n")
 open(os.path.join(root, "robots.txt"), "w", encoding="utf-8").write(f"User-agent: *\nAllow: /\nDisallow: /plan-comidas-bsas/tools/\nSitemap: {SITE}sitemap.xml\n")
