@@ -24,6 +24,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Menuario">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>try{if(matchMedia("(display-mode: standalone)").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)||sessionStorage.getItem("inApp")==="1"){document.documentElement.classList.add("is-app");sessionStorage.setItem("inApp","1")}}catch(e){}</script>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="motion.css">
 <link rel="stylesheet" href="gami.css">
@@ -133,7 +134,7 @@
   <p class="lead">Comparamos siete cadenas que entregan en CABA y GBA. Primero la respuesta corta; después las condiciones de envío de cada una, por tipo de tienda; y al final, para quien quiera el detalle, el precio producto por producto.</p>
 </section>
 
-<div class="rates-row card">
+<div class="rates-row card" data-web>
   <div><h3>Cotización usada para convertir</h3><p class="muted small" id="ratesNote">Cargando…</p></div>
   <div class="seg" id="modeSeg"><button data-mode="blue" class="on">Blue</button><button data-mode="oficial">Oficial</button></div>
   <dl><div><dt>1 USD</dt><dd id="rUsd">—</dd></div><div><dt>1 EUR</dt><dd id="rEur">—</dd></div></dl>
@@ -161,7 +162,7 @@
   <div class="map-list" id="mapList"></div>
 </section>
 <div id="mapBox" hidden></div>
-<section class="sec">
+<section class="sec" data-web>
   <h2><span class="num">3</span>La respuesta corta</h2>
   <div class="two">
     <div class="ranking card" id="ranking"></div>
@@ -169,7 +170,7 @@
   </div>
 </section>
 
-<section class="sec">
+<section class="sec" data-web>
   <h2><span class="num">4</span>Condiciones de envío, por tipo de tienda</h2>
   <p class="muted">Lo que publica cada cadena. El costo exacto se confirma siempre en el checkout con tu dirección.</p>
   <div id="storeGroups"></div>
@@ -178,7 +179,7 @@
   <div class="apps" id="apps"></div>
 </section>
 
-<section class="sec">
+<section class="sec" data-web>
   <h2><span class="num">5</span>El changuito, producto por producto</h2>
   <p class="muted">Veinte productos básicos del plan, en la cantidad de una semana, agrupados por góndola. Precio normalizado a la misma unidad (por kg, por paquete o por 170 g). Verde = el más barato de la fila. Tocá un precio para abrir el producto en el sitio de la cadena.</p>
   <details class="card det">
@@ -188,13 +189,13 @@
   </details>
 </section>
 
-<section class="sec sources">
+<section class="sec sources" data-web>
   <h3 class="sub">Fuentes y método</h3>
   <ul id="sources"></ul>
 </section>
 </main>
 
-<footer class="foot">
+<footer class="foot" data-web>
   <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="promos.html">Promos</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
   <p class="foot-legal"><a href="terminos.html">Términos de uso</a> · <a href="privacidad.html">Privacidad</a> · © 2026 Jaemeson Dieu, todos los derechos reservados</p>
   <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a> <button type="button" class="mini-btn install-btn" hidden>Instalar la app</button></p>
@@ -203,7 +204,8 @@
   <a href="index.html" data-nav="inicio"><svg class="ic duo"><use href="#i-home" class="sh"/><use href="#i-home"/></svg>Inicio</a>
   <a href="plan.html" data-nav="plan"><svg class="ic duo"><use href="#i-calendar" class="sh"/><use href="#i-calendar"/></svg>Plan</a>
   <a href="recetas.html" data-nav="recetas"><svg class="ic duo"><use href="#i-recetas" class="sh"/><use href="#i-recetas"/></svg>Recetas</a>
-  <a href="mi-plan.html" data-nav="miplan"><svg class="ic duo"><use href="#i-users" class="sh"/><use href="#i-users"/></svg>Mi plan</a>
+  <a href="compras.html" data-nav="compras" class="tb-app"><svg class="ic duo"><use href="#i-compras" class="sh"/><use href="#i-compras"/></svg>Compras</a>
+  <a href="mi-plan.html" data-nav="miplan" class="tb-web"><svg class="ic duo"><use href="#i-users" class="sh"/><use href="#i-users"/></svg>Mi plan</a>
   <button type="button" id="moreBtn" aria-expanded="false" aria-controls="moreMenu"><svg class="ic duo"><use href="#i-plus" class="sh"/><use href="#i-plus"/></svg>Más</button>
 </nav>
 <div class="more-menu" id="moreMenu" hidden>

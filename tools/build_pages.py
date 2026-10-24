@@ -42,7 +42,7 @@ for page, (title, desc) in META.items():
         "<link rel=\"manifest\" href=\"manifest.webmanifest\">\n<meta name=\"theme-color\" content=\"#2F8F5B\">\n"
         "<link rel=\"apple-touch-icon\" href=\"img/icons/apple-touch-180.png\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n"
         "<meta name=\"apple-mobile-web-app-title\" content=\"Menuario\">\n<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"default\">\n"
-        "<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
+        "<script>try{if(matchMedia(\"(display-mode: standalone)\").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)||sessionStorage.getItem(\"inApp\")===\"1\"){document.documentElement.classList.add(\"is-app\");sessionStorage.setItem(\"inApp\",\"1\")}}catch(e){}</script>\n<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n<a class=\"skip\" href=\"#main\">Saltar al contenido</a>\n" + head + "\n" + body + "\n" + foot)
     if page not in ("compras", "promos", "supermercados"):
         html = html.replace('<script src="ahorro.js" data-only="compras promos supermercados"></script>\n', "")
     if page not in ("mi-plan", "nutricion"):

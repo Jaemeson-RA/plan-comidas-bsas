@@ -785,6 +785,77 @@
   renderNotifState();
   document.addEventListener("click", (e) => { if (e.target.closest(".notif-btn")) { e.preventDefault(); openNotif(); } });
 
+  // ---------- modo app: barra propia, pestañas, tablero «Hoy» y «Más» con todas las funciones ----------
+  if (document.documentElement.classList.contains("is-app")) {
+    const H = new Date().getHours();
+    const TITLES = { inicio: ["", H < 12 ? "Buen día" : H < 20 ? "Buenas tardes" : "Buenas noches"], plan: ["", "Plan"], recetas: ["", "Recetas"], compras: ["", "Compras"],
+      supermercados: ["Comprar", "Súper"], promos: ["Comprar", "Promos"], temporada: ["Cocinar", "Estación"], nutricion: ["Vos", "Nutrición"], miplan: ["Vos", "Mi plan"],
+      app: ["Menuario", "La app"], terminos: ["Menuario", "Términos de uso"], privacidad: ["Menuario", "Privacidad"], "404": ["Menuario", "No encontrada"] };
+    const TABS = ["inicio", "plan", "recetas", "compras"];
+    const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"], MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+    const now = new Date(), fecha = `${DIAS[now.getDay()]} ${now.getDate()} de ${MESES[now.getMonth()]}`;
+    const [sub, title] = TITLES[page] || ["Menuario", document.title.split(" · ")[0]];
+    const bar = document.createElement("header"); bar.className = "appbar";
+    bar.innerHTML = `${TABS.includes(page) ? "" : `<a class="ab-btn ab-back" href="index.html" aria-label="Volver">${ic("arrow")}</a>`}
+      <div class="ab-tt"><small>${esc(page === "inicio" ? fecha : sub)}</small><h1>${esc(title)}</h1></div>
+      <div class="ab-act"><button type="button" class="ab-btn notif-btn" aria-label="Recordatorios">${ic("bell")}</button><a class="ab-btn${page === "miplan" ? " on" : ""}" href="mi-plan.html" aria-label="Mi plan">${ic("users")}</a></div>`;
+    document.body.prepend(bar);
+    bar.querySelector(".ab-back")?.addEventListener("click", (e) => { if (history.length > 1 && document.referrer.startsWith(location.origin)) { e.preventDefault(); history.back(); } });
+    const onScroll = () => bar.classList.toggle("sc", scrollY > 8); addEventListener("scroll", onScroll, { passive: true }); onScroll();
+    const tb = $(".tabbar a[data-nav='inicio']"); if (tb) tb.lastChild.textContent = "Hoy";
+    // todas las funciones, por categoría
+    const CATS_APP = [
+      ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "bolt", "Mes a medida"], ["temporada.html", "leaf", "Estación"]]],
+      ["Comprar", "c2", [["compras.html", "compras", "Lista"], ["compras.html#comparar", "coin", "Comparar precios"], ["promos.html", "tag", "Promos"], ["supermercados.html#mapa", "pin", "Sucursales"]]],
+      ["Vos", "c3", [["mi-plan.html", "users", "Mi plan"], ["mi-plan.html#prog", "chart", "Progreso"], ["nutricion.html", "flame", "Nutrición"], ["mi-plan.html#rank", "trophy", "Ranking"]]],
+    ];
+    const grid = () => CATS_APP.map(([t, c, items]) => `<section class="ap-cat ${c}"><h2>${t}</h2><div class="ap-grid">${items.map(([href, i, l]) => `<a class="ap-tile" href="${href}"><span class="ap-ic">${ic(i)}</span><span class="ap-l">${l}</span></a>`).join("")}</div></section>`).join("");
+    if (page === "inicio" && $("#appHome")) {
+      const mon = mondayOf(todayISO), n = shoppingFor(weekAt(mon)).reduce((t, c) => t + c.items.length, 0);
+      const week = Array.from({ length: 7 }, (_, i) => houseDay(addDays(mon, i)));
+      const td = houseDay(todayISO), tm = houseDay(addDays(todayISO, 1));
+      const meal = (k, lbl, ico) => { const r = R[td[k]]; return `<button type="button" class="ap-meal" data-rec="${td[k]}"><span class="ap-mk">${ic(ico)}${lbl}</span><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span class="ap-mn">${esc(r.name)}</span>${ic("arrow")}</button>`; };
+      $("#appHome").innerHTML = `
+        <section class="ap-today"><div class="ap-h"><h2>Menú de hoy</h2><a href="plan.html">Semana</a></div>
+          <div class="ap-meals">${meal("desayuno", "Desayuno", "desayuno")}${meal("almuerzo", "Almuerzo", "almuerzo")}${meal("cena", "Cena", "cena")}
+            <div class="ap-meal ap-mer"><span class="ap-mk">${ic("merienda")}Merienda</span><span class="ap-mn">${esc(td.merienda)}</span></div></div>
+          <button type="button" class="ap-tmw" data-rec="${tm.almuerzo}">Mañana: <b>${esc(R[tm.almuerzo].name)}</b>${ic("arrow")}</button></section>
+        <div class="ap-quick">
+          <a class="ap-q" href="compras.html">${ic("compras")}<span><b>Tu lista</b><small>${n} productos</small></span></a>
+          <a class="ap-q" href="mi-plan.html">${ic("check")}<span><b>Marcar el día</b><small>Sumá XP</small></span></a>
+          <button type="button" class="ap-q notif-btn">${ic("bell")}<span><b>Recordatorios</b><small class="ap-nstate">Elegí cuándo</small></span></button>
+        </div>
+        <section class="ap-week"><div class="ap-h"><h2>Esta semana</h2><a href="plan.html">Ver el plan</a></div>
+          <div class="ap-days">${week.map((d) => { const r = R[d.almuerzo]; return `<button type="button" class="ap-day${d.date === todayISO ? " is-today" : ""}" data-rec="${d.almuerzo}"><span class="ap-dw">${d.date === todayISO ? "Hoy" : d.dow.slice(0, 3)} <b>${+d.date.slice(8)}</b></span><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span class="ap-dn">${esc(r.name)}</span></button>`; }).join("")}</div></section>
+        ${grid()}`;
+      const p = npGet(); if (p?.on) $$(".ap-nstate").forEach((x) => { x.textContent = "Activados"; });
+      $(".ap-day.is-today")?.scrollIntoView({ inline: "center", block: "nearest" });
+    }
+    // «Más»: hoja con todas las funciones, moneda y ajustes
+    const moreB = $("#moreBtn");
+    if (moreB) moreB.addEventListener("click", (e) => {
+      e.stopImmediatePropagation(); $("#moreMenu") && ($("#moreMenu").hidden = true);
+      let sh = $("#appMore"); if (!sh) { sh = document.createElement("div"); sh.id = "appMore"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
+      const cur = $("#curSeg .on")?.dataset.cur || "ARS";
+      sh.innerHTML = `<div class="sh-bg" data-shx></div><div class="sh-box as-box ap-more" role="dialog" aria-modal="true" aria-label="Todas las funciones">
+        <span class="ap-grab" aria-hidden="true"></span>${grid()}
+        <div class="ap-set">
+          <button type="button" class="ap-row notif-btn">${ic("bell")}<span>Recordatorios</span>${ic("arrow")}</button>
+          <div class="ap-row"><span class="ap-ri">${ic("coin")}</span><span>Moneda</span><div class="seg ap-cur">${["ARS", "USD", "EUR"].map((c) => `<button type="button" data-apcur="${c}" class="${c === cur ? "on" : ""}">${c}</button>`).join("")}</div></div>
+          <button type="button" class="ap-row" data-apsug>${ic("plus")}<span>Sugerir un plato</span>${ic("arrow")}</button>
+        </div>
+        <p class="ap-legal"><a href="terminos.html">Términos</a> · <a href="privacidad.html">Privacidad</a> · Menuario 1.0</p></div>`;
+      sh.hidden = false; document.body.classList.add("no-scroll");
+      const close = () => { sh.hidden = true; document.body.classList.remove("no-scroll"); };
+      sh.onclick = (ev) => {
+        if (ev.target.closest("[data-shx]") || ev.target.closest("a") || ev.target.closest(".notif-btn")) { close(); return; }
+        const c = ev.target.closest("[data-apcur]"); if (c) { $(`#curSeg [data-cur="${c.dataset.apcur}"]`)?.click(); sh.querySelectorAll("[data-apcur]").forEach((b) => b.classList.toggle("on", b === c)); return; }
+        if (ev.target.closest("[data-apsug]")) { close(); $("#sugFab")?.click(); }
+      };
+      sh.onkeydown = (ev) => { if (ev.key === "Escape") close(); };
+    }, true);
+  }
+
   const REM = "recordatorio";
   const remGet = () => { try { return JSON.parse(localStorage.getItem(REM) || "null"); } catch (e) { return null; } };
   function downloadIcs(hora) {

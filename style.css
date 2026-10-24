@@ -952,3 +952,94 @@ body.no-scroll{overflow:hidden}
 .notif-cta small{display:block;color:var(--muted);font-size:.85rem}
 .notif-cta > .ic{width:20px;height:20px;color:var(--verde);flex:none}
 @media (max-width:420px){.nt-opts{margin-left:0}}
+/* ===== modo app (html.is-app: app instalada, TWA o ?app=1) ===== */
+html.is-app [data-web],html.is-app .top,html.is-app .sug-fab,html.is-app .install-btn,html.is-app .page-head,html.is-app .notif-cta{display:none!important}
+html:not(.is-app) [data-app],html:not(.is-app) .tb-app{display:none!important}
+html.is-app .tb-web{display:none!important}
+html.is-app body{padding-bottom:calc(76px + env(safe-area-inset-bottom));-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+html.is-app main{padding:0 16px;max-width:760px}
+.appbar{position:sticky;top:0;z-index:70;display:flex;align-items:center;gap:.6rem;padding:calc(env(safe-area-inset-top) + 14px) 16px 10px;background:rgba(251,247,240,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:box-shadow .2s,padding .2s}
+.appbar.sc{box-shadow:0 1px 0 var(--border),0 8px 18px rgba(31,45,42,.05);padding-top:calc(env(safe-area-inset-top) + 8px);padding-bottom:8px}
+.ab-tt{flex:1;min-width:0}
+.ab-tt small{display:block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);line-height:1.2}
+.ab-tt h1{font-family:var(--display);font-weight:400;font-size:1.75rem;line-height:1.15;margin:.05rem 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:font-size .2s}
+.appbar.sc .ab-tt h1{font-size:1.3rem}
+.ab-act{display:flex;gap:.45rem}
+.ab-btn{width:42px;height:42px;flex:none;border-radius:50%;border:1.5px solid var(--border);background:var(--crema);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none}
+.ab-btn .ic{width:21px;height:21px}
+.ab-btn.on{background:var(--ok2);border-color:var(--verde);color:var(--verde)}
+.ab-back .ic{transform:rotate(180deg)}
+html.is-app .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:60;max-width:none}
+html.is-app .tabbar a,html.is-app .tabbar button{font-size:.7rem}
+html.is-app main{animation:appIn .32s cubic-bezier(.2,.8,.2,1) both}
+@keyframes appIn{from{opacity:0;transform:translateY(10px)}}
+@media (prefers-reduced-motion:reduce){html.is-app main{animation:none}}
+html.is-app .today-wrap{margin:.3rem 0 1.1rem}
+/* tablero «Hoy» */
+.app-home{display:grid;grid-template-columns:minmax(0,1fr);gap:1.4rem;margin-bottom:1.5rem}
+.ap-quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem}
+.ap-q{display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;padding:.75rem .7rem;border-radius:16px;background:var(--crema);border:1.5px solid var(--border);box-shadow:var(--hard-sm);color:var(--ink);text-decoration:none;font:inherit;text-align:left;cursor:pointer}
+.ap-q > .ic{width:22px;height:22px;color:var(--verde)}
+.ap-q b{display:block;font-size:.86rem;line-height:1.2}
+.ap-q small{display:block;font-size:.74rem;color:var(--muted);margin-top:.1rem}
+.ap-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.55rem}
+.ap-h h2,.ap-cat h2{font-family:var(--display);font-weight:400;font-size:1.2rem;margin:0}
+.ap-h a{font-weight:600;font-size:.86rem;color:var(--verde);text-decoration:none}
+.ap-days{display:flex;gap:.6rem;overflow-x:auto;scroll-snap-type:x proximity;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none}
+.ap-days::-webkit-scrollbar{display:none}
+.ap-day{flex:0 0 112px;scroll-snap-align:start;display:flex;flex-direction:column;gap:.35rem;text-align:left;font:inherit;color:var(--ink);background:var(--crema);border:1.5px solid var(--border);border-radius:16px;padding:.5rem;cursor:pointer}
+.ap-day.is-today{border-color:var(--verde);box-shadow:0 0 0 3px rgba(47,143,91,.14)}
+.ap-dw{font-size:.72rem;font-weight:700;text-transform:capitalize;color:var(--muted)}
+.ap-dw b{color:var(--ink);font-size:.85rem;margin-left:.15rem}
+.ap-day.is-today .ap-dw{color:var(--verde)}
+.ap-day img{width:100%;height:66px;object-fit:cover;border-radius:10px;background:var(--paper2)}
+.ap-dn{font-size:.76rem;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
+.ap-cat{--t:#E3F2E9;--c:#23704A}
+.ap-cat.c2{--t:#FCEFD6;--c:#A2650F}
+.ap-cat.c3{--t:#FBE4DD;--c:#B5462A}
+.ap-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.9rem .4rem;margin-top:.7rem}
+.ap-tile{display:flex;flex-direction:column;align-items:center;gap:.4rem;text-decoration:none;color:var(--ink);text-align:center}
+.ap-ic{width:58px;height:58px;border-radius:18px;background:var(--t);color:var(--c);display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.ap-ic .ic{width:27px;height:27px}
+.ap-tile:active .ap-ic{transform:scale(.93)}
+.ap-l{font-size:.75rem;font-weight:600;line-height:1.2}
+/* hoja «Más» */
+.sh-box.ap-more{padding-top:.7rem}
+.ap-grab{display:block;width:42px;height:5px;border-radius:3px;background:var(--border);margin:0 auto .8rem}
+.ap-more .ap-cat{margin-bottom:1.1rem}
+.ap-set{border:1.5px solid var(--border);border-radius:16px;background:var(--paper);overflow:hidden;margin-top:.3rem}
+.ap-row{display:flex;align-items:center;gap:.75rem;width:100%;padding:.8rem .9rem;font:inherit;color:var(--ink);background:none;border:0;border-bottom:1px solid var(--line);text-align:left;cursor:pointer}
+.ap-row:last-child{border-bottom:0}
+.ap-row > span:not(.ap-ri){flex:1;font-weight:600}
+.ap-row > .ic:first-child,.ap-ri .ic{width:20px;height:20px;color:var(--verde)}
+.ap-row > .ic:last-child{width:16px;height:16px;color:var(--muted)}
+.ap-cur{margin-left:auto}
+.ap-legal{text-align:center;font-size:.78rem;color:var(--muted);margin:.9rem 0 .2rem}
+.ap-legal a{color:var(--muted)}
+/* tarjeta «Menú de hoy» de la app */
+.ap-meals{background:var(--crema);border:1.5px solid var(--border);border-radius:18px;box-shadow:var(--hard-sm);overflow:hidden}
+.ap-meal{display:grid;grid-template-columns:86px 52px minmax(0,1fr) 16px;align-items:center;gap:.7rem;width:100%;padding:.6rem .8rem;font:inherit;color:var(--ink);text-align:left;background:none;border:0;border-bottom:1px solid var(--line);cursor:pointer}
+.ap-meal:last-child{border-bottom:0}
+.ap-mk{display:flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ap-mk .ic{width:15px;height:15px;color:var(--verde);flex:none}
+.ap-meal img{width:52px;height:52px;border-radius:12px;object-fit:cover;background:var(--paper2)}
+.ap-mn{font-weight:600;font-size:.92rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ap-meal > .ic:last-child{width:15px;height:15px;color:var(--muted)}
+.ap-mer{grid-template-columns:86px minmax(0,1fr);cursor:default}
+.ap-mer .ap-mn{font-weight:400;color:var(--ink2)}
+.ap-tmw{display:flex;align-items:center;gap:.35rem;width:100%;margin-top:.55rem;padding:.6rem .85rem;border-radius:14px;border:1.5px dashed var(--border);background:transparent;font:inherit;font-size:.86rem;color:var(--muted);text-align:left;cursor:pointer}
+.ap-tmw b{color:var(--ink);font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ap-tmw .ic{width:15px;height:15px;flex:none}
+/* «Más» de la barra de abajo: igual que las otras pestañas (ícono arriba, texto abajo) */
+.tabbar button{display:flex;flex-direction:column;align-items:center;gap:.1rem;color:var(--muted);font-size:.68rem;font-weight:700;padding:.3rem 0;border-radius:10px}
+.tabbar button.on{color:var(--verde)}
+/* modo app: cada pantalla con lo esencial */
+html.is-app .ab-tt small:empty{display:none}
+html.is-app .plan-tools .legend,html.is-app .cat-head p,html.is-app .cmp-head p.muted,html.is-app .hel-quick{display:none}
+html.is-app .ss-actions a[href^="plan.html"],html.is-app .ss-actions a[href="supermercados.html"],html.is-app #dlList,html.is-app #printList{display:none}
+html.is-app .ss{padding:.8rem .9rem}
+html.is-app .cat-head{margin-bottom:.4rem}
+html.is-app .sec{padding-top:1.2rem;padding-bottom:1.2rem}
+html.is-app #buscar > p.muted,html.is-app #mapa > p.muted,html.is-app .sec h2 .num{display:none}
+html.is-app .sec > h2{font-size:1.3rem;margin-bottom:.6rem}
+html.is-app .buscador{padding-top:.6rem}

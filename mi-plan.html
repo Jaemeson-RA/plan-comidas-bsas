@@ -24,6 +24,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Menuario">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>try{if(matchMedia("(display-mode: standalone)").matches||navigator.standalone||/[?&]app=1/.test(location.search)||/^android-app:/.test(document.referrer)||sessionStorage.getItem("inApp")==="1"){document.documentElement.classList.add("is-app");sessionStorage.setItem("inApp","1")}}catch(e){}</script>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="motion.css">
 <link rel="stylesheet" href="gami.css">
@@ -407,7 +408,7 @@
 </div>
 </main>
 
-<footer class="foot">
+<footer class="foot" data-web>
   <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="promos.html">Promos</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
   <p class="foot-legal"><a href="terminos.html">Términos de uso</a> · <a href="privacidad.html">Privacidad</a> · © 2026 Jaemeson Dieu, todos los derechos reservados</p>
   <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a> <button type="button" class="mini-btn install-btn" hidden>Instalar la app</button></p>
@@ -416,7 +417,8 @@
   <a href="index.html" data-nav="inicio"><svg class="ic duo"><use href="#i-home" class="sh"/><use href="#i-home"/></svg>Inicio</a>
   <a href="plan.html" data-nav="plan"><svg class="ic duo"><use href="#i-calendar" class="sh"/><use href="#i-calendar"/></svg>Plan</a>
   <a href="recetas.html" data-nav="recetas"><svg class="ic duo"><use href="#i-recetas" class="sh"/><use href="#i-recetas"/></svg>Recetas</a>
-  <a href="mi-plan.html" data-nav="miplan"><svg class="ic duo"><use href="#i-users" class="sh"/><use href="#i-users"/></svg>Mi plan</a>
+  <a href="compras.html" data-nav="compras" class="tb-app"><svg class="ic duo"><use href="#i-compras" class="sh"/><use href="#i-compras"/></svg>Compras</a>
+  <a href="mi-plan.html" data-nav="miplan" class="tb-web"><svg class="ic duo"><use href="#i-users" class="sh"/><use href="#i-users"/></svg>Mi plan</a>
   <button type="button" id="moreBtn" aria-expanded="false" aria-controls="moreMenu"><svg class="ic duo"><use href="#i-plus" class="sh"/><use href="#i-plus"/></svg>Más</button>
 </nav>
 <div class="more-menu" id="moreMenu" hidden>
