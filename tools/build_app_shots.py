@@ -13,16 +13,15 @@ SITE = "https://jaemeson-ra.github.io/plan-comidas-bsas/"
 OUT = os.path.join(ROOT, "img", "app"); os.makedirs(OUT, exist_ok=True)
 W, H = 360, 740
 
-# lleva el bloque `q` a 10 px del borde de arriba (la cabecera no es fija en el teléfono)
-TOP = "(q) => { const e = document.querySelector(q); if (e) window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 10); }"
+# lleva el bloque `q` justo debajo de la barra de la app (fija arriba)
+TOP = "(q) => { const e = document.querySelector(q); const h = document.querySelector('.appbar')?.offsetHeight || 0; if (e) window.scrollTo(0, e.getBoundingClientRect().top + scrollY - h - 8); }"
 NUT = ("() => { const f = (i, v) => { const e = document.getElementById(i); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); e.dispatchEvent(new Event('change', {bubbles: true})); };"
        " f('pEdad', '32'); f('pAltura', '175'); f('pPeso', '74'); const fm = document.getElementById('profForm'); fm.requestSubmit ? fm.requestSubmit() : fm.submit(); }")
 SHOTS = [
-    ("1-hoy", "index.html", [("top", "#today")]),
+    ("1-hoy", "index.html", []),
     ("2-semana", "plan.html", [("click", "#viewSeg button:last-child"), ("top", "#weekView")]),
     ("3-receta", "recetas.html", [("js", "() => document.querySelector('[data-rec]').click()")]),
-    ("4-compras", "compras.html", [("top", "#shopGrid")]),
-    ("5-promos", "promos.html", [("top", "#promoPlan")]),
+    ("5-promos", "promos.html", []),
     ("6-nutricion", "nutricion.html", [("js", NUT), ("wait", 4500), ("top", "#scoreBox")]),
 ]
 HIDE = ".sug-fab, .toast, #netPill { display: none !important; } * { scroll-behavior: auto !important; }"

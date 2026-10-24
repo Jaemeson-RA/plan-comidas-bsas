@@ -829,7 +829,7 @@
           <div class="ap-days">${week.map((d) => { const r = R[d.almuerzo]; return `<button type="button" class="ap-day${d.date === todayISO ? " is-today" : ""}" data-rec="${d.almuerzo}"><span class="ap-dw">${d.date === todayISO ? "Hoy" : d.dow.slice(0, 3)} <b>${+d.date.slice(8)}</b></span><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span class="ap-dn">${esc(r.name)}</span></button>`; }).join("")}</div></section>
         ${grid()}`;
       const p = npGet(); if (p?.on) $$(".ap-nstate").forEach((x) => { x.textContent = "Activados"; });
-      $(".ap-day.is-today")?.scrollIntoView({ inline: "center", block: "nearest" });
+      { const t = $(".ap-day.is-today"), row = $(".ap-days"); if (t && row) row.scrollLeft = t.offsetLeft - row.offsetLeft - (row.clientWidth - t.offsetWidth) / 2; }  // centra hoy sin mover la página
     }
     // «Más»: hoja con todas las funciones, moneda y ajustes
     const moreB = $("#moreBtn");
