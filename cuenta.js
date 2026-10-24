@@ -1,7 +1,7 @@
 /* Cuenta, calendario personal, recetas e ingredientes de la comunidad, nutrición.
    Firebase Auth (email + contraseña) + Realtime Database. Páginas: mi-plan.html y nutricion.html. */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getDatabase, ref, set, update, onValue, get, push, remove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
 const D = window.DATA, CFG = window.CONFIG || {}, R = D.recipes;
@@ -121,7 +121,7 @@ const myName = () => cal?.profile?.name || user?.displayName || (user?.email || 
 
 // ---------- compartido ----------
 function weekList() {
-  const first = mondayOf(todayISO < D.period.start ? D.period.start : todayISO);
+  const first = mondayOf(todayISO);  // tu calendario arranca en tu semana actual, aunque el plan de la casa empiece después
   return Array.from({ length: 6 }, (_, i) => { const s = addDays(first, i * 7); return { start: s, end: addDays(s, 6), label: `${label(s)} → ${label(addDays(s, 6))}` }; });
 }
 function dayPlan(dateISO, src) {
@@ -138,13 +138,13 @@ function aggregateShopping(days) {
   out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
   return out.filter((c) => c.items.length);
 }
-function render() { if (page === "miplan") { renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); } if (page === "nutricion") renderNut(); }
+function render() { if (page === "miplan") { renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); renderWho(); renderPerfil(); renderFriends(); } if (page === "nutricion") renderNut(); }
 
 // =====================================================================
 // MI PLAN · calendario
 // =====================================================================
 let myWeek = null, pickCtx = null, notifyTimer = null;
-$("#mpSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; $$("#mpSeg button").forEach((x) => x.classList.toggle("on", x === b)); ["cal", "rec", "ing", "rank"].forEach((t) => { $("#tab" + t[0].toUpperCase() + t.slice(1)).hidden = b.dataset.tab !== t; }); localStorage.setItem("mpTab", b.dataset.tab); window.dispatchEvent(new Event("scroll")); });
+$("#mpSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; $$("#mpSeg button").forEach((x) => x.classList.toggle("on", x === b)); ["cal", "rec", "ing", "rank", "perfil"].forEach((t) => { $("#tab" + t[0].toUpperCase() + t.slice(1)).hidden = b.dataset.tab !== t; }); localStorage.setItem("mpTab", b.dataset.tab); window.dispatchEvent(new Event("scroll")); });
 if (page === "miplan") { const t = location.hash === "#rank" ? "rank" : localStorage.getItem("mpTab"); if (t) $(`#mpSeg [data-tab="${t}"]`)?.click(); }
 function renderMiPlan() {
   const box = $("#planBox"); if (!box) return; box.hidden = !user; if (!user) return;
@@ -154,7 +154,7 @@ function renderMiPlan() {
   const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i));
   $("#myCal").innerHTML = days.map((dt, i) => { const d = cal?.days?.[dt] || {}; return `<article class="my-day${dt === todayISO ? " today" : ""}"><h4>${DOW[i]} <span>${label(dt)}</span></h4>
       ${SLOTS.map((s) => { const r = R[d[s]]; return `<button class="slot${r ? "" : " empty"}" data-date="${dt}" data-slot="${s}">${ic(s)}${r ? `<img src="${r.img}" alt=""><span>${esc(r.name)}${r.custom ? " <small>· receta de " + esc(r.ownerName) + "</small>" : ""}</span>` : `<span>+ elegir ${s}</span>`}</button>`; }).join("")}
-      ${dt <= todayISO ? `<button class="done-btn${cal?.done?.[dt] ? " on" : ""}" data-done="${dt}">${ic("check")} ${cal?.done?.[dt] ? "Día cumplido" : "Marcar cumplido"}</button>` : `<span class="done-btn future">${ic("clock")} todavía no</span>`}
+      ${dt <= todayISO ? (cal?.libre?.[dt] ? `<span class="done-btn libre">${ic("star")} Día libre (combo a salvo)</span>` : `<span class="done-row"><button class="done-btn${cal?.done?.[dt] ? " on" : ""}" data-done="${dt}">${ic("check")} ${cal?.done?.[dt] ? "Día cumplido" : "Marcar cumplido"}</button>${!cal?.done?.[dt] && fichasDisponibles() > 0 ? `<button class="done-btn ficha" data-libre="${dt}" title="Usar una ficha: el día no suma puntos pero no corta la racha">${ic("coin")} Día libre</button>` : ""}</span>`) : `<span class="done-btn future">${ic("clock")} todavía no</span>`}
     </article>`; }).join("");
   const list = aggregateShopping(days.map((dt) => cal?.days?.[dt]));
   const key = (c, n) => `myshop:${myWeek}:${c}:${n}`;
@@ -174,6 +174,7 @@ $("#fillHouse")?.addEventListener("click", async () => {
 });
 $("#clearMyWeek")?.addEventListener("click", async () => { const upd = {}; Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)).forEach((dt) => { upd[dt] = null; }); try { await update(ref(db, `calendars/${user.uid}/days`), upd); touched("Semana vaciada."); } catch (e) { toast(errMsg(e)); } });
 const myListText = () => { const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)); const lines = [`Lista de compras · ${label(myWeek)} → ${label(addDays(myWeek, 6))}`, ""]; aggregateShopping(days.map((dt) => cal?.days?.[dt])).forEach((c) => { lines.push(c.cat.toUpperCase()); c.items.forEach((i) => lines.push(`- ${i.n} · ${i.q}`)); lines.push(""); }); return lines.join("\n"); };
+$("#myDl")?.addEventListener("click", () => { const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)); window.downloadListHtml(`Lista de compras · ${label(myWeek)} → ${label(addDays(myWeek, 6))}`, aggregateShopping(days.map((dt) => cal?.days?.[dt])), `mi-lista-${myWeek}.html`); });
 $("#myCopy")?.addEventListener("click", async () => { toast((await copyText(myListText())) ? "Lista copiada. Pegala en Notas o WhatsApp." : "No se pudo copiar."); });
 $("#myShare")?.addEventListener("click", async () => { try { await navigator.share({ title: "Mi lista de compras", text: myListText() }); } catch (e) {} });
 function touched(msg) {
@@ -247,7 +248,7 @@ $("#rIngRows")?.addEventListener("click", (e) => { const b = e.target.closest("[
 $("#rPorc")?.addEventListener("input", drawRows);
 $("#recEditor")?.addEventListener("click", (e) => { if (e.target.closest("[data-eclose]")) closeEditor(); });
 $("#recForm")?.addEventListener("submit", async (e) => {
-  e.preventDefault(); const err = $("#recErr"); err.hidden = true;
+  e.preventDefault(); const err = $("#recErr"); err.hidden = true; const snap = myXP();  // XP antes de guardar
   const name = $("#rName").value.trim(); if (!name) { err.textContent = "Ponele un nombre."; err.hidden = false; return; }
   if (!edRows.length) { err.textContent = "Agregá al menos un ingrediente."; err.hidden = false; return; }
   const porciones = Math.max(1, +$("#rPorc").value || 1);
@@ -257,7 +258,7 @@ $("#recForm")?.addEventListener("submit", async (e) => {
     nut: nutOfRows(edRows, porciones), owner: user.uid, ownerName: myName(), ownerEmail: user.email, createdAt: community[edKey]?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
   try {
     if (edKey) await update(ref(db, `recetas/${edKey}`), data); else await set(push(ref(db, "recetas")), data);
-    closeEditor(); toast("Receta guardada: ya está disponible para todos.");
+    closeEditor(); toast("Receta guardada: ya está disponible para todos."); if (!edKey) setTimeout(() => gainXP(80, "receta creada", snap), 700); setTimeout(syncPublic, 1500);
     window.notifyAdmin?.({ type: "receta", title: name, de: myName(), email: user.email, porciones, ingredientes: data.ing.map((i) => `${i.n} ${i.q} ${i.u}`).join(", "), nutricion: data.nut, pasos: data.pasos.join(" | ") });
   } catch (ex) { err.textContent = errMsg(ex); err.hidden = false; }
 });
@@ -295,7 +296,7 @@ function openIng(key) {
 function closeIng() { stopScan(); $("#ingEditor").hidden = true; document.body.style.overflow = ""; }
 $("#ingEditor")?.addEventListener("click", (e) => { if (e.target.closest("[data-iclose]")) closeIng(); });
 $("#ingForm")?.addEventListener("submit", async (e) => {
-  e.preventDefault(); const err = $("#ingErr"); err.hidden = true;
+  e.preventDefault(); const err = $("#ingErr"); err.hidden = true; const snap = myXP();
   const n = $("#iName").value.trim(); if (!n) { err.textContent = "Ponele nombre."; err.hidden = false; return; }
   const num = (id) => { const v = $("#" + id).value; return v === "" ? 0 : Math.max(0, +v); };
   const data = { n, marca: $("#iMarca").value.trim(), cat: $("#iCat").value, barcode: $("#iCode").value.trim() || null, u: +$("#iUnit").value || null,
@@ -303,7 +304,7 @@ $("#ingForm")?.addEventListener("submit", async (e) => {
     owner: user.uid, ownerName: myName(), source: $("#iCode").value.trim() ? "off" : "manual", createdAt: ingDB[ingKey]?.createdAt || new Date().toISOString() };
   try {
     if (ingKey) await update(ref(db, `ingredientes/${ingKey}`), data); else await set(push(ref(db, "ingredientes")), data);
-    closeIng(); toast("Ingrediente guardado: ya lo puede usar todo el mundo.");
+    closeIng(); toast("Ingrediente guardado: ya lo puede usar todo el mundo."); if (!ingKey) setTimeout(() => gainXP(40, "ingrediente cargado", snap), 700); setTimeout(syncPublic, 1500);
     window.notifyAdmin?.({ type: "ingrediente", title: n, de: myName(), email: user.email, marca: data.marca, codigo: data.barcode, por100: data.por100 });
   } catch (ex) { err.textContent = errMsg(ex); err.hidden = false; }
 });
@@ -377,22 +378,25 @@ let ladder = {};
 onValue(ref(db, "ladder"), (s) => { ladder = s.val() || {}; renderRank(); }, () => {});
 $("#myCal")?.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-done]"); if (!b) return;
-  const dt = b.dataset.done; const on = !cal?.done?.[dt];
+  const dt = b.dataset.done; const on = !cal?.done?.[dt]; const snap = myXP();
   try {
     await update(ref(db, `calendars/${user.uid}/done`), { [dt]: on ? true : null });
     const done = Object.assign({}, cal?.done || {}); if (on) done[dt] = true; else delete done[dt];
     const st = computeStats(done);
     await set(ref(db, `ladder/${user.uid}`), { name: myName(), points: st.points, streak: st.streak, best: st.best, days: st.days, weeks: st.weeks, updatedAt: new Date().toISOString() });
     toast(on ? (st.streak >= 7 ? `¡Día cumplido! Combo ×2: racha de ${st.streak} días.` : st.streak >= 3 ? `¡Día cumplido! Combo ×1,5: racha de ${st.streak} días.` : "¡Día cumplido! +10 puntos.") : "Día desmarcado.");
-    touched();
+    if (on) gainXP(xpDay(st.streak), "día cumplido", snap);
+    touched(); syncPublic();
   } catch (ex) { toast(errMsg(ex)); }
 });
-function computeStats(done) {
+function computeStats(done, libre) {
+  libre = libre || cal?.libre || {};
   const dates = Object.keys(done || {}).filter((d) => done[d]).sort();
+  const bridged = (a, b) => { let d = addDays(a, 1); while (d < b) { if (!libre[d]) return false; d = addDays(d, 1); } return true; };
   let points = 0, run = 0, best = 0, prev = null;
-  dates.forEach((d) => { run = (prev && addDays(prev, 1) === d) ? run + 1 : 1; prev = d; best = Math.max(best, run); points += 10 * (run >= 7 ? 2 : run >= 3 ? 1.5 : 1); });
+  dates.forEach((d) => { run = (prev && (addDays(prev, 1) === d || bridged(prev, d))) ? run + 1 : 1; prev = d; best = Math.max(best, run); points += 10 * (run >= 7 ? 2 : run >= 3 ? 1.5 : 1); });
   let streak = 0;
-  if (dates.length) { const last = dates[dates.length - 1]; if (last === todayISO || last === addDays(todayISO, -1)) { let d = last; while (done[d]) { streak++; d = addDays(d, -1); } } }
+  if (dates.length) { const last = dates[dates.length - 1]; let cur = todayISO; while (cur > last && libre[cur]) cur = addDays(cur, -1); if (last === cur || last === addDays(cur, -1)) { let d = last; while (done[d] || libre[d]) { if (done[d]) streak++; d = addDays(d, -1); } } }
   const mondays = new Set(dates.map((d) => mondayOf(d))); let weeks = 0;
   mondays.forEach((m) => { if (Array.from({ length: 7 }, (_, i) => addDays(m, i)).every((d) => done[d])) weeks++; });
   points += weeks * 50;
@@ -401,14 +405,16 @@ function computeStats(done) {
 function renderRank() {
   if (!$("#rankMe") || !user) return;
   const st = computeStats(cal?.done || {});
-  const rows = Object.entries(ladder).map(([uid, x]) => Object.assign({ uid }, x)).sort((a, b) => (b.points || 0) - (a.points || 0) || (b.streak || 0) - (a.streak || 0));
-  const pos = rows.findIndex((r) => r.uid === user.uid) + 1;
+  let rows = Object.entries(ladder).map(([uid, x]) => Object.assign({ uid }, x)).sort((a, b) => (b.points || 0) - (a.points || 0) || (b.streak || 0) - (a.streak || 0));
+  const allPos = rows.findIndex((r) => r.uid === user.uid) + 1, allN = rows.length;
+  if (ladderMode === "amigos") rows = rows.filter((r) => r.uid === user.uid || cal?.friends?.[r.uid]);
+  const pos = allPos;
   const mult = st.streak >= 7 ? "×2" : st.streak >= 3 ? "×1,5" : "×1";
   $("#rankMe").innerHTML = `<p class="kicker">Tu puntaje</p><div class="score-num">${st.points.toLocaleString("es-AR")}<small> pts</small></div>
     <div class="rank-chips"><span class="chip hot">${ic("flame")} racha ${st.streak} ${st.streak === 1 ? "día" : "días"} · combo ${mult}</span><span class="chip">${ic("bolt")} mejor racha ${st.best}</span><span class="chip">${ic("check")} ${st.days} días cumplidos</span><span class="chip">${ic("calendar")} ${st.weeks} ${st.weeks === 1 ? "semana perfecta" : "semanas perfectas"}</span></div>
-    <p class="muted small">${pos ? `Estás en el puesto <b>#${pos}</b> de ${rows.length}.` : "Marcá tu primer día cumplido en el calendario para entrar al ranking."}</p>`;
+    <p class="muted small">${pos ? `Estás en el puesto <b>#${pos}</b> de ${allN}.` : "Marcá tu primer día cumplido en el calendario para entrar al ranking."}</p>`;
   const medal = (i) => (i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1));
-  $("#ladderTable").innerHTML = rows.length ? `<thead><tr><th>Puesto</th><th>Quién</th><th>Puntos</th><th>Racha</th><th>Mejor racha</th><th>Días</th><th>Semanas perfectas</th></tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.uid === user.uid ? "me" : ""}"><td>${medal(i)}</td><td style="text-align:left">${esc(r.name)}${r.uid === user.uid ? " <small>(vos)</small>" : ""}</td><td><b>${(r.points || 0).toLocaleString("es-AR")}</b></td><td>${r.streak ? `${r.streak} ${r.streak >= 7 ? "×2" : r.streak >= 3 ? "×1,5" : ""}` : "—"}</td><td>${r.best || 0}</td><td>${r.days || 0}</td><td>${r.weeks || 0}</td></tr>`).join("")}</tbody>` : `<tbody><tr><td colspan="7" class="muted">Todavía nadie marcó días cumplidos. ¡Sé el primero!</td></tr></tbody>`;
+  $("#ladderTable").innerHTML = rows.length ? `<thead><tr><th>Puesto</th><th>Quién</th><th>Nivel</th><th>Puntos</th><th>Racha</th><th>Mejor</th><th>Días</th><th>Semanas</th></tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.uid === user.uid ? "me" : ""}"><td>${medal(i)}</td><td style="text-align:left"><span class="lad-user">${avatarHtml(pub[r.uid] || {}, r.name)}${esc(r.name)}${r.uid === user.uid ? " <small>(vos)</small>" : ""}</span></td><td>${r.level || 1}</td><td><b>${(r.points || 0).toLocaleString("es-AR")}</b></td><td>${r.streak ? `${r.streak} ${r.streak >= 7 ? "×2" : r.streak >= 3 ? "×1,5" : ""}` : "—"}</td><td>${r.best || 0}</td><td>${r.days || 0}</td><td>${r.weeks || 0}</td></tr>`).join("")}</tbody>` : `<tbody><tr><td colspan="8" class="muted">${ladderMode === "amigos" ? "Todavía no agregaste amigos." : "Todavía nadie marcó días cumplidos. ¡Sé el primero!"}</td></tr></tbody>`;
 }
 
 // =====================================================================
@@ -529,3 +535,250 @@ if (page === "nutricion") {
   $("#nutWeekTabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { nut.week = b.dataset.w; renderNut(); } });
   renderNut();
 }
+
+// =====================================================================
+// GAMIFICACIÓN · XP, niveles, fichas, agua, insignias, perfil, amigos
+// =====================================================================
+let pub = {}, ladderMode = "todos", myEmailHash = null, lastXP = null;
+onValue(ref(db, "public"), (s) => { pub = s.val() || {}; renderRank(); renderFriends(); renderWho(); }, () => {});
+
+// ---- sonido (sintetizado, sin archivos) ----
+const SND_KEY = "sonidos";
+const soundOn = () => localStorage.getItem(SND_KEY) !== "0";
+let actx = null;
+function tone(freq, t0, dur, type = "sine", vol = 0.18) {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume();
+    const o = actx.createOscillator(), g = actx.createGain(); o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, actx.currentTime + t0); g.gain.exponentialRampToValueAtTime(vol, actx.currentTime + t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + t0 + dur);
+    o.connect(g); g.connect(actx.destination); o.start(actx.currentTime + t0); o.stop(actx.currentTime + t0 + dur + 0.05);
+  } catch (e) {}
+}
+const sfxXP = () => { if (!soundOn()) return; tone(660, 0, 0.12, "triangle", 0.12); tone(990, 0.08, 0.18, "triangle", 0.1); };
+const sfxLevel = () => { if (!soundOn()) return; [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.11, 0.35, "triangle", 0.16)); tone(1319, 0.5, 0.6, "sine", 0.12); };
+const sfxBadge = () => { if (!soundOn()) return; tone(880, 0, 0.1, "square", 0.06); tone(1175, 0.1, 0.1, "square", 0.06); tone(1760, 0.2, 0.4, "triangle", 0.1); };
+const sfxWater = () => { if (!soundOn()) return; tone(900, 0, 0.08, "sine", 0.1); tone(1400, 0.06, 0.14, "sine", 0.08); };
+
+// ---- XP y niveles ----
+const xpDay = (streak) => (streak >= 7 ? 100 : streak >= 3 ? 75 : 50);
+const levelOf = (xp) => Math.max(1, Math.floor(Math.sqrt(Math.max(0, xp) / 100)) + 1);   // nivel L se alcanza con 100·(L−1)²
+const xpForLevel = (L) => 100 * (L - 1) * (L - 1);
+function myCounts() {
+  const recipes = Object.values(community).filter((c) => c.owner === user?.uid).length;
+  const ings = Object.values(ingDB).filter((c) => c.owner === user?.uid).length;
+  const agua = cal?.agua || {}; const aguaDays = Object.keys(agua).sort();
+  const vasos = aguaDays.reduce((a, d) => a + Math.min(3, agua[d] || 0), 0), full = aguaDays.filter((d) => (agua[d] || 0) >= 3);
+  let aguaStreak = 0, best = 0, prev = null, run = 0;
+  full.forEach((d) => { run = prev && addDays(prev, 1) === d ? run + 1 : 1; prev = d; best = Math.max(best, run); });
+  if (full.length) { const last = full[full.length - 1]; if (last === todayISO || last === addDays(todayISO, -1)) { let d = last; while ((agua[d] || 0) >= 3) { aguaStreak++; d = addDays(d, -1); } } }
+  const friends = Object.keys(cal?.friends || {}).length;
+  const planDays = Object.values(cal?.days || {}).filter((d) => d && SLOTS.some((s) => d[s])).length;
+  return { recipes, ings, vasos, aguaFull: full.length, aguaStreak, aguaBest: best, friends, planDays };
+}
+function myXP() {
+  const st = computeStats(cal?.done || {}); const c = myCounts();
+  // XP por día cumplido con el combo del momento
+  const done = cal?.done || {}; const libre = cal?.libre || {}; const dates = Object.keys(done).filter((d) => done[d]).sort();
+  let xp = 0, run = 0, prev = null;
+  const bridged = (a, b) => { let d = addDays(a, 1); while (d < b) { if (!libre[d]) return false; d = addDays(d, 1); } return true; };
+  dates.forEach((d) => { run = prev && (addDays(prev, 1) === d || bridged(prev, d)) ? run + 1 : 1; prev = d; xp += xpDay(run); });
+  xp += st.weeks * 200 + c.recipes * 80 + c.ings * 40 + c.vasos * 10 + c.aguaFull * 20;
+  const level = levelOf(xp);
+  return { xp, level, st, c, next: xpForLevel(level + 1), base: xpForLevel(level) };
+}
+const fichasDisponibles = () => { if (!cal) return 0; const { level } = myXP(); const used = Object.keys(cal?.libre || {}).length; return Math.max(0, (level - 1) - used); };
+
+// ---- animación de XP y subida de nivel ----
+function gainXP(delta, reason, snap) {
+  const after = myXP();  // XP real con los datos ya guardados
+  const before = snap || lastXP || { xp: Math.max(0, after.xp - delta), level: levelOf(Math.max(0, after.xp - delta)) };
+  const toXp = after.xp; const toLevel = after.level; delta = Math.max(0, toXp - before.xp) || delta;
+  if (delta <= 0 && toLevel <= before.level) { lastXP = { xp: toXp, level: toLevel }; return; }
+  let el = $("#xpToast"); if (!el) { el = document.createElement("div"); el.id = "xpToast"; el.className = "xp-toast"; document.body.appendChild(el); }
+  const pct = (xp, L) => Math.min(100, Math.round((xp - xpForLevel(L)) / (xpForLevel(L + 1) - xpForLevel(L)) * 100));
+  el.innerHTML = `<div class="xt-row"><span class="xt-plus">+${delta} XP</span><span class="xt-why">${esc(reason || "")}</span></div><div class="xp-bar big"><i style="width:${pct(before.xp, before.level)}%"></i></div><small>Nivel ${before.level}</small>`;
+  el.classList.add("show"); sfxXP();
+  requestAnimationFrame(() => setTimeout(() => {
+    const bar = el.querySelector(".xp-bar i");
+    if (toLevel > before.level) {
+      bar.style.width = "100%";
+      setTimeout(() => {
+        el.innerHTML = `<div class="xt-level">${ic("trophy")} ¡Nivel ${toLevel}!</div><div class="xt-why">Ganaste una ficha: podés usar un día libre sin perder el combo.</div><div class="xp-bar big"><i style="width:0%"></i></div><small>Nivel ${toLevel}</small>`;
+        el.classList.add("level"); sfxLevel(); burst();
+        setTimeout(() => { const b2 = el.querySelector(".xp-bar i"); if (b2) b2.style.width = pct(toXp, toLevel) + "%"; }, 150);
+      }, 700);
+    } else bar.style.width = pct(toXp, toLevel) + "%";
+  }, 40));
+  clearTimeout(el._h); el._h = setTimeout(() => { el.classList.remove("show", "level"); }, toLevel > before.level ? 4200 : 2600);
+  lastXP = { xp: toXp, level: toLevel };
+  checkBadges(after.level, toLevel);
+}
+function burst() {
+  const c = document.createElement("div"); c.className = "burst"; document.body.appendChild(c);
+  for (let i = 0; i < 26; i++) { const p = document.createElement("i"); p.style.setProperty("--x", (Math.random() * 2 - 1).toFixed(2)); p.style.setProperty("--d", (Math.random() * 0.4).toFixed(2) + "s"); p.style.background = ["#2F8F5B", "#E4572E", "#F2B544", "#9CCBEA"][i % 4]; c.appendChild(p); }
+  setTimeout(() => c.remove(), 1800);
+}
+
+// ---- barra de usuario (avatar, nivel, XP, agua) ----
+function avatarHtml(p, name) { const ini = (name || "?").trim()[0]?.toUpperCase() || "?"; return p?.photo ? `<img class="av" src="${p.photo}" alt="">` : `<span class="av ini">${esc(ini)}</span>`; }
+function renderWho() {
+  if (page !== "miplan" || !user || !$("#whoLevel")) return;
+  const x = myXP(); lastXP = { xp: x.xp, level: x.level };
+  $("#whoLevel").textContent = x.level;
+  const pct = Math.min(100, Math.round((x.xp - x.base) / (x.next - x.base) * 100));
+  $("#xpFill").style.width = pct + "%"; $("#xpText").textContent = `${x.xp.toLocaleString("es-AR")} XP · nivel ${x.level} · faltan ${(x.next - x.xp).toLocaleString("es-AR")} para el ${x.level + 1} · ${fichasDisponibles()} ${fichasDisponibles() === 1 ? "ficha" : "fichas"}`;
+  const photo = cal?.profile?.photo; const img = $("#avatarImg"), ini = $("#avatarInit");
+  if (photo) { img.src = photo; img.hidden = false; ini.hidden = true; } else { img.hidden = true; ini.hidden = false; ini.textContent = (myName() || "?")[0].toUpperCase(); }
+  const n = Math.min(3, cal?.agua?.[todayISO] || 0);
+  $("#aguaCups").innerHTML = [0, 1, 2].map((i) => `<svg class="ic cup${i < n ? " on" : ""}"><use href="#i-droplet"/></svg>`).join("");
+  $("#aguaTxt").textContent = n >= 3 ? "¡Hidratación del día completa! +20 XP extra" : `${n}/3 vasos de 500 ml hoy · +10 XP cada uno`;
+  $("#aguaBtn").disabled = n >= 3;
+}
+$("#aguaBtn")?.addEventListener("click", async () => {
+  const n = Math.min(3, cal?.agua?.[todayISO] || 0); if (n >= 3) return; const snap = myXP();
+  try { await update(ref(db, `calendars/${user.uid}/agua`), { [todayISO]: n + 1 }); sfxWater(); gainXP(n + 1 >= 3 ? 30 : 10, n + 1 >= 3 ? "día hidratado" : "vaso de agua", snap); touched(); syncPublic(); } catch (e) { toast(errMsg(e)); }
+});
+$("#goPerfil")?.addEventListener("click", () => $('#mpSeg [data-tab="perfil"]').click());
+$("#avatarBtn")?.addEventListener("click", () => { $('#mpSeg [data-tab="perfil"]').click(); setTimeout(() => $("#setPhoto")?.click(), 200); });
+$("#myCal")?.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-libre]"); if (!b) return;
+  if (fichasDisponibles() <= 0) { toast("No te quedan fichas: subí de nivel para ganar una."); return; }
+  if (!confirm("¿Usar una ficha para marcar este día como libre? No suma puntos, pero tu racha sigue.")) return;
+  try { await update(ref(db, `calendars/${user.uid}/libre`), { [b.dataset.libre]: true }); toast("Día libre usado: el combo sigue vivo."); touched(); syncPublic(); } catch (ex) { toast(errMsg(ex)); }
+});
+
+// ---- insignias ----
+const BADGES = [
+  { id: "racha3", t: "Tres seguidos", d: "3 días cumplidos seguidos", ic: "flame", test: (m) => m.st.best >= 3 },
+  { id: "racha7", t: "Una semana", d: "7 días seguidos", ic: "flame", test: (m) => m.st.best >= 7 },
+  { id: "racha15", t: "Quincena", d: "15 días seguidos", ic: "flame", test: (m) => m.st.best >= 15 },
+  { id: "racha30", t: "Un mes entero", d: "30 días seguidos", ic: "flame", test: (m) => m.st.best >= 30 },
+  { id: "racha60", t: "Inquebrantable", d: "60 días seguidos", ic: "flame", test: (m) => m.st.best >= 60 },
+  { id: "dias10", t: "Primeros diez", d: "10 días cumplidos", ic: "check", test: (m) => m.st.days >= 10 },
+  { id: "dias30", t: "Constante", d: "30 días cumplidos", ic: "check", test: (m) => m.st.days >= 30 },
+  { id: "dias100", t: "Centenario", d: "100 días cumplidos", ic: "check", test: (m) => m.st.days >= 100 },
+  { id: "semana1", t: "Semana perfecta", d: "7 de 7 en una semana", ic: "calendar", test: (m) => m.st.weeks >= 1 },
+  { id: "semana4", t: "Mes perfecto", d: "4 semanas perfectas", ic: "calendar", test: (m) => m.st.weeks >= 4 },
+  { id: "plan7", t: "Semana armada", d: "7 días con platos en tu calendario", ic: "calendar", test: (m) => m.c.planDays >= 7 },
+  { id: "receta1", t: "Primera receta", d: "Creaste una receta", ic: "recetas", test: (m) => m.c.recipes >= 1 },
+  { id: "receta5", t: "Cocinero/a", d: "5 recetas creadas", ic: "recetas", test: (m) => m.c.recipes >= 5 },
+  { id: "receta15", t: "Chef de la comunidad", d: "15 recetas creadas", ic: "recetas", test: (m) => m.c.recipes >= 15 },
+  { id: "ing1", t: "Primer ingrediente", d: "Cargaste un ingrediente", ic: "tag", test: (m) => m.c.ings >= 1 },
+  { id: "ing10", t: "Escáner", d: "10 ingredientes cargados", ic: "tag", test: (m) => m.c.ings >= 10 },
+  { id: "agua1", t: "Hidratado/a", d: "Un día con los 3 vasos", ic: "droplet", test: (m) => m.c.aguaFull >= 1 },
+  { id: "agua7", t: "Semana hidratada", d: "7 días seguidos con 3 vasos", ic: "droplet", test: (m) => m.c.aguaBest >= 7 },
+  { id: "agua30", t: "Fuente", d: "30 días seguidos hidratado/a", ic: "droplet", test: (m) => m.c.aguaBest >= 30 },
+  { id: "amigo1", t: "En buena compañía", d: "Tu primer amigo/a", ic: "users", test: (m) => m.c.friends >= 1 },
+  { id: "amigo5", t: "Mesa llena", d: "5 amigos", ic: "users", test: (m) => m.c.friends >= 5 },
+  { id: "nivel5", t: "Nivel 5", d: "Llegaste al nivel 5", ic: "trophy", test: (m) => m.level >= 5 },
+  { id: "nivel10", t: "Nivel 10", d: "Llegaste al nivel 10", ic: "trophy", test: (m) => m.level >= 10 },
+];
+const earnedBadges = () => { if (!cal) return []; const m = myXP(); return BADGES.filter((b) => b.test(m)).map((b) => b.id); };
+function checkBadges() {
+  const now = earnedBadges(); const seen = new Set(JSON.parse(localStorage.getItem("badges:" + (user?.uid || "")) || "[]"));
+  const nuevos = now.filter((id) => !seen.has(id));
+  if (nuevos.length && seen.size + nuevos.length !== now.length + 0 || nuevos.length) {
+    if (seen.size > 0 || now.length <= 3) nuevos.forEach((id, i) => { const b = BADGES.find((x) => x.id === id); setTimeout(() => { toast(`Insignia nueva: ${b.t}. ${b.d}.`); sfxBadge(); }, 600 * (i + 1)); });
+  }
+  localStorage.setItem("badges:" + (user?.uid || ""), JSON.stringify(now));
+}
+function badgeHtml(b, on, shareable) { return `<div class="badge${on ? " on" : ""}" title="${esc(b.d)}"><span class="b-ic"><svg class="ic"><use href="#i-${b.ic}"/></svg></span><b>${esc(b.t)}</b><small>${esc(b.d)}</small>${on && shareable ? `<button class="mini-btn share" data-share="${b.id}">${ic("share")} Compartir</button>` : ""}</div>`; }
+async function shareBadge(id) {
+  const b = BADGES.find((x) => x.id === id); const url = "https://jaemeson-ra.github.io/plan-comidas-bsas/";
+  const text = `Conseguí la insignia «${b.t}» (${b.d}) en Plan de comidas Buenos Aires. ${url}`;
+  // tarjeta para compartir (canvas)
+  const cv = document.createElement("canvas"); cv.width = 1080; cv.height = 1080; const g = cv.getContext("2d");
+  g.fillStyle = "#FBF7F0"; g.fillRect(0, 0, 1080, 1080); g.strokeStyle = "rgba(31,45,42,.06)"; for (let i = 0; i < 1080; i += 40) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 1080); g.moveTo(0, i); g.lineTo(1080, i); g.stroke(); }
+  g.fillStyle = "#E3F2E9"; g.beginPath(); g.arc(540, 420, 230, 0, Math.PI * 2); g.fill(); g.fillStyle = "#2F8F5B"; g.beginPath(); g.arc(540, 420, 170, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#fff"; g.font = "700 150px Outfit, sans-serif"; g.textAlign = "center"; g.fillText({ flame: "🔥", check: "✔", calendar: "📅", recetas: "🍳", tag: "🏷", droplet: "💧", users: "👥", trophy: "🏆" }[b.ic] || "★", 540, 475);
+  g.fillStyle = "#1F2D2A"; g.font = "400 76px 'Young Serif', Georgia, serif"; g.fillText(b.t, 540, 740);
+  g.fillStyle = "#3C4A46"; g.font = "500 40px Outfit, sans-serif"; g.fillText(b.d, 540, 805); g.fillText(`${myName()} · Plan de comidas Buenos Aires`, 540, 900);
+  g.fillStyle = "#2F8F5B"; g.font = "600 34px Outfit, sans-serif"; g.fillText("jaemeson-ra.github.io/plan-comidas-bsas", 540, 980);
+  const blob = await new Promise((r) => cv.toBlob(r, "image/png")); const file = new File([blob], `insignia-${b.id}.png`, { type: "image/png" });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ title: b.t, text, files: [file] });
+    else if (navigator.share) await navigator.share({ title: b.t, text, url });
+    else { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); await navigator.clipboard?.writeText(text); toast("Imagen descargada y texto copiado para compartir."); }
+  } catch (e) { if (e?.name !== "AbortError") toast("No se pudo compartir."); }
+}
+
+// ---- perfil y ajustes ----
+function renderPerfil() {
+  if (page !== "miplan" || !user || !$("#perfilCard")) return;
+  const x = myXP(); const on = new Set(earnedBadges());
+  $("#perfilCard").innerHTML = `<div class="perfil-head">${avatarHtml(cal?.profile || {}, myName())}<div><p class="kicker">Tu perfil</p><h3>${esc(myName())}</h3><p class="muted small">Nivel ${x.level} · ${x.xp.toLocaleString("es-AR")} XP · ${on.size} ${on.size === 1 ? "insignia" : "insignias"} · ${fichasDisponibles()} ${fichasDisponibles() === 1 ? "ficha" : "fichas"}</p></div></div>
+    <div class="xp"><div class="xp-bar"><i style="width:${Math.min(100, Math.round((x.xp - x.base) / (x.next - x.base) * 100))}%"></i></div><small>${(x.next - x.xp).toLocaleString("es-AR")} XP para el nivel ${x.level + 1}</small></div>
+    <div class="rank-chips"><span class="chip hot">${ic("flame")} racha ${x.st.streak}</span><span class="chip">${ic("check")} ${x.st.days} días</span><span class="chip">${ic("droplet")} ${x.c.vasos} vasos</span><span class="chip">${ic("recetas")} ${x.c.recipes} recetas</span><span class="chip">${ic("users")} ${x.c.friends} amigos</span></div>
+    <label class="snd"><input type="checkbox" id="sndChk" ${soundOn() ? "checked" : ""}> Sonidos al ganar XP, subir de nivel y destrabar insignias</label>`;
+  $("#sndChk").addEventListener("change", (e) => { localStorage.setItem(SND_KEY, e.target.checked ? "1" : "0"); if (e.target.checked) sfxXP(); });
+  $("#badgesGrid").innerHTML = BADGES.map((b) => badgeHtml(b, on.has(b.id), true)).join("");
+  // ajustes
+  $("#setName").value = cal?.profile?.name || myName(); $("#setEmail").value = user.email;
+  const ph = cal?.profile?.photo; const img = $("#setAvatarImg"), ini = $("#setAvatarInit");
+  if (ph) { img.src = ph; img.hidden = false; ini.hidden = true; } else { img.hidden = true; ini.hidden = false; ini.textContent = (myName() || "?")[0].toUpperCase(); }
+  const p = cal?.profile?.nut || loadProfile(); if (p) { $("#bSexo").value = p.sexo; $("#bEdad").value = p.edad; $("#bAltura").value = p.altura; $("#bPeso").value = p.peso; $("#bAct").value = p.act; }
+}
+$("#badgesGrid")?.addEventListener("click", (e) => { const b = e.target.closest("[data-share]"); if (b) shareBadge(b.dataset.share); });
+$("#setPhotoBtn")?.addEventListener("click", () => $("#setPhoto").click());
+$("#setPhoto")?.addEventListener("change", (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const rd = new FileReader(); rd.onload = () => { const im = new Image(); im.onload = async () => {
+    const S = 160, cv = document.createElement("canvas"); cv.width = S; cv.height = S; const g = cv.getContext("2d");
+    const r = Math.max(S / im.width, S / im.height), w = im.width * r, h = im.height * r; g.drawImage(im, (S - w) / 2, (S - h) / 2, w, h);
+    const data = cv.toDataURL("image/jpeg", 0.82);
+    try { await update(ref(db, `calendars/${user.uid}/profile`), { photo: data }); toast("Foto actualizada."); syncPublic(); } catch (ex) { toast(errMsg(ex)); }
+  }; im.src = rd.result; }; rd.readAsDataURL(f); e.target.value = "";
+});
+$("#setPhotoDel")?.addEventListener("click", async () => { try { await update(ref(db, `calendars/${user.uid}/profile`), { photo: null }); syncPublic(); toast("Foto quitada."); } catch (ex) { toast(errMsg(ex)); } });
+$("#setForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault(); const err = $("#setErr"); err.hidden = true; const name = $("#setName").value.trim();
+  if (name.length < 2) { err.textContent = "El nombre tiene que tener al menos 2 letras."; err.hidden = false; return; }
+  try { await update(ref(db, `calendars/${user.uid}/profile`), { name }); await updateProfile(user, { displayName: name }); toast("Nombre guardado."); syncPublic(); } catch (ex) { err.textContent = errMsg(ex); err.hidden = false; }
+});
+$("#passForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault(); const err = $("#passErr"); err.hidden = true;
+  try { await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, $("#passOld").value)); await updatePassword(user, $("#passNew").value); $("#passOld").value = ""; $("#passNew").value = ""; toast("Contraseña cambiada."); }
+  catch (ex) { err.textContent = errMsg(ex); err.hidden = false; }
+});
+$("#bodyForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault(); const p = { sexo: $("#bSexo").value, edad: +$("#bEdad").value, altura: +$("#bAltura").value, peso: +$("#bPeso").value, act: +$("#bAct").value };
+  if (!p.edad || !p.altura || !p.peso) { toast("Completá edad, altura y peso."); return; }
+  localStorage.setItem(PROF_KEY, JSON.stringify(p)); try { await update(ref(db, `calendars/${user.uid}/profile`), { nut: p }); toast("Datos guardados: la nutrición ya los usa."); } catch (ex) { toast(errMsg(ex)); }
+});
+
+// ---- amigos ----
+async function sha256(s) { const b = new TextEncoder().encode(s.trim().toLowerCase()); const h = await crypto.subtle.digest("SHA-256", b); return [...new Uint8Array(h)].map((x) => x.toString(16).padStart(2, "0")).join(""); }
+function renderFriends() {
+  if (page !== "miplan" || !user || !$("#friendsList")) return;
+  const ids = Object.keys(cal?.friends || {});
+  $("#friendsList").innerHTML = ids.length ? ids.map((fid) => { const p = pub[fid] || {}; const bs = (p.badges || []).slice(0, 4); return `<div class="friend">${avatarHtml(p, p.name)}<div><b>${esc(p.name || cal.friends[fid]?.name || "amigo/a")}</b><small class="muted">nivel ${p.level || 1} · ${(p.xp || 0).toLocaleString("es-AR")} XP · racha ${p.streak || 0}</small><div class="f-badges">${bs.map((id) => { const b = BADGES.find((x) => x.id === id); return b ? `<span class="chip" title="${esc(b.d)}">${ic(b.ic)} ${esc(b.t)}</span>` : ""; }).join("")}${(p.badges || []).length > 4 ? `<span class="chip">+${p.badges.length - 4}</span>` : ""}</div></div><button class="mini-btn" data-unfriend="${fid}" title="Quitar">${ic("x")}</button></div>`; }).join("")
+    : `<p class="muted small">Todavía no tenés amigos agregados.</p>`;
+}
+$("#friendForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault(); const err = $("#friendErr"); err.hidden = true; const email = $("#friendEmail").value.trim();
+  if (email.toLowerCase() === user.email.toLowerCase()) { err.textContent = "Ese sos vos."; err.hidden = false; return; }
+  try {
+    const h = await sha256(email); const hit = Object.entries(pub).find(([uid, p]) => p.emailHash === h);
+    if (!hit) { err.textContent = "No encontramos una cuenta con ese correo (tu amigo/a tiene que haber entrado al menos una vez a Mi plan)."; err.hidden = false; return; }
+    await update(ref(db, `calendars/${user.uid}/friends`), { [hit[0]]: { name: hit[1].name || "", since: new Date().toISOString() } });
+    $("#friendEmail").value = ""; toast(`${hit[1].name || "Amigo/a"} agregado/a.`); setTimeout(checkBadges, 800); syncPublic();
+  } catch (ex) { err.textContent = errMsg(ex); err.hidden = false; }
+});
+$("#friendsList")?.addEventListener("click", async (e) => { const b = e.target.closest("[data-unfriend]"); if (b && confirm("¿Quitar de tus amigos?")) { await update(ref(db, `calendars/${user.uid}/friends`), { [b.dataset.unfriend]: null }).catch((ex) => toast(errMsg(ex))); syncPublic(); } });
+$("#ladderSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; ladderMode = b.dataset.l; $$("#ladderSeg button").forEach((x) => x.classList.toggle("on", x === b)); renderRank(); });
+
+// ---- perfil público (lo que ven los demás) ----
+let syncTimer = null;
+function syncPublic() {
+  if (!user || !cal) return; clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try {
+      if (!myEmailHash) myEmailHash = await sha256(user.email);
+      const x = myXP(); const badges = earnedBadges();
+      await set(ref(db, `public/${user.uid}`), { name: myName(), photo: cal?.profile?.photo || null, level: x.level, xp: x.xp, streak: x.st.streak, best: x.st.best, days: x.st.days, badges, emailHash: myEmailHash, updatedAt: new Date().toISOString() });
+      await update(ref(db, `ladder/${user.uid}`), { name: myName(), level: x.level, xp: x.xp, points: x.st.points, streak: x.st.streak, best: x.st.best, days: x.st.days, weeks: x.st.weeks, updatedAt: new Date().toISOString() });
+    } catch (e) { /* reglas sin desplegar */ }
+  }, 800);
+}
+// al entrar: publicar el perfil (así los amigos te encuentran) y recordar el XP actual para las animaciones
+onAuthStateChanged(auth, (u) => { if (u) setTimeout(() => { if (cal) { lastXP = null; syncPublic(); checkBadges(); } }, 2500); });

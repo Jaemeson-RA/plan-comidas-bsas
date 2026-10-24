@@ -22,7 +22,7 @@ for page, (title, desc) in META.items():
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
         f"<title>{title}</title>\n<meta name=\"description\" content=\"{desc}\">\n"
         f"<link rel=\"icon\" href=\"{FAVICON}\">\n"
-        "<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n</head>\n<body>\n" + head + "\n" + body + "\n" + foot)
+        "<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n<link rel=\"stylesheet\" href=\"gami.css\">\n</head>\n<body>\n" + head + "\n" + body + "\n" + foot)
     if page not in ("mi-plan", "nutricion"):
         html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion"></script>\n', "")
     open(os.path.join(root, f"{page}.html"), "w", encoding="utf-8").write(html)

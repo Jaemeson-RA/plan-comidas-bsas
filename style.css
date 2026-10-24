@@ -602,3 +602,17 @@ table.ladder tr.me td{background:var(--oro2)}
 
 .who{margin-bottom:1.2rem}
 .week-actions{margin-top:.4rem}
+
+/* buscador y comparador de precios */
+.buscador{padding-top:1.4rem}
+.buscar-form{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0 1rem}
+.buscar-form input{flex:1;min-width:220px;font:inherit;font-size:1rem;padding:.65rem .8rem;border:1.5px solid var(--border);border-radius:999px;background:var(--crema)}
+.buscar-form .btn{padding:.6rem 1.1rem}
+.buscar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem;margin-top:.8rem}
+.bs{padding:.8rem .9rem}
+.bs h4{font-family:var(--display);font-weight:400;font-size:1.1rem;margin-bottom:.4rem}
+.bs h4 small{color:var(--muted);font-family:var(--body)}
+.bs-row{display:grid;grid-template-columns:40px 1fr auto;gap:.5rem;align-items:center;padding:.35rem 0;border-top:1px dashed var(--line);text-decoration:none;color:var(--ink);font-size:.86rem}
+.bs-row img{width:40px;height:40px;object-fit:contain;border-radius:6px;background:#fff}
+.bs-row b{color:var(--verde3);white-space:nowrap}
+.bs-row small{color:var(--muted)}

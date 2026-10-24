@@ -9,6 +9,7 @@ T = {
  "desayuno": "sunrise", "almuerzo": "sun", "cena": "moon-stars", "clock": "clock", "flame": "flame", "tag": "tag", "users": "users",
  "bulb": "bulb", "plus": "plus", "play": "player-play", "mail": "mail", "copy": "copy", "refresh": "refresh", "check": "check",
  "arrow": "arrow-right", "external": "external-link", "pin": "map-pin", "bolt": "bolt", "leaf": "leaf", "coin": "coin",
+ "droplet": "droplet", "trophy": "trophy", "award": "award", "camera": "camera", "lock": "lock", "settings": "settings", "userplus": "user-plus", "share": "share", "star": "star", "medal": "medal", "logout": "logout", "heart": "heart", "x": "x",
 }
 def inner(path):
     s = open(path, encoding="utf-8").read()

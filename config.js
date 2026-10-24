@@ -5,6 +5,8 @@ window.CONFIG = {
   adminEmail: "jaemeson.dieu@gmail.com",
   // URL del Apps Script desplegado como "aplicación web" (ver docs/apps-script.gs y README).
   // Mientras esté vacío, las sugerencias se mandan con mailto: y no hay avisos de cuentas/calendarios.
+  // Proxy de precios (Cloudflare Worker, ver tools/worker). Vacío = el buscador en vivo queda desactivado.
+  priceApi: "",
   notifyUrl: "https://script.google.com/macros/s/AKfycbxZcgnTWwKDyOQgLyyx0X7fsRtk1tcOHXQd4jz1c5OtZN4EXqwBxliiJ5wPbxtUcGqxWQ/exec",
   // Proyecto Firebase existente (viaje-del-amor): Authentication (email + contraseña) + Realtime Database.
   firebase: {

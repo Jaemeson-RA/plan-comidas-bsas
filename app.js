@@ -241,7 +241,7 @@
     const n = list.reduce((a, c) => a + c.items.length, 0);
     const key = (c, nm) => `shop:${state.week}:${c}:${nm}`;
     const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
-    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
+    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
     $("#clearWeek").addEventListener("click", () => { list.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
     // texto plano de la lista (solo lo que falta comprar; si no hay nada tildado, todo) para pegar en Notas o WhatsApp
     const listText = () => {
@@ -262,6 +262,7 @@
       try { await navigator.clipboard.writeText(text); return true; }
       catch (e) { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (err) {} ta.remove(); return ok; }
     };
+    $("#dlList").addEventListener("click", () => window.downloadListHtml("Lista de compras · " + w.label, list, `lista-compras-semana-${state.week}.html`));
     $("#copyList").addEventListener("click", async () => {
       const { text, partial } = listText();
       const ok = await copyText(text);
@@ -372,6 +373,47 @@
       const b = $("#sugCopy"), t = b.textContent;
       try { await navigator.clipboard.writeText(body()); b.textContent = "¡Copiado!"; } catch (err) { b.textContent = "No se pudo copiar"; }
       setTimeout(() => { b.textContent = t; }, 1600);
+    });
+  }
+
+  // ---------- enlaces a tiendas, descarga de la lista con links, buscador en vivo ----------
+  const STORE_SEARCH = { Carrefour: (q) => `https://www.carrefour.com.ar/${encodeURIComponent(q)}?_q=${encodeURIComponent(q)}&map=ft`, "Día": (q) => `https://diaonline.supermercadosdia.com.ar/${encodeURIComponent(q)}?_q=${encodeURIComponent(q)}&map=ft`,
+    Jumbo: (q) => `https://www.jumbo.com.ar/${encodeURIComponent(q)}?_q=${encodeURIComponent(q)}&map=ft`, Disco: (q) => `https://www.disco.com.ar/${encodeURIComponent(q)}?_q=${encodeURIComponent(q)}&map=ft`, Vea: (q) => `https://www.vea.com.ar/${encodeURIComponent(q)}?_q=${encodeURIComponent(q)}&map=ft`,
+    "ChangoMás": (q) => `https://www.masonline.com.ar/${encodeURIComponent(q)}?_q=${encodeURIComponent(q)}&map=ft`, Coto: (q) => `https://www.cotodigital.com.ar/sitios/cdigi/browse?Ntt=${encodeURIComponent(q)}` };
+  const ING2PROD = [[/leche/, "leche"], [/huevo/, "huevos"], [/pollo|suprema|pechuga/, "pollo"], [/picada/, "picada"], [/nalga|bife/, "nalga"], [/merluza/, "merluza"], [/^arroz/, "arroz"], [/lenteja/, "lentejas"], [/avena/, "avena"], [/pan integral|pan lactal/, "pan"], [/yogur/, "yogur"], [/untable/, "untable"], [/girasol|^aceite$/, "girasol"], [/oliva/, "oliva"], [/zapallo|calabaza/, "calabaza"], [/^tomate$|tomate redondo/, "tomate"], [/banana/, "banana"], [/acelga/, "acelga"], [/at[uú]n/, "atun"], [/yerba/, "yerba"]];
+  const B0 = D.basket, STORES = Object.keys(B0.sites), cheapestStore = Object.entries(B0.totals).sort((x, y) => x[1] - y[1])[0][0];
+  function cheapestFor(name) {
+    const n = name.toLowerCase().replace(/\(.*?\)/g, "").trim();
+    const hit = ING2PROD.find(([re]) => re.test(n));
+    if (hit) {
+      const pid = hit[1]; const cands = STORES.map((s) => ({ s, x: B0.sites[s][pid] })).filter((c) => c.x && !c.x.estimated && c.x.link).sort((p, q) => p.x.unitprice - q.x.unitprice);
+      if (cands.length) return { store: cands[0].s, link: cands[0].x.link, price: cands[0].x.unitprice, ulab: cands[0].x.ulab, product: cands[0].x.name, exact: true };
+    }
+    return { store: cheapestStore, link: STORE_SEARCH[cheapestStore](name.replace(/\(.*?\)/g, "").trim()), exact: false };
+  }
+  window.buildListHtml = (title, list) => {
+    const rows = list.map((c) => `<h2>${esc(c.cat)}</h2><ul>${c.items.map((i) => { const h = cheapestFor(i.n); return `<li><a href="${h.link}" target="_blank" rel="noopener">${esc(i.n)}</a> <b>${esc(i.q)}</b> <small>· ${h.exact ? `${esc(h.store)} · $ ${Math.round(h.price).toLocaleString("es-AR")} ${esc(h.ulab)} · ${esc(h.product)}` : `buscar en ${esc(h.store)}`}</small></li>`; }).join("")}</ul>`).join("");
+    return `<!DOCTYPE html><html lang="es-AR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>body{font-family:system-ui,sans-serif;max-width:720px;margin:1.5rem auto;padding:0 1rem;color:#1F2D2A;background:#FBF7F0}h1{font-size:1.5rem}h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:#2F8F5B;margin:1.4rem 0 .4rem;border-bottom:1px dashed #E2D8C6;padding-bottom:.2rem}ul{list-style:none;padding:0;margin:0}li{padding:.4rem 0;border-bottom:1px solid #EFE7D8}a{color:#1F2D2A;font-weight:600}small{color:#6B7772;display:block}b{color:#2F8F5B}p.note{font-size:.8rem;color:#6B7772;margin-top:1.5rem}</style></head><body><h1>${esc(title)}</h1><p>Cada ingrediente lleva al producto más barato de las siete cadenas según los precios del ${esc(B0.date.split("-").reverse().join("/"))} (o a la búsqueda en ${esc(cheapestStore)}, la cadena más barata del changuito). Tocá el nombre para abrirlo.</p>${rows}<p class="note">Generado por Plan de comidas Buenos Aires · jaemeson-ra.github.io/plan-comidas-bsas · los precios cambian seguido: verificá en el carrito.</p></body></html>`;
+  };
+  window.downloadListHtml = (title, list, filename) => { const blob = new Blob([window.buildListHtml(title, list)], { type: "text/html;charset=utf-8" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
+
+  if (page === "supermercados" && $("#buscarForm")) {
+    const res = $("#buscarRes");
+    $("#buscarForm").addEventListener("submit", async (e) => {
+      e.preventDefault(); const q = $("#buscarQ").value.trim(); if (q.length < 2) return;
+      if (!CFG.priceApi) { res.innerHTML = `<p class="muted">El buscador en vivo todavía no está activado (falta la URL del proxy de precios en config.js). Mientras tanto, abrí la búsqueda en cada cadena: ${Object.keys(STORE_SEARCH).map((s) => `<a href="${STORE_SEARCH[s](q)}" target="_blank" rel="noopener">${esc(s)}</a>`).join(" · ")}.</p>`; return; }
+      res.innerHTML = `<p class="muted">Buscando «${esc(q)}» en las siete cadenas…</p>`;
+      try {
+        const j = await (await fetch(`${CFG.priceApi.replace(/\/$/, "")}/search?q=${encodeURIComponent(q)}`)).json();
+        const qn = q.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+        const rows = (j.results || []).filter((r) => qn.every((w) => r.name.toLowerCase().includes(w.replace(/[,.]/g, "")) || true)).sort((a, b) => a.price - b.price);
+        const byStore = {}; rows.forEach((r) => { (byStore[r.store] = byStore[r.store] || []).push(r); });
+        const best = rows[0];
+        res.innerHTML = rows.length ? `<p class="small">${rows.length} resultados · el más barato: <b>${esc(best.name)}</b> en <b>${esc(best.store)}</b> a <b data-ars="${best.price}"></b>${best.unit === "kg" ? " por kg" : ""} · <a href="${best.link}" target="_blank" rel="noopener">comprar ↗</a></p>
+          <div class="buscar-grid">${Object.entries(byStore).sort((a, b) => a[1][0].price - b[1][0].price).map(([s, list]) => `<div class="card bs"><h4>${esc(s)} <small>${list.length}</small></h4>${list.slice(0, 5).map((r) => `<a class="bs-row" href="${r.link}" target="_blank" rel="noopener">${r.img ? `<img src="${r.img}" alt="" loading="lazy">` : ""}<span>${esc(r.name)}</span><b data-ars="${r.price}"></b>${r.unit === "kg" ? "<small>/kg</small>" : ""}</a>`).join("")}</div>`).join("")}</div>
+          <p class="muted small">Precios leídos recién de los catálogos online (${new Date(j.at).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}). Las cadenas que no aparecen no tienen ese producto o no respondieron.</p>` : `<p class="muted">Nada con ese nombre en ninguna cadena. Probá con menos palabras (ej. «yerba» en vez de «yerba mate con palo 1 kg»).</p>`;
+        renderMoney();
+      } catch (err) { res.innerHTML = `<p class="muted">No se pudo consultar el proxy de precios. Abrí la búsqueda en cada cadena: ${Object.keys(STORE_SEARCH).map((s) => `<a href="${STORE_SEARCH[s](q)}" target="_blank" rel="noopener">${esc(s)}</a>`).join(" · ")}.</p>`; }
     });
   }
 

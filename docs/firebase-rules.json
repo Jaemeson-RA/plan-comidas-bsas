@@ -21,6 +21,12 @@
       }
     },
 
+    "public": {
+      ".read": true,
+      ".indexOn": ["emailHash"],
+      "$uid": { ".write": "auth != null && auth.uid == $uid" }
+    },
+
     "ladder": {
       ".read": true,
       ".indexOn": ["points"],

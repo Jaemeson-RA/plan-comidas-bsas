@@ -34,6 +34,27 @@ Todo lo que un usuario crea (recetas e ingredientes) queda disponible para toda 
 | `docs/firebase-rules.json` | reglas de la Realtime Database (incluye las del proyecto Camino del Corazón, que comparte el proyecto) |
 | `docs/apps-script.gs` | script de Google que reenvía por correo todo lo que pasa en el sitio |
 
+## Gamificación (Mi plan)
+
+- **XP y niveles**: día cumplido 50 XP (75 con racha ≥ 3, 100 con racha ≥ 7), semana perfecta +200, receta creada 80, ingrediente 40, vaso de agua 10 (3 por día) y +20 al completar el día. El nivel L se alcanza con 100·(L−1)² XP. Al subir de nivel aparece una animación con sonido (desactivable en Perfil) y se gana una **ficha**: permite marcar un **día libre** que no suma puntos pero no corta la racha.
+- **Insignias**: rachas (3/7/15/30/60), días cumplidos, semanas perfectas, recetas e ingredientes creados, hidratación (1 día, 7 y 30 seguidos), amigos, niveles. Se comparten como imagen desde Perfil.
+- **Perfil**: foto (se guarda a 160 px en la base), nombre, cambio de contraseña, datos corporales para Nutrición.
+- **Amigos**: se agregan por correo (se compara un hash SHA-256, el correo no se publica). La ladder tiene filtro «Mis amigos».
+- Todo se calcula en el cliente a partir de `calendars/{uid}` (done, libre, agua, friends) y se publica un resumen en `public/{uid}` y `ladder/{uid}`.
+
+## Precios: buscador en vivo y lista con enlaces
+
+- **Bajar con enlaces** (Compras y Mi plan) genera un `.html` con cada ingrediente enlazado al producto más barato del changuito (o a la búsqueda en la cadena más barata).
+- **Buscar y comparar** (Supermercados) consulta en vivo las siete cadenas a través de un Cloudflare Worker (`tools/worker/`), porque los sitios de los súper no aceptan llamadas directas desde el navegador. Para activarlo:
+
+```bash
+cd tools/worker
+npx wrangler login          # una vez, con la cuenta de Cloudflare
+npx wrangler deploy         # imprime la URL https://plan-comidas-precios.<cuenta>.workers.dev
+```
+
+  Pegar esa URL en `config.js` → `priceApi` y hacer push. Sin la URL, el buscador muestra enlaces de búsqueda a cada cadena.
+
 ## Pasos manuales pendientes (una sola vez, ~10 minutos)
 
 El código de cuentas, recetas, ingredientes y avisos por correo ya está. Para que funcione hay que activar tres cosas desde las consolas (no se pueden hacer desde el código):
