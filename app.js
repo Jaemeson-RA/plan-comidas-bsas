@@ -102,7 +102,7 @@
       <div class="rm">
         <h2>${esc(r.name)}</h2>
         ${r.custom ? `<p class="muted small">Receta de la comunidad, creada por <b>${esc(r.ownerName)}</b>.</p>` : ""}
-        <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("plate")}<b>${r.porciones} porciones</b></span>${r.cost ? `<span>${ic("tag")}<b data-ars="${r.cost}"></b> aprox./porción</span>` : ""}</div>
+        <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("plate")}<b>${r.porciones} ${r.porciones === 1 ? "porción" : "porciones"}</b></span>${r.cost ? `<span>${ic("tag")}<b data-ars="${r.cost}"></b> aprox./porción</span>` : ""}</div>
         ${nutLine}
         <div class="rm-cols">
           <div><h3>Ingredientes</h3><ul>${r.ing.map((i) => `<li>${qty(i) ? `<b>${qty(i)}</b> ` : ""}${esc(i.n)}</li>`).join("")}</ul></div>
@@ -353,6 +353,7 @@
     const v = (id) => ($("#" + id).value || "").trim();
     const toggle = (open) => { panel.hidden = !open; fab.classList.toggle("open", open); fab.setAttribute("aria-expanded", open); if (open) $("#sugNombre").focus(); };
     fab.addEventListener("click", () => toggle(panel.hidden));
+    $("#moreSug")?.addEventListener("click", () => { const mm = $("#moreMenu"); if (mm) mm.hidden = true; toggle(true); });
     $("#sugClose").addEventListener("click", () => toggle(false));
     fields.forEach((id) => { const el = $("#" + id); el.value = localStorage.getItem("sug:" + id) || ""; el.addEventListener("input", () => localStorage.setItem("sug:" + id, el.value)); });
     const body = () => `Plato: ${v("sugNombre")}\nReceta (link): ${v("sugLink") || "-"}\n\nIngredientes:\n${v("sugIng") || "-"}\n\nTips:\n${v("sugTips") || "-"}\n\nDe: ${v("sugDe") || "-"}\n\n(enviado desde ${location.href})`;

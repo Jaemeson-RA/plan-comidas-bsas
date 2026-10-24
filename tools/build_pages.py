@@ -3,12 +3,12 @@ import os, sys
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 root = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 head = open(os.path.join(root, "icons.svg"), encoding="utf-8").read() + "\n" + open(os.path.join(root, "_head.html"), encoding="utf-8").read()
-FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23C8402F'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E"
+FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%232F8F5B'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E"
 foot = open(os.path.join(root, "_foot.html"), encoding="utf-8").read()
 META = {
  "index": ("Plan de comidas · Buenos Aires", "Plan de comidas de 5 semanas para Buenos Aires: recetas fáciles, lista de compras y comparativa de supermercados con envío a domicilio."),
  "plan": ("Calendario · Plan de comidas Buenos Aires", "Qué se come cada día, en un calendario del 27 de octubre al 30 de noviembre de 2026."),
- "recetas": ("Recetas · Plan de comidas Buenos Aires", "18 recetas fáciles para 2 porciones con foto, video, ingredientes y costo por porción."),
+ "recetas": ("Recetas · Plan de comidas Buenos Aires", "30 recetas fáciles para una persona, con foto, video, ingredientes, nutrición y costo por porción."),
  "compras": ("Lista de compras · Plan de comidas Buenos Aires", "Lista de compras semanal armada por góndola a partir de las recetas del plan."),
  "supermercados": ("Supermercados · Plan de comidas Buenos Aires", "Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR."),
  "temporada": ("Productos de estación · Plan de comidas Buenos Aires", "Frutas y verduras de estación en Argentina, mes por mes, y los platos del plan que las aprovechan."),

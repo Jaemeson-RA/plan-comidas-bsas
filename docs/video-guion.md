@@ -7,7 +7,7 @@ Tono: cercano, rioplatense, ritmo ágil pero sin apuro. Mismo micrófono y misma
 | Archivo | Escena | Texto a grabar | Duración ideal |
 |---|---|---|---|
 | `voz_01` | Portada | **¡Bienvenido a tu plan alimentario personalizado! Acá vas a encontrar recetas fáciles, tu lista de compras, los precios de los supermercados y mucho más.** | 7–8 s |
-| `voz_02` | Inicio del sitio | **Un mes entero de desayunos, almuerzos y cenas, pensado para dos y con productos de acá.** | 5 s |
+| `voz_02` | Inicio del sitio | **Un mes entero de desayunos, almuerzos y cenas, pensado para vos, con productos de acá.** | 5 s |
 | `voz_03` | Calendario | **En el calendario tocás un plato y se abre la receta.** | 3 s |
 | `voz_04` | Receta | **Cada receta tiene foto, video, ingredientes y el costo por porción.** | 4 s |
 | `voz_05` | Lista de compras | **La lista de compras se arma sola, por góndola. La copiás y la pegás en las notas del teléfono.** | 5 s |

@@ -78,10 +78,10 @@ ING_DB = [
  ING("salmón (filet)","carne",208,20,0,0,13,3,0,0.15),
  ING("papa","verd",77,2,17,0.8,0.1,0,2.2,0.02,u=150),
  ING("aceitunas verdes","alm",115,0.8,6,0,11,1.4,3.2,3.5,u=4),
- ING("tapas para empanadas (docena)","alm",320,8,55,2,8,4,2,1.2,u=300),
+ ING("tapas para empanadas","alm",320,8,55,2,8,4,2,1.2,u=25,alias=["tapas para empanadas (docena)"]),
  ING("harina 0000","alm",364,10,76,0.3,1,0.2,2.7,0),
  ING("curry en polvo","pantry",325,14,56,3,14,2,53,0.1),
- ING("leche de coco (lata)","alm",197,2,3,2,21,19,0,0.03,u=400),
+ ING("leche de coco","alm",197,2,3,2,21,19,0,0.03,u=400,alias=["leche de coco (lata)"]),
  ING("batata","verd",86,1.6,20,4.2,0.1,0,3,0.14),
  ING("pan de hamburguesa","pan",270,9,48,6,4,1,2.5,1.1,u=60),
  ING("garbanzos cocidos (lata)","alm",139,7.3,22,0.3,2.6,0.3,6.4,0.6,u=240),
@@ -140,11 +140,28 @@ def _nut(id, ing, porc=2):
         NUT_LOG.append((id, "calc", calc["kcal"], "est", est["kcal"]))
         calc["source"] = "ingredientes"; return calc
     est.update({"sug": None, "sat": None, "source": "estimado"}); return est
-PORCIONES = {"lentejas":4,"empanadas":4,"pastel":4,"noquis":4,"albondigas":3,"arrozpollo":3,"tortilla":3,"curry":3}
+# Las recetas se escribieron para 2 personas (o 3-4 en los platos de olla). El plan es para UNA persona:
+# los platos de olla quedan en 2 porciones (una para hoy, otra para congelar o la vianda), el resto en 1.
+OLD_PORC = {"lentejas":4,"empanadas":4,"pastel":4,"noquis":4,"albondigas":3,"arrozpollo":3,"tortilla":3,"curry":3}
+PORCIONES = {"lentejas":2,"empanadas":2,"pastel":2,"noquis":2,"albondigas":2,"arrozpollo":2,"tortilla":2,"curry":2}
+HALVES = {"palta","cebolla","cebolla morada","morrón rojo","limón","tomate","zapallito","berenjena","lechuga","banana","pepino","brócoli o zapallito","puerro","zanahoria","acelga (atado)","espinaca fresca (atado)","garbanzos cocidos (lata)","tomate triturado (lata)","caldo de verduras (cubo)","atún al natural (lata 170 g)"}
+def _scale(id, ing):
+    f = PORCIONES.get(id,1) / OLD_PORC.get(id,2)
+    out = []
+    for i in ing:
+        q = i["q"] * f; u = i["u"]; n = i["n"]
+        if u in ("g","ml"): q = max(5, int(round(q / 5.0)) * 5)
+        elif u == "u":
+            if q < 1: q = 0.5 if n in HALVES else 1
+            else: q = round(q * 2) / 2
+        elif u in ("cda","cdita"): q = max(0.5, round(q * 2) / 2)
+        out.append(dict(i, q=q))
+    return out
 def rec(id, name, tipo, tiempo, kcal, cost, tags, ing, pasos, tip):
-    R[id] = {"id":id,"name":name,"tipo":tipo,"tiempo":tiempo,"kcal":kcal,"cost":cost,"tags":tags,"porciones":PORCIONES.get(id,2),
+    ing = _scale(id, ing)
+    R[id] = {"id":id,"name":name,"tipo":tipo,"tiempo":tiempo,"kcal":kcal,"cost":cost,"tags":tags,"porciones":PORCIONES.get(id,1),
              "ing":ing,"pasos":pasos,"tip":tip,"yt":YT[id],
-             "nut":_nut(id, ing, PORCIONES.get(id,2)),
+             "nut":_nut(id, ing, PORCIONES.get(id,1)),
              "img":media[id]["img"]["file"],"credit":{"title":media[id]["img"]["title"].replace("File:",""),
              "page":media[id]["img"]["page"],"license":media[id]["img"]["license"],"artist":media[id]["img"]["artist"]}}
 
@@ -196,7 +213,7 @@ rec("sopa","Sopa de verduras con huevo duro y tostada","plato",35,320,1600,["liv
 rec("tarta","Tarta de acelga light (sin masa o con masa integral)","plato",45,380,2500,["horno","vegetariano","rinde"],
  [I("acelga (atado)",1,"u","verd"),I("huevos",3,"u","lact"),I("cebolla",1,"u","verd"),I("queso port salut light",100,"g","lact"),I("queso untable light",50,"g","lact"),
   I("avena",60,"g","alm"),I("aceite de oliva",1,"cda","pantry"),I("nuez moscada, sal, pimienta",1,"pizca","pantry")],
- ["Lavar la acelga, hervirla 3 min, escurrir y exprimir bien. Picar.","Rehogar la cebolla. Mezclar con la acelga, 3 huevos, el queso en cubos, el untable, la avena y los condimentos.","Volcar en una tartera aceitada (sin masa) o sobre una masa integral.","Hornear a 180 °C unos 30 min hasta que dore."],
+ ["Lavar la acelga, hervirla 3 min, escurrir y exprimir bien. Picar.","Rehogar la cebolla. Mezclar con la acelga, los huevos, el queso en cubos, el untable, la avena y los condimentos.","Volcar en una tartera aceitada (sin masa) o sobre una masa integral.","Hornear a 180 °C unos 30 min hasta que dore."],
  "Fría también es riquísima: la porción que sobra es el almuerzo del día siguiente.")
 rec("wok","Wok de pollo y verduras con arroz","plato",25,480,3100,["rápido","una sartén"],
  [I("suprema de pollo",400,"g","carne"),I("zanahoria",1,"u","verd"),I("morrón rojo",1,"u","verd"),I("cebolla",1,"u","verd"),I("brócoli o zapallito",1,"u","verd"),
@@ -217,7 +234,7 @@ rec("lentejas","Guiso de lentejas light","plato",50,480,2300,["económico","batc
  [I("lentejas secas",250,"g","alm"),I("carne picada magra",150,"g","carne"),I("cebolla",1,"u","verd"),I("zanahoria",2,"u","verd"),I("morrón rojo",1,"u","verd"),
   I("zapallo anco / calabaza",300,"g","verd"),I("tomate triturado (lata)",1,"u","alm"),I("ajo (dientes)",2,"u","verd"),I("pimentón, comino, laurel, sal",1,"pizca","pantry"),I("aceite de oliva",1,"cda","pantry")],
  ["Remojar las lentejas 1 hora (o usar las que no necesitan remojo).","Rehogar cebolla, ajo, morrón y zanahoria. Sumar la carne picada y dorar.","Agregar las lentejas, el zapallo en cubos, el tomate y agua hasta cubrir. Pimentón, comino, laurel.","Cocinar a fuego bajo 35-40 min, revolviendo. Ajustar sal al final."],
- "Rinde 4 porciones: congelá la mitad. Sin chorizo ni panceta es igual de sabroso y mucho más liviano.")
+ "Rinde 2 porciones: una para hoy y otra para congelar. Sin chorizo ni panceta es igual de sabroso y mucho más liviano.")
 rec("zapallitos","Zapallitos rellenos con carne y queso","plato",45,450,3000,["horno","clásico argentino"],
  [I("zapallitos redondos",4,"u","verd"),I("carne picada magra",250,"g","carne"),I("cebolla",1,"u","verd"),I("huevos",1,"u","lact"),I("queso port salut light",80,"g","lact"),
   I("pan rallado",2,"cda","alm"),I("ajo (dientes)",1,"u","verd"),I("orégano, sal, pimienta",1,"pizca","pantry"),I("aceite de oliva",1,"cda","pantry")],
@@ -234,10 +251,10 @@ rec("pastel","Pastel de papa light","plato",60,520,2900,["horno","clásico argen
  ["Hervir las papas 20 min y hacer un puré con leche, sal y nuez moscada.","Rehogar cebolla y morrón, dorar la carne con pimentón y comino. Sumar 1 huevo duro picado y las aceitunas.","Fuente: capa de carne, capa de puré, queso rallado arriba.","Horno a 200 °C 20 min hasta gratinar."],
  "Versión light: mitad papa y mitad zapallo en el puré.")
 rec("empanadas","Empanadas de carne al horno","plato",60,540,2800,["horno","clásico argentino","finde"],
- [I("tapas para empanadas (docena)",1,"u","alm"),I("carne picada magra",400,"g","carne"),I("cebolla",2,"u","verd"),I("cebolla de verdeo",2,"u","verd"),I("huevos",2,"u","lact"),
+ [I("tapas para empanadas",12,"u","alm"),I("carne picada magra",400,"g","carne"),I("cebolla",2,"u","verd"),I("cebolla de verdeo",2,"u","verd"),I("huevos",2,"u","lact"),
   I("aceitunas verdes",12,"u","alm"),I("pimentón, comino, ají molido, sal",1,"pizca","pantry"),I("aceite",2,"cda","pantry")],
  ["Rehogar la cebolla en abundante aceite hasta transparentar. Sumar la carne y cocinar 5 min; condimentar fuerte con pimentón, comino y ají molido.","Fuera del fuego: verdeo picado. Enfriar en la heladera (ideal, 1 hora).","Rellenar las tapas con huevo duro picado y una aceituna; cerrar con repulgue o con tenedor.","Pintar con huevo. Horno a 220 °C 15-18 min."],
- "Salen 12: 3 por persona para el almuerzo del sábado y quedan 6 para la vianda del lunes.")
+ "Salen 6: 3 para el almuerzo del sábado y 3 para la vianda del lunes.")
 
 # ---------- MÁS PLATOS ----------
 rec("noquis","Ñoquis de calabaza","plato",45,520,1900,["clásico argentino","vegetariano","29 del mes"],
@@ -251,14 +268,14 @@ rec("tortilla","Tortilla de papas","plato",35,480,1700,["clásico","vegetariano"
 rec("albondigas","Albóndigas con fideos","plato",40,580,3200,["clásico","rinde","batch"],
  [I("carne picada magra",400,"g","carne"),I("pan rallado",3,"cda","alm"),I("huevos",1,"u","lact"),I("ajo (dientes)",2,"u","verd"),I("perejil",1,"pizca","pantry"),I("cebolla",1,"u","verd"),I("tomate triturado (lata)",1,"u","alm"),I("fideos (spaghetti o tallarines)",200,"g","alm"),I("aceite de oliva",1,"cda","pantry"),I("orégano, sal, pimienta",1,"pizca","pantry")],
  ["Mezclar la carne con pan rallado, huevo, un ajo picado, perejil y sal. Formar bolitas del tamaño de una nuez.","Dorarlas en sartén con un hilo de aceite y reservar.","En la misma sartén rehogar la cebolla y el otro ajo; sumar el tomate y el orégano. Volver las albóndigas y cocinar 20 min a fuego bajo.","Hervir los fideos al dente y servir con la salsa."],
- "Congelá la mitad de las albóndigas crudas: otra cena resuelta.")
+ "Rinde 2: congelá la mitad de las albóndigas crudas y tenés otra cena resuelta.")
 rec("curry","Pollo al curry con arroz","plato",30,560,3400,["una olla","rápido"],
- [I("suprema de pollo",400,"g","carne"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("curry en polvo",1,"cda","pantry"),I("jengibre (opcional)",1,"pizca","pantry"),I("leche de coco (lata)",0.5,"u","alm"),I("tomate",1,"u","verd"),I("arroz",150,"g","alm"),I("aceite",1,"cda","pantry"),I("sal",1,"pizca","pantry")],
+ [I("suprema de pollo",400,"g","carne"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("curry en polvo",1,"cda","pantry"),I("jengibre (opcional)",1,"pizca","pantry"),I("leche de coco",200,"ml","alm"),I("tomate",1,"u","verd"),I("arroz",150,"g","alm"),I("aceite",1,"cda","pantry"),I("sal",1,"pizca","pantry")],
  ["Dorar el pollo en cubos y reservar.","Rehogar cebolla y ajo; agregar el curry y el jengibre 30 segundos.","Sumar la leche de coco, el tomate en cubos y el pollo. Cocinar 15 min a fuego bajo.","Servir con el arroz blanco y perejil o cilantro picado."],
  "Si no hay leche de coco, va con un pote de yogur natural agregado fuera del fuego.")
 rec("hamburguesas","Hamburguesas caseras con batatas al horno","plato",40,620,3300,["horno","finde"],
  [I("carne picada magra",300,"g","carne"),I("cebolla",0.5,"u","verd"),I("huevos",1,"u","lact"),I("pan rallado",2,"cda","alm"),I("pan de hamburguesa",2,"u","pan"),I("batata",400,"g","verd"),I("tomate",1,"u","verd"),I("lechuga",0.5,"u","verd"),I("queso port salut light",40,"g","lact"),I("pimentón, sal, pimienta",1,"pizca","pantry"),I("aceite de oliva",1,"cda","pantry")],
- ["Batatas en bastones con oliva, pimentón y sal: horno a 200 °C unos 30 min.","Mezclar la carne con la cebolla rallada, el huevo, el pan rallado y sal. Formar 2 medallones sin apretar demasiado.","Plancha caliente: 4 min por lado; el queso arriba en el último minuto.","Armar con lechuga y tomate en el pan tostado."],
+ ["Batatas en bastones con oliva, pimentón y sal: horno a 200 °C unos 30 min.","Mezclar la carne con la cebolla rallada, el huevo, el pan rallado y sal. Formar un medallón grande (o dos chicos) sin apretar demasiado.","Plancha caliente: 4 min por lado; el queso arriba en el último minuto.","Armar con lechuga y tomate en el pan tostado."],
  "Cuanto menos amasás la carne, más jugosa queda.")
 rec("garbanzos","Ensalada de garbanzos y quinoa","plato",20,450,2300,["vegetariano","proteico","vianda"],
  [I("garbanzos cocidos (lata)",1,"u","alm"),I("quinoa",100,"g","alm"),I("tomate",2,"u","verd"),I("pepino",1,"u","verd"),I("cebolla morada",0.5,"u","verd"),I("perejil",1,"pizca","pantry"),I("limón",1,"u","verd"),I("aceite de oliva",2,"cda","pantry"),I("comino, sal, pimienta",1,"pizca","pantry")],
@@ -270,7 +287,7 @@ rec("berenjenas","Berenjenas a la parmesana light","plato",50,420,2600,["horno",
  "Al horno en vez de fritas: la mitad de aceite y el mismo sabor.")
 rec("arrozpollo","Arroz con pollo","plato",40,560,3000,["una olla","rinde"],
  [I("suprema de pollo",400,"g","carne"),I("arroz",200,"g","alm"),I("cebolla",1,"u","verd"),I("morrón rojo",1,"u","verd"),I("arvejas (lata o congeladas)",150,"g","alm"),I("ajo (dientes)",2,"u","verd"),I("caldo de verduras (cubo)",1,"u","pantry"),I("pimentón, cúrcuma, sal",1,"pizca","pantry"),I("aceite",1,"cda","pantry")],
- ["Dorar el pollo en trozos y reservar.","Rehogar cebolla, morrón y ajo; sumar el arroz y el pimentón, revolver 1 min.","Agregar 500 ml de caldo caliente y el pollo; tapar y cocinar 18 min a fuego bajo.","Arvejas 5 min antes del final. Reposar tapado 5 min."],
+ ["Dorar el pollo en trozos y reservar.","Rehogar cebolla, morrón y ajo; sumar el arroz y el pimentón, revolver 1 min.","Agregar el caldo caliente (el doble de volumen que el arroz) y el pollo; tapar y cocinar 18 min a fuego bajo.","Arvejas 5 min antes del final. Reposar tapado 5 min."],
  "El reposo tapado es lo que deja el arroz suelto y húmedo.")
 rec("wrap","Wrap de pollo y palta","plato",15,480,3100,["rápido","sin horno"],
  [I("tortillas de harina (rapiditas)",2,"u","pan"),I("suprema de pollo",250,"g","carne"),I("palta",1,"u","verd"),I("lechuga",0.5,"u","verd"),I("tomate",1,"u","verd"),I("yogur natural (pote)",1,"u","lact"),I("limón",0.5,"u","verd"),I("pimentón, sal",1,"pizca","pantry")],
@@ -333,9 +350,9 @@ for wk in weeks:
                 key = (ing["c"], ing["n"], ing["u"])
                 agg[key] = agg.get(key,0) + ing["q"]
     # meriendas (aprox. por semana)
-    agg[("lact","yogur natural (pote)","u")] = agg.get(("lact","yogur natural (pote)","u"),0) + 3
-    agg[("verd","fruta de estación (manzana, naranja, banana)","u")] = agg.get(("verd","fruta de estación (manzana, naranja, banana)","u"),0) + 8
-    agg[("pan","pan integral (rodajas)","u")] = agg.get(("pan","pan integral (rodajas)","u"),0) + 8
+    agg[("lact","yogur natural (pote)","u")] = agg.get(("lact","yogur natural (pote)","u"),0) + 2
+    agg[("verd","fruta de estación (manzana, naranja, banana)","u")] = agg.get(("verd","fruta de estación (manzana, naranja, banana)","u"),0) + 4
+    agg[("pan","pan integral (rodajas)","u")] = agg.get(("pan","pan integral (rodajas)","u"),0) + 4
     bycat = collections.OrderedDict((c,[]) for c in ["verd","carne","lact","alm","pan"])
     for (c,n,u),q in agg.items():
         q = round(q,1)

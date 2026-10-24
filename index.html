@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plan de comidas · Buenos Aires</title>
 <meta name="description" content="Plan de comidas de 5 semanas para Buenos Aires: recetas fáciles, lista de compras y comparativa de supermercados con envío a domicilio.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23C8402F'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%232F8F5B'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="motion.css">
 </head>
@@ -106,7 +106,7 @@
   <h2 class="center"><span class="squig">Preguntas frecuentes</span></h2>
   <div class="faq-grid single">
     <div class="faq-list">
-      <details class="card q"><summary>¿Para quién es este plan?</summary><p>Para dos personas que viven en Buenos Aires y quieren comer bien sin pensar todos los días qué cocinar. Las recetas usan productos de cualquier súper o verdulería del barrio; las porciones se indican en cada ficha.</p></details>
+      <details class="card q"><summary>¿Para quién es este plan?</summary><p>Para una persona que vive en Buenos Aires y quiere comer bien sin pensar todos los días qué cocinar. Cada receta es una porción (los guisos y las empanadas rinden dos: una para hoy y otra para congelar o llevar). Si cocinás para más gente, multiplicá las cantidades.</p></details>
       <details class="card q"><summary>¿Tengo que crear una cuenta?</summary><p>No para ver el plan, las recetas, la lista de compras, los supermercados o la nutrición del plan de la casa. Sí para armar <a href="mi-plan.html">tu propio calendario</a>, crear recetas, cargar ingredientes y entrar al ranking. Solo pedimos nombre, correo y contraseña.</p></details>
       <details class="card q"><summary>¿Cómo funciona el ranking?</summary><p>Marcás cada día que cumpliste lo planeado: 10 puntos. Tres días seguidos activan el combo ×1,5; siete, el ×2. Una semana perfecta suma 50. La ladder compara a todos en tiempo real.</p></details>
       <details class="card q"><summary>¿De dónde salen las calorías y la sal?</summary><p>Cada ingrediente tiene valores por 100 g (tablas SARA y USDA); la receta suma sus gramos y divide por las porciones. Los productos que escaneás traen los valores de Open Food Facts o del paquete. Las recomendaciones usan Mifflin-St Jeor y los límites de la OMS; son orientativas.</p></details>
@@ -133,6 +133,7 @@
   <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados</a>
   <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Productos de estación</a>
   <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
+  <button type="button" id="moreSug" class="more-sug"><svg class="ic"><use href="#i-plus"/></svg>Sugerir un plato</button>
 </div>
 <button class="sug-fab" id="sugFab" aria-expanded="false" aria-controls="sugPanel" aria-label="Sugerir un plato"><i><svg class="ic"><use href="#i-plus"/></svg></i><span>Sugerir un plato</span></button>
 <aside class="sug-panel" id="sugPanel" hidden aria-label="Sugerir un plato">

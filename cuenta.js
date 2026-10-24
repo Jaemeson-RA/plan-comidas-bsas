@@ -197,7 +197,7 @@ function fillPicker(q) {
   q = norm(q);
   const rank = (r) => (r.custom && r.owner === user?.uid ? 0 : r.tipo === (pickCtx.slot === "desayuno" ? "desayuno" : "plato") ? 1 : 2);
   const list = Object.values(R).filter((r) => !q || norm(r.name + " " + r.tags.join(" ") + " " + r.ing.map((i) => i.n).join(" ") + (r.custom ? " mi receta comunidad " + r.ownerName : "")).includes(q)).sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
-  $("#pickerGrid").innerHTML = list.map((r) => `<button class="pick" data-pick="${r.id}"><img src="${r.img}" alt="" loading="lazy"><span><b>${esc(r.name)}</b><small>${r.tiempo} min · ${r.kcal} kcal${r.tipo === "desayuno" ? " · desayuno" : ""}${r.custom ? " · de " + esc(r.ownerName) : ""}</small></span></button>`).join("") || `<p class="muted">Nada con ese nombre.</p>`;
+  $("#pickerGrid").innerHTML = list.map((r) => `<button class="pick" data-pick="${r.id}"><img src="${r.img}" alt="" loading="lazy"><span><b>${esc(r.name)}</b><small>${r.tiempo} min · ${r.kcal} kcal${r.porciones > 1 ? " · rinde " + r.porciones : ""}${r.tipo === "desayuno" ? " · desayuno" : ""}${r.custom ? " · de " + esc(r.ownerName) : ""}</small></span></button>`).join("") || `<p class="muted">Nada con ese nombre.</p>`;
 }
 $("#pickerSearch")?.addEventListener("input", (e) => fillPicker(e.target.value));
 $("#picker")?.addEventListener("click", async (e) => {
@@ -228,7 +228,7 @@ $("#myRecipes")?.addEventListener("click", (e) => { const b = e.target.closest("
 function openEditor(key) {
   edKey = key; const c = key ? community[key] : null;
   $("#recEditorTitle").textContent = c ? "Editar receta" : "Nueva receta";
-  $("#rName").value = c?.name || ""; $("#rTipo").value = c?.tipo || "plato"; $("#rPorc").value = c?.porciones || 2; $("#rTiempo").value = c?.tiempo || 30; $("#rImg").value = c?.img || "";
+  $("#rName").value = c?.name || ""; $("#rTipo").value = c?.tipo || "plato"; $("#rPorc").value = c?.porciones || 1; $("#rTiempo").value = c?.tiempo || 30; $("#rImg").value = c?.img || "";
   $("#rPasos").value = (c?.pasos || []).join("\n"); $("#rTip").value = c?.tip || ""; $("#rTags").value = (c?.tags || []).join(", ");
   edRows = (c?.ing || []).map((i) => Object.assign({}, i));
   $("#recDelete").hidden = !c; $("#recErr").hidden = true; $("#rIngSearch").value = ""; $("#rIngSugs").hidden = true;
@@ -250,7 +250,7 @@ $("#recForm")?.addEventListener("submit", async (e) => {
   e.preventDefault(); const err = $("#recErr"); err.hidden = true;
   const name = $("#rName").value.trim(); if (!name) { err.textContent = "Ponele un nombre."; err.hidden = false; return; }
   if (!edRows.length) { err.textContent = "Agregá al menos un ingrediente."; err.hidden = false; return; }
-  const porciones = Math.max(1, +$("#rPorc").value || 2);
+  const porciones = Math.max(1, +$("#rPorc").value || 1);
   const data = { name, tipo: $("#rTipo").value, porciones, tiempo: Math.max(1, +$("#rTiempo").value || 30), img: $("#rImg").value.trim() || null,
     ing: edRows.map((r) => ({ ref: r.ref, n: r.n, marca: r.marca || "", q: +r.q, u: r.u, c: r.c, g: Math.round(gramsOf(r)), peso: r.peso || null, por100: r.por100 })),
     pasos: $("#rPasos").value.split("\n").map((s) => s.trim()).filter(Boolean), tip: $("#rTip").value.trim(), tags: $("#rTags").value.split(",").map((s) => s.trim()).filter(Boolean),

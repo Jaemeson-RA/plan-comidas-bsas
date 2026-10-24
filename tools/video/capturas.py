@@ -10,9 +10,9 @@ OUT = os.path.join(ROOT, "media", "frames"); os.makedirs(OUT, exist_ok=True)
 
 # escenas: id, texto incrustado (kicker, título, subtítulo)
 SCENES = [
- ("inicio", "Tu plan", "Un mes de comidas, listo", "Desayunos, almuerzos y cenas para dos, con productos de acá."),
+ ("inicio", "Tu plan", "Un mes de comidas, listo", "Desayunos, almuerzos y cenas para vos, con productos de acá."),
  ("calendario", "Calendario", "Todo el mes de un vistazo", "Tocá un plato y se abre la receta."),
- ("receta", "Recetas", "Con foto, video y costo", "Ingredientes para 2, pasos claros y precio por porción."),
+ ("receta", "Recetas", "Con foto, video y costo", "Ingredientes para una porción, pasos claros y precio."),
  ("compras", "Compras", "La lista se arma sola", "Por góndola. Copiala a las notas del teléfono."),
  ("super", "Supermercados", "Siete cadenas comparadas", "Precios en pesos, dólares o euros, y dónde conviene pedir."),
  ("editor", "Tus recetas", "Creá las tuyas", "La nutrición se calcula sola con cada ingrediente."),

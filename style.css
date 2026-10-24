@@ -397,7 +397,7 @@ table.basket tfoot td.best{background:var(--ok);color:#fff}
 .save-state.show{opacity:1}
 .seg.big{margin:.2rem 0 1.2rem;flex-wrap:wrap}
 .seg.big button{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem}
-.week-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin:-.3rem 0 1rem}
+.week-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin:0 0 1rem}
 
 /* ---------- mi calendario ---------- */
 .my-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.55rem}
@@ -588,3 +588,17 @@ table.ladder tr.me td{background:var(--oro2)}
 
 /* video vertical en móvil */
 @media (max-width:720px){.hero-video video.vertical{aspect-ratio:9/16;max-height:72vh;width:auto;max-width:100%;margin:0 auto}}
+
+/* móvil: sin botón flotante (va en el menú Más), header que se va con el scroll, panel de sugerencias pegado a la tabbar */
+.more-sug{display:flex;align-items:center;gap:.6rem;width:100%;text-align:left;border:0;border-top:1px dashed var(--line);background:transparent;padding:.75rem .8rem .5rem;border-radius:0;font:inherit;font-weight:700;color:var(--rojo);cursor:pointer;margin-top:.2rem}
+.det{margin-bottom:1rem}
+@media (max-width:720px){
+  .sug-fab{display:none}
+  .sug-panel{bottom:calc(76px + .6rem);max-height:calc(100vh - 76px - 2rem)}
+  .top{position:static}
+  html{scroll-padding-top:1rem}
+  body{padding-bottom:84px}
+}
+
+.who{margin-bottom:1.2rem}
+.week-actions{margin-top:.4rem}
