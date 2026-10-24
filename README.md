@@ -133,6 +133,14 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 - Para recompilar: `python tools/build_android.py --version` (sube la versión, compila, firma y copia el APK a `descargas/`). Los cambios del sitio no necesitan una app nueva: la app siempre muestra el sitio publicado.
 - `docs/play-store.md` y `tools/build_store.py` quedan listos por si algún día se publica en Google Play.
 
+## Modo app (`html.is-app`)
+
+- Dentro de la app (TWA de Android, PWA instalada, `?app=1` o la misma pestaña después de entrar así) un script en el `<head>` marca `html.is-app` antes de pintar, y el sitio se ve como una app: no hay cabecera, pie, textos de presentación, preguntas ni video.
+- Barra propia arriba (título de la pantalla, Recordatorios y Mi plan; flecha de volver fuera de las pestañas) y pestañas abajo: **Hoy · Plan · Recetas · Compras · Más**.
+- **Hoy**: menú del día compacto (cada comida abre su receta), mañana, accesos rápidos (lista, marcar el día, avisos), la semana para deslizar y todas las funciones por categoría (Cocinar, Comprar, Vos).
+- **Más**: las mismas categorías, recordatorios, moneda y sugerir un plato.
+- Lo que solo va en la web lleva `data-web`; lo que solo va en la app, `data-app`. Ojo: la clase es `is-app` porque `.app` ya existe (tarjetas de las apps de delivery) y `.today` es el pizarrón de la web.
+
 ## Recordatorios (Web Push, `tools/worker/push.js`)
 
 - El navegador se suscribe con la clave pública VAPID de `config.js` y manda la dirección de la suscripción y las preferencias a `POST /push/sub` del Worker. Se guardan en KV (`PROMOS`, claves `sub:<hash>`, todo en la metadata) y vencen a los 120 días si no se vuelve a abrir el sitio (cada visita las renueva una vez por día).
