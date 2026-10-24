@@ -623,25 +623,26 @@
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid = /android/i.test(navigator.userAgent);
+  // un solo botón «Instalar la app» en todo el sitio; dentro de la app (TWA de Android o instalada) no aparece
+  const inApp = standalone || /^android-app:/.test(document.referrer) || /[?&]app=1/.test(location.search) || sessionStorage.getItem("inApp") === "1";
+  if (inApp) { try { sessionStorage.setItem("inApp", "1"); } catch (e) {} }
   let installEvt = null;
   const showInstall = (on) => $$(".install-btn").forEach((b) => { b.hidden = !on; });
-  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; showInstall(true); });
+  showInstall(!inApp && page !== "app");
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; });
   window.addEventListener("appinstalled", () => { installEvt = null; showInstall(false); toastG("¡Listo! La app quedó en tu pantalla de inicio."); });
-  if (!standalone && isIOS) showInstall(true);
-  // dentro de la app (TWA de Android o instalada) no tiene sentido ofrecer bajarla
-  const inApp = standalone || /^android-app:/.test(document.referrer) || /[?&]app=1/.test(location.search) || sessionStorage.getItem("inApp") === "1";
-  if (inApp) { try { sessionStorage.setItem("inApp", "1"); } catch (e) {} $$(".app-link").forEach((a) => a.remove()); }
   if (page === "app") {
-    const isAndroid = /android/i.test(navigator.userAgent);
     if (isAndroid) $("#appAndroid")?.classList.add("hl"); else if (isIOS) $("#appIos")?.classList.add("hl");
     fetch("descargas/menuario.apk", { method: "HEAD" }).then((r) => { const n = +r.headers.get("content-length"); if (r.ok && n) $("#apkSize").textContent = "· " + (n / 1048576).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " MB"; }).catch(() => {});
   }
   document.addEventListener("click", async (e) => {
     if (!e.target.closest(".install-btn")) return;
     $("#moreMenu") && ($("#moreMenu").hidden = true);
-    if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; showInstall(r?.outcome !== "accepted"); }
-    else if (isIOS) toastG("En iPhone: tocá Compartir (el cuadrado con la flecha) en Safari y después «Agregar a inicio».");
-    else toastG("Abrí el menú del navegador (⋮) y elegí «Instalar app» o «Agregar a la pantalla de inicio».");
+    // en la compu, si el navegador ofrece instalarla, se instala ahí mismo; si no (o en el teléfono), la página de la app:
+    // Android baja el APK, iPhone ve cómo agregarla al inicio, la compu ve el QR
+    if (installEvt && !isAndroid && !isIOS) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if (r?.outcome === "accepted") showInstall(false); return; }
+    location.href = "app.html";
   });
   const net = () => {
     let p = $("#netPill"); if (navigator.onLine) { if (p) { p.classList.add("back"); setTimeout(() => p.remove(), 1200); } return; }

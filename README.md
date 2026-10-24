@@ -127,7 +127,7 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 ## App de Android (`descargas/menuario.apk`)
 
 - Es una Trusted Web Activity hecha con [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap): abre el sitio a pantalla completa con Chrome, con ícono, pantalla de inicio y accesos directos. Paquete `ar.menuario.app`, Android 7 o más.
-- Se baja desde `app.html` (enlace «La app» en el pie y en «Más»). Dentro de la app esos enlaces desaparecen. En iPhone se agrega desde Safari con «Agregar a inicio».
+- Se baja desde `app.html`. Hay un solo botón, «Instalar la app» (menú «Más», pie y Perfil): en Android lleva al APK, en iPhone a cómo agregarla al inicio y en la compu usa la instalación del navegador si la ofrece, o muestra el QR. Dentro de la app el botón no aparece. En iPhone se agrega desde Safari con «Agregar a inicio».
 - La pantalla completa sin barra de direcciones depende de `https://jaemeson-ra.github.io/.well-known/assetlinks.json`, publicado desde el repositorio `jaemeson-ra.github.io` con la huella de la clave de firma.
 - El proyecto de Android y la clave (`android.keystore` + `keystore.env`) están FUERA de este repositorio, en `../plan-comidas-android`. Sin esa clave no se puede publicar una actualización que se instale encima de la anterior: guardar una copia.
 - Para recompilar: `python tools/build_android.py --version` (sube la versión, compila, firma y copia el APK a `descargas/`). Los cambios del sitio no necesitan una app nueva: la app siempre muestra el sitio publicado.
