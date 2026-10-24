@@ -13,6 +13,8 @@ META = {
  "supermercados": ("Supermercados · Plan de comidas Buenos Aires", "Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR."),
  "temporada": ("Productos de estación · Plan de comidas Buenos Aires", "Frutas y verduras de estación en Argentina, mes por mes, y los platos del plan que las aprovechan."),
  "nutricion": ("Nutrición · Plan de comidas Buenos Aires", "Calorías, proteínas, fibra y sal de tu calendario por semana y por mes, con aportes recomendados y nota sobre 10."),
+ "terminos": ("Términos de uso · Plan de comidas Buenos Aires", "Condiciones de uso del sitio: salud, precios, cuentas, contenido de usuarios y propiedad intelectual."),
+ "privacidad": ("Política de privacidad · Plan de comidas Buenos Aires", "Qué datos se guardan, para qué, quién los procesa y cómo borrarlos, según la Ley 25.326."),
  "mi-plan": ("Mi plan · Plan de comidas Buenos Aires", "Creá tu cuenta y armá tu propio calendario de comidas eligiendo las recetas que quieras."),
 }
 for page, (title, desc) in META.items():

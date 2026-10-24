@@ -1,0 +1,34 @@
+Copyright (c) 2026 Jaemeson Dieu. Todos los derechos reservados. All rights reserved.
+
+ESPAÑOL
+
+El código fuente, el diseño, la estructura de datos, los textos, las recetas redactadas, las
+medallas, los íconos propios, las ilustraciones y el video de este repositorio y del sitio
+https://jaemeson-ra.github.io/plan-comidas-bsas/ son obra de Jaemeson Dieu y están protegidos
+por la Ley 11.723 de Propiedad Intelectual (República Argentina) y por los tratados
+internacionales de derecho de autor.
+
+Que el repositorio sea público solo permite verlo y, dentro de GitHub, hacer un fork, en los
+términos de los Términos de Servicio de GitHub. NO se concede ninguna licencia para copiar,
+modificar, redistribuir, publicar, alojar en otro sitio, vender ni usar con fines comerciales
+todo o parte de este trabajo sin autorización previa y por escrito del autor.
+
+Componentes de terceros, que conservan su propia licencia:
+- Fotos de las recetas (img/ e img/w/): Wikimedia Commons, licencias Creative Commons
+  indicadas en cada receta del sitio, con su autor.
+- Íconos de base: Tabler Icons, licencia MIT (https://github.com/tabler/tabler-icons).
+- Fuentes: Young Serif y Outfit, SIL Open Font License 1.1.
+- Videos de las recetas: YouTube, propiedad de sus autores; el sitio solo los incrusta.
+- Precios: catálogos públicos de cada cadena. Cotizaciones: DolarApi (https://dolarapi.com).
+- Datos de productos escaneados: Open Food Facts, Open Database License.
+
+Pedidos de uso o autorización: jaemeson.dieu@gmail.com
+
+ENGLISH
+
+The source code, design, data structure, texts, written recipes, medals, original icons,
+illustrations and video in this repository and on the website above are the work of Jaemeson
+Dieu. The repository being public only allows viewing it and forking it within GitHub under
+GitHub's Terms of Service. No license is granted to copy, modify, redistribute, publish, host
+elsewhere, sell or use this work commercially, in whole or in part, without the author's prior
+written permission. Third-party components listed above keep their own licenses.

@@ -46,7 +46,7 @@ MANIFEST = {
                   {"name": "Mi plan", "url": "./mi-plan.html?app=1", "icons": [{"src": "img/icons/icon-192.png", "sizes": "192x192"}]}],
 }
 
-PAGES = ["index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html"]
+PAGES = ["index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html"]
 CORE = ["./"] + PAGES + ["style.css", "motion.css", "gami.css", "app.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest",
         "img/icons/icon-192.png"] + sorted("fonts/" + os.path.basename(f) for f in glob.glob(os.path.join(ROOT, "fonts", "*.woff2")))
 

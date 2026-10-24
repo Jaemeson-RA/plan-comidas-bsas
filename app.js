@@ -1,3 +1,4 @@
+/*! Plan de comidas Buenos Aires · © 2026 Jaemeson Dieu · Todos los derechos reservados · ver LICENSE */
 /* Plan de comidas · Buenos Aires — lógica compartida por todas las páginas */
 (function () {
   const D = window.DATA;

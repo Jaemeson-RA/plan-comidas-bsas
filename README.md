@@ -108,3 +108,12 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 - La nutrición de cada receta se calcula sumando sus ingredientes en gramos y dividiendo por las porciones. Si a una receta le falta algún dato, se usa una estimación y se indica «estimado».
 - Los ingredientes que cargan los usuarios (a mano, buscando en Open Food Facts o escaneando el código de barras) tienen la misma estructura y entran al cálculo de las recetas de la comunidad.
 - Recomendaciones: energía con Mifflin-St Jeor × factor de actividad; proteínas 0,8–1,6 g/kg (objetivo 1 g/kg); fibra 25 g (mujeres) / 30 g (varones); sal < 5 g; azúcares < 10 % de la energía; grasas 25–35 %, saturadas < 10 %; carbohidratos 45–60 %. La nota sobre 10 descuenta puntos por cada desvío y la variedad.
+
+## Licencia y páginas legales
+
+© 2026 Jaemeson Dieu, **todos los derechos reservados** (ver `LICENSE`). El repositorio es público porque GitHub Pages gratis lo exige, pero eso solo permite verlo: no autoriza a copiar ni reutilizar el código. Las fotos (Creative Commons, Wikimedia), los íconos (Tabler, MIT), las fuentes (SIL OFL) y los videos (YouTube) conservan sus licencias.
+
+- `terminos.html`: términos de uso (no es consejo médico, precios orientativos, cuentas, contenido de usuarios, ranking con perfiles de ejemplo, propiedad intelectual, ley argentina).
+- `privacidad.html`: política de privacidad según la Ley 25.326 (datos, qué es público, proveedores, transferencia internacional, derechos ARCO, leyenda de la AAIP).
+- Al crear cuenta hay que aceptar ambos; se guarda `termsAt` y `termsVersion` en el perfil. Perfil → «Borrar mi cuenta» elimina calendario, perfil público, ranking, buzón, recetas e ingredientes propios y la cuenta.
+- GitHub: rama `main` protegida (sin force-push ni borrado), secret scanning y push protection activados.

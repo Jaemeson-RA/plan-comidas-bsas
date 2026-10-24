@@ -1,7 +1,8 @@
+/*! Plan de comidas Buenos Aires · © 2026 Jaemeson Dieu · Todos los derechos reservados · ver LICENSE */
 /* Cuenta, calendario personal, recetas e ingredientes de la comunidad, nutrición.
    Firebase Auth (email + contraseña) + Realtime Database. Páginas: mi-plan.html y nutricion.html. */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider, deleteUser } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getDatabase, ref, set, update, onValue, get, push, remove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
 const D = window.DATA, CFG = window.CONFIG || {}, R = D.recipes;
@@ -85,13 +86,14 @@ if (authBox) {
   const RC = CFG.recaptchaSiteKey || ""; let rcWidget = null, rcLoading = null;
   const loadRecaptcha = () => rcLoading || (rcLoading = new Promise((res, rej) => { window.__rcReady = res; const s = document.createElement("script"); s.src = "https://www.google.com/recaptcha/api.js?onload=__rcReady&render=explicit&hl=es-419"; s.async = true; s.onerror = () => { rcLoading = null; rej(new Error("recaptcha")); }; document.head.appendChild(s); }));
   const showRecaptcha = async () => { if (!RC || rcWidget !== null) return; try { await loadRecaptcha(); const box = $("#recaptchaBox"); rcWidget = window.grecaptcha.render("recaptchaBox", { sitekey: RC, theme: "light", size: (box.parentElement.clientWidth || 304) < 304 ? "compact" : "normal" }); } catch (e) { $("#authErr").textContent = "No se pudo cargar la verificación «No soy un robot». Revisá la conexión y volvé a tocar «Crear cuenta»."; $("#authErr").hidden = false; } };
-  $("#authSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; mode = b.dataset.mode; $$("#authSeg button").forEach((x) => x.classList.toggle("on", x === b)); $("#fName").hidden = mode !== "signup"; $("#fCaptcha").hidden = RC ? true : mode !== "signup"; $("#fRecaptcha").hidden = !RC || mode !== "signup"; if (mode === "signup") { if (RC) showRecaptcha(); else newCaptcha(); } $("#authBtn").textContent = mode === "signup" ? "Crear mi cuenta" : "Ingresar"; $("#aPass").autocomplete = mode === "signup" ? "new-password" : "current-password"; });
+  $("#authSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; mode = b.dataset.mode; $$("#authSeg button").forEach((x) => x.classList.toggle("on", x === b)); $("#fName").hidden = mode !== "signup"; $("#fCaptcha").hidden = RC ? true : mode !== "signup"; $("#fRecaptcha").hidden = !RC || mode !== "signup"; $("#fTerms").hidden = mode !== "signup"; if (mode === "signup") { if (RC) showRecaptcha(); else newCaptcha(); } $("#authBtn").textContent = mode === "signup" ? "Crear mi cuenta" : "Ingresar"; $("#aPass").autocomplete = mode === "signup" ? "new-password" : "current-password"; });
   $("#authForm").addEventListener("submit", async (e) => {
     e.preventDefault(); const err = $("#authErr"); err.hidden = true;
     const email = $("#aEmail").value.trim(), pass = $("#aPass").value, name = ($("#aName")?.value || "").trim();
     if (!email || pass.length < 6) { err.textContent = "Completá el correo y una contraseña de al menos 6 caracteres."; err.hidden = false; return; }
     if (mode === "signup") {
       if ($("#aWeb").value) { err.textContent = "No se pudo crear la cuenta."; err.hidden = false; return; }  // campo trampa: solo lo llenan los bots
+      if (!$("#aTerms").checked) { err.textContent = "Para crear la cuenta tenés que aceptar los términos de uso y la política de privacidad."; err.hidden = false; return; }
       if (RC) {
         const tok = window.grecaptcha && rcWidget !== null ? window.grecaptcha.getResponse(rcWidget) : "";
         if (!tok) { err.textContent = "Marcá la casilla «No soy un robot» para crear la cuenta."; err.hidden = false; return; }
@@ -109,7 +111,7 @@ if (authBox) {
       if (mode === "signup") {
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
         if (name) await updateProfile(cred.user, { displayName: name });
-        await set(ref(db, `calendars/${cred.user.uid}/profile`), { name: name || email.split("@")[0], email, createdAt: new Date().toISOString() });
+        await set(ref(db, `calendars/${cred.user.uid}/profile`), { name: name || email.split("@")[0], email, createdAt: new Date().toISOString(), termsAt: new Date().toISOString(), termsVersion: "2026-10-24" });
         window.notifyAdmin?.({ type: "nueva_cuenta", title: name || email, name, email });
         toast("¡Cuenta creada! Ya podés armar tu calendario.");
       } else await signInWithEmailAndPassword(auth, email, pass);
@@ -976,3 +978,30 @@ function demoLadder() {
   });
   return (demoCache = out);
 }
+
+
+// =====================================================================
+// BORRAR MI CUENTA (derecho de supresión, Ley 25.326 art. 16)
+// =====================================================================
+$("#delForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault(); const err = $("#delErr"); err.hidden = true;
+  if (!user) return;
+  if (!confirm("¿Seguro? Se borran tu cuenta y todo lo que creaste, y no se puede recuperar.")) return;
+  const btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
+  try {
+    await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, $("#delPass").value));
+    const uid = user.uid, email = user.email, name = myName();
+    const upd = {};
+    Object.entries(community).forEach(([k, c]) => { if (c.owner === uid) upd[`recetas/${k}`] = null; });
+    Object.entries(ingDB).forEach(([k, c]) => { if (c.owner === uid) upd[`ingredientes/${k}`] = null; });
+    Object.keys(inbox || {}).forEach((k) => { upd[`inbox/${uid}/${k}`] = null; });
+    upd[`public/${uid}`] = null; upd[`ladder/${uid}`] = null; upd[`calendars/${uid}`] = null;
+    if (unsubCal) { unsubCal(); unsubCal = null; } if (unsubInbox) { unsubInbox(); unsubInbox = null; }
+    await update(ref(db), upd);
+    window.notifyAdmin?.({ type: "baja", title: name, name, email });
+    try { localStorage.removeItem("badges:" + uid); } catch (ex) {}
+    await deleteUser(user);
+    toast("Listo: tu cuenta y tus datos se borraron.");
+  } catch (ex) { err.textContent = ex?.code === "auth/wrong-password" || ex?.code === "auth/invalid-credential" ? "La contraseña no coincide." : errMsg(ex); err.hidden = false; }
+  btn.disabled = false;
+});

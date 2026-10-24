@@ -1,3 +1,4 @@
+/*! Plan de comidas Buenos Aires · © 2026 Jaemeson Dieu · Todos los derechos reservados · ver LICENSE */
 /* =========================================================
    Plan de comidas · Buenos Aires — "la libreta del almacén"
    Papel cuadriculado, tinta verde botella, colorado y dorado
@@ -692,3 +693,20 @@ table.ladder tr.me td{background:var(--oro2)}
 @media (max-width:360px){.recaptcha #recaptchaBox{transform:scale(.9);transform-origin:0 0}}
 /* el atributo hidden siempre gana (antes .f{display:flex} lo pisaba y en «Ingresar» se veían nombre y captcha) */
 [hidden]{display:none!important}
+
+/* páginas legales */
+.legal{max-width:78ch;padding:1.4rem 1.6rem;margin-bottom:2rem;line-height:1.65}
+.legal h2{font-size:1.25rem;margin:1.6rem 0 .4rem;scroll-margin-top:90px}
+.legal h2:first-of-type{margin-top:.6rem}
+.legal ul{padding-left:1.2rem}.legal li{margin:.25rem 0}
+.legal-toc{display:flex;flex-wrap:wrap;gap:.4rem;padding-bottom:1rem;border-bottom:1px dashed var(--line)}
+.legal-toc a{border:1.5px solid var(--border);border-radius:999px;padding:.2rem .7rem;font-size:.82rem;font-weight:600;color:var(--ink);text-decoration:none;background:var(--paper)}
+.legal-toc a:hover{border-color:var(--verde);color:var(--verde3)}
+.legal .aaip{font-size:.85rem;color:var(--ink2);background:var(--paper);border-left:3px solid var(--verde);padding:.6rem .8rem;border-radius:0 8px 8px 0}
+.foot-legal{font-size:.82rem}
+.terms{display:flex;gap:.5rem;align-items:flex-start;font-size:.88rem;margin:.2rem 0 .6rem;line-height:1.4}
+.terms input{margin-top:.2rem;width:18px;height:18px;flex:none;accent-color:var(--verde)}
+.btn.danger{background:var(--rojo);border-color:var(--rojo)}
+.btn.danger:hover{background:#c4441f}
+.del-card{margin-top:1rem;border-color:var(--rojo2)}
+@media (max-width:720px){.legal{padding:1.1rem 1rem}}

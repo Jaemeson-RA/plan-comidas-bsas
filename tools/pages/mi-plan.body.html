@@ -14,13 +14,14 @@
     <div class="f recaptcha" id="fRecaptcha" hidden><label>Para saber que sos una persona</label><div id="recaptchaBox"></div></div>
     <div class="f captcha" id="fCaptcha" hidden><label for="aCaptcha">Para saber que sos una persona: <span id="captchaQ"></span></label><div class="captcha-row"><input id="aCaptcha" inputmode="numeric" autocomplete="off" placeholder="resultado"><button type="button" class="mini-btn" id="captchaNew" aria-label="Otra pregunta"><svg class="ic"><use href="#i-refresh"/></svg></button></div></div>
     <div class="hp" aria-hidden="true"><label for="aWeb">Sitio web</label><input id="aWeb" tabindex="-1" autocomplete="off"></div>
+    <label class="terms" id="fTerms" hidden><input type="checkbox" id="aTerms"> <span>Leí y acepto los <a href="terminos.html" target="_blank" rel="noopener">términos de uso</a> y la <a href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a>.</span></label>
     <p class="auth-err" id="authErr" hidden></p>
     <div class="sug-actions">
       <button class="btn" type="submit" id="authBtn">Ingresar</button>
       <button class="mini-btn" type="button" id="authReset">Olvidé mi contraseña</button>
     </div>
   </form>
-  <p class="muted small" style="margin-top:.8rem">Solo guardamos tu nombre, tu correo y lo que creás acá. Nada más.</p>
+  <p class="muted small" style="margin-top:.8rem">Solo guardamos tu nombre, tu correo y lo que creás acá. Todo el detalle, en la <a href="privacidad.html">política de privacidad</a>.</p>
 </section>
 
 <section id="planBox" hidden>
@@ -143,6 +144,13 @@
         </form>
       </div>
     </div>
+    <form class="card editor set-card del-card" id="delForm">
+      <h3><svg class="ic"><use href="#i-x"/></svg> Borrar mi cuenta</h3>
+      <p class="muted small">Se borran tu calendario, tus días, tu perfil público, tu puesto en el ranking, tus amigos, tus propuestas y las recetas e ingredientes que creaste. No se puede deshacer.</p>
+      <div class="f"><label for="delPass">Tu contraseña, para confirmar</label><input id="delPass" type="password" autocomplete="current-password" required></div>
+      <p class="auth-err" id="delErr" hidden></p>
+      <div class="sug-actions"><button class="btn danger" type="submit">Borrar mi cuenta para siempre</button></div>
+    </form>
     <div class="card editor set-card rem-card" id="remCard">
       <h3><svg class="ic"><use href="#i-clock"/></svg> Recordatorio diario</h3>
       <p class="muted small">Un aviso a la noche para marcar tu día y no cortar la racha. Lo más confiable es sumarlo al calendario del teléfono: suena aunque el sitio esté cerrado.</p>
