@@ -77,8 +77,8 @@ def build(o):
                 inputs += ["-i", v[0]]; ms = int((off + 0.25) * 1000)
                 filters.append(f"[{k}:a]loudnorm=I=-16:TP=-1.5:LRA=11,adelay={ms}|{ms}[vz{i}]"); vz.append(f"[vz{i}]"); k += 1
             off += d - XF
-        filters.append("".join(vz) + f"amix=inputs={len(vz)}:normalize=0,apad[vmix]")
-        filters.append(f"[{ai}:a]volume=-15dB,atrim=0:{total:.2f}[m];[m][vmix]sidechaincompress=threshold=0.03:ratio=6:attack=80:release=600[duck];[duck][vmix]amix=inputs=2:duration=first:normalize=0,afade=t=out:st={total-2.5:.2f}:d=2.5[aout]")
+        filters.append("".join(vz) + f"amix=inputs={len(vz)}:normalize=0,apad,asplit=2[vm1][vm2]")
+        filters.append(f"[{ai}:a]volume=-15dB,atrim=0:{total:.2f}[m];[m][vm1]sidechaincompress=threshold=0.03:ratio=6:attack=80:release=600[duck];[duck][vm2]amix=inputs=2:duration=first:normalize=0,afade=t=out:st={total-2.5:.2f}:d=2.5[aout]")
     elif a.voz:
         inputs += ["-i", a.voz]
         filters.append(f"[{ai}:a]volume=-15dB,atrim=0:{total:.2f}[m];[{ai+1}:a]loudnorm=I=-16:TP=-1.5:LRA=11,apad[vz];[m][vz]sidechaincompress=threshold=0.03:ratio=6:attack=80:release=600[duck];[duck][vz]amix=inputs=2:duration=first:dropout_transition=2,afade=t=out:st={total-2.5:.2f}:d=2.5[aout]")
