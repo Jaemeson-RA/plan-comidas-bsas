@@ -1,11 +1,12 @@
 /**
  * Plan de comidas · proxy de precios (Cloudflare Worker).
  * GET /search?q=harina  -> busca en Jumbo, Disco, Vea, Carrefour, Día, ChangoMás (VTEX) y Coto, y devuelve JSON con CORS.
+ * POST /verify      -> comprueba un reCAPTCHA v2 con la clave secreta (variable RECAPTCHA_SECRET del Worker).
  * Los sitios de los súper no permiten llamadas directas desde el navegador (sin CORS); este worker las hace por el sitio.
  */
 const VTEX = { Jumbo: "www.jumbo.com.ar", Disco: "www.disco.com.ar", Vea: "www.vea.com.ar", Carrefour: "www.carrefour.com.ar", "Día": "diaonline.supermercadosdia.com.ar", "ChangoMás": "www.masonline.com.ar" };
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36";
-const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Cache-Control": "public, max-age=600" };
+const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Cache-Control": "public, max-age=600" };
 
 async function vtex(store, host, q) {
   const r = await fetch(`https://${host}/api/catalog_system/pub/products/search/?ft=${encodeURIComponent(q)}&_from=0&_to=11`, { headers: { "User-Agent": UA, Accept: "application/json" }, cf: { cacheTtl: 600 } });
@@ -38,10 +39,25 @@ async function coto(q) {
   }
   return out;
 }
+// POST /verify {token} -> pregunta a Google si el reCAPTCHA es válido (la clave secreta vive en el Worker: wrangler secret put RECAPTCHA_SECRET)
+const HOSTS = ["jaemeson-ra.github.io", "localhost", "127.0.0.1"];
+async function verify(req, env) {
+  const H = { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" };
+  const out = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: H });
+  if (req.method !== "POST") return out({ ok: false, error: "usar POST" }, 405);
+  if (!env.RECAPTCHA_SECRET) return out({ ok: false, error: "falta RECAPTCHA_SECRET" }, 500);
+  let token = ""; try { token = String((await req.json()).token || "").slice(0, 4000); } catch (e) {}
+  if (!token) return out({ ok: false, error: "sin token" }, 400);
+  const body = new URLSearchParams({ secret: env.RECAPTCHA_SECRET, response: token, remoteip: req.headers.get("CF-Connecting-IP") || "" });
+  const j = await (await fetch("https://www.google.com/recaptcha/api/siteverify", { method: "POST", body })).json().catch(() => ({}));
+  const ok = j.success === true && HOSTS.includes(j.hostname);
+  return out({ ok, codes: j["error-codes"] || [], hostname: j.hostname || null });
+}
 export default {
-  async fetch(req) {
+  async fetch(req, env) {
     if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
     const url = new URL(req.url);
+    if (url.pathname === "/verify") return verify(req, env);
     if (url.pathname !== "/search") return new Response("Plan de comidas · proxy de precios. Usar /search?q=producto", { headers: CORS });
     const q = (url.searchParams.get("q") || "").trim().slice(0, 60);
     if (q.length < 2) return new Response(JSON.stringify({ error: "q muy corto" }), { status: 400, headers: { ...CORS, "Content-Type": "application/json" } });

@@ -53,6 +53,7 @@ El plan ya no tiene fecha de fin. `data.js` trae las rotaciones (desayunos, almu
 - **Resumen semanal** (Perfil): días cumplidos, XP ganada, vasos de agua y puesto en la ladder, comparados con la semana pasada. La XP se recalcula con fecha de corte.
 - **Desafío de la semana** (Ranking): tu progreso y el de tus amigos hacia los 5 días.
 - **Amigos**: se agregan por correo (se compara un hash SHA-256, el correo no se publica). La ladder tiene filtro «Mis amigos». **Proponer un plato**: elegís receta, día y comida; a tu amigo le aparece en su calendario para aceptar (se agrega solo) o rechazar, y vos ves la respuesta. Las reglas solo dejan escribir en el buzón de alguien que tenés como amigo.
+- **Personas de ejemplo en la ladder**: 14 porteños con barrio (Flor de Palermo, Nico de Caballito…). No son cuentas ni datos en Firebase: `demoLadder()` en `cuenta.js` los calcula en el navegador, día por día desde su fecha de inicio, con las mismas reglas de puntos y XP, así la tabla avanza sola. No se pueden agregar como amigos. `config.js` → `demoLadder: false` los saca.
 - Todo se calcula en el cliente a partir de `calendars/{uid}` (done, libre, agua, friends) y se publica un resumen en `public/{uid}` (incluido el progreso de la semana) y `ladder/{uid}`.
 
 ## Precios: buscador en vivo, lista con enlaces y alertas
@@ -72,6 +73,17 @@ npx wrangler deploy
 Ya hechos: Authentication con correo/contraseña, dominio autorizado, Apps Script desplegado, Worker de precios desplegado.
 
 **Pendiente (1 minuto): republicar las reglas.** Firebase → proyecto `viaje-del-amor` → Realtime Database → *Rules* → pegar el contenido de `docs/firebase-rules.json` → *Publicar*. Agrega `inbox` (el buzón de «Proponer un plato»); sin esto las propuestas no se pueden enviar.
+
+**reCAPTCHA v2 al crear cuenta** (casilla «No soy un robot», verificada en el servidor por el Worker `POST /verify`). Mientras `recaptchaSiteKey` esté vacío, se usa la suma de control local.
+
+1. https://www.google.com/recaptcha/admin/create → tipo **reCAPTCHA v2 · «No soy un robot»**, dominios `jaemeson-ra.github.io` y `localhost`.
+2. La **clave del sitio** (pública) va en `config.js` → `recaptchaSiteKey`.
+3. La **clave secreta** va solo en el Worker, nunca en el repositorio:
+
+```bash
+cd tools/worker
+npx wrangler secret put RECAPTCHA_SECRET
+```
 
 Opcional, recomendado si el sitio se abre al público: **Firebase App Check** con reCAPTCHA v3 (Firebase → App Check → registrar la app web) para que el servidor rechace registros automatizados. El captcha local del formulario frena bots simples pero no reemplaza esa capa.
 

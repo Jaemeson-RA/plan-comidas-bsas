@@ -8,6 +8,11 @@ window.CONFIG = {
   // Proxy de precios (Cloudflare Worker, ver tools/worker). Vacío = el buscador en vivo queda desactivado.
   priceApi: "https://plan-comidas-precios.jaemeson-dieu.workers.dev",
   notifyUrl: "https://script.google.com/macros/s/AKfycbxZcgnTWwKDyOQgLyyx0X7fsRtk1tcOHXQd4jz1c5OtZN4EXqwBxliiJ5wPbxtUcGqxWQ/exec",
+  // Personas de ejemplo en la ladder (no son cuentas: se generan en el navegador, ver DEMO en cuenta.js). false = ocultarlas.
+  demoLadder: true,
+  // reCAPTCHA v2 («No soy un robot») para crear cuenta. Clave del SITIO (pública); la secreta va en el Worker.
+  // Vacía = se usa la suma de control local.
+  recaptchaSiteKey: "",
   // Proyecto Firebase existente (viaje-del-amor): Authentication (email + contraseña) + Realtime Database.
   firebase: {
     apiKey: "AIzaSyDby2S1qUHAChX_RwqPRLkU8qgpmsSvQWg",

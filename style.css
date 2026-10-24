@@ -686,3 +686,9 @@ table.ladder tr.me td{background:var(--oro2)}
 @media (max-width:720px){.to-top{bottom:calc(84px + env(safe-area-inset-bottom));right:.8rem}.cal-cell.out{display:none}}
 @keyframes pillin{from{transform:translateY(10px);opacity:0}}
 @media (max-width:720px){.hel-q:nth-of-type(n+7){display:none}.heladera .hel-head p.muted{display:none}}
+
+/* reCAPTCHA: el widget mide 304 px; en pantallas muy chicas se achica para no desbordar */
+.recaptcha #recaptchaBox{min-height:78px}
+@media (max-width:360px){.recaptcha #recaptchaBox{transform:scale(.9);transform-origin:0 0}}
+/* el atributo hidden siempre gana (antes .f{display:flex} lo pisaba y en «Ingresar» se veían nombre y captcha) */
+[hidden]{display:none!important}

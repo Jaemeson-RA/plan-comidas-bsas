@@ -81,15 +81,28 @@ if (authBox) {
   let captcha = { a: 0, b: 0, t: 0 };
   const newCaptcha = () => { captcha = { a: 2 + Math.floor(Math.random() * 8), b: 1 + Math.floor(Math.random() * 9), t: Date.now() }; $("#captchaQ").textContent = `¿cuánto es ${captcha.a} + ${captcha.b}?`; $("#aCaptcha").value = ""; };
   $("#captchaNew").addEventListener("click", newCaptcha);
-  $("#authSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; mode = b.dataset.mode; $$("#authSeg button").forEach((x) => x.classList.toggle("on", x === b)); $("#fName").hidden = mode !== "signup"; $("#fCaptcha").hidden = mode !== "signup"; if (mode === "signup") newCaptcha(); $("#authBtn").textContent = mode === "signup" ? "Crear mi cuenta" : "Ingresar"; $("#aPass").autocomplete = mode === "signup" ? "new-password" : "current-password"; });
+  // reCAPTCHA v2: se carga solo al abrir «Crear cuenta»; el token lo verifica el Worker (POST /verify)
+  const RC = CFG.recaptchaSiteKey || ""; let rcWidget = null, rcLoading = null;
+  const loadRecaptcha = () => rcLoading || (rcLoading = new Promise((res, rej) => { window.__rcReady = res; const s = document.createElement("script"); s.src = "https://www.google.com/recaptcha/api.js?onload=__rcReady&render=explicit&hl=es-419"; s.async = true; s.onerror = () => { rcLoading = null; rej(new Error("recaptcha")); }; document.head.appendChild(s); }));
+  const showRecaptcha = async () => { if (!RC || rcWidget !== null) return; try { await loadRecaptcha(); const box = $("#recaptchaBox"); rcWidget = window.grecaptcha.render("recaptchaBox", { sitekey: RC, theme: "light", size: (box.parentElement.clientWidth || 304) < 304 ? "compact" : "normal" }); } catch (e) { $("#authErr").textContent = "No se pudo cargar la verificación «No soy un robot». Revisá la conexión y volvé a tocar «Crear cuenta»."; $("#authErr").hidden = false; } };
+  $("#authSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; mode = b.dataset.mode; $$("#authSeg button").forEach((x) => x.classList.toggle("on", x === b)); $("#fName").hidden = mode !== "signup"; $("#fCaptcha").hidden = RC ? true : mode !== "signup"; $("#fRecaptcha").hidden = !RC || mode !== "signup"; if (mode === "signup") { if (RC) showRecaptcha(); else newCaptcha(); } $("#authBtn").textContent = mode === "signup" ? "Crear mi cuenta" : "Ingresar"; $("#aPass").autocomplete = mode === "signup" ? "new-password" : "current-password"; });
   $("#authForm").addEventListener("submit", async (e) => {
     e.preventDefault(); const err = $("#authErr"); err.hidden = true;
     const email = $("#aEmail").value.trim(), pass = $("#aPass").value, name = ($("#aName")?.value || "").trim();
     if (!email || pass.length < 6) { err.textContent = "Completá el correo y una contraseña de al menos 6 caracteres."; err.hidden = false; return; }
     if (mode === "signup") {
       if ($("#aWeb").value) { err.textContent = "No se pudo crear la cuenta."; err.hidden = false; return; }  // campo trampa: solo lo llenan los bots
-      if (+$("#aCaptcha").value !== captcha.a + captcha.b) { err.textContent = "La comprobación no coincide: resolvé la suma para crear la cuenta."; err.hidden = false; newCaptcha(); return; }
-      if (Date.now() - captcha.t < 1500) { err.textContent = "Muy rápido… volvé a intentar."; err.hidden = false; newCaptcha(); return; }
+      if (RC) {
+        const tok = window.grecaptcha && rcWidget !== null ? window.grecaptcha.getResponse(rcWidget) : "";
+        if (!tok) { err.textContent = "Marcá la casilla «No soy un robot» para crear la cuenta."; err.hidden = false; return; }
+        $("#authBtn").disabled = true; let ok = false;
+        try { const r = await fetch(`${String(CFG.priceApi || "").replace(/\/$/, "")}/verify`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: tok }) }); ok = (await r.json()).ok === true; } catch (ex) {}
+        $("#authBtn").disabled = false;
+        if (!ok) { err.textContent = "No pudimos comprobar que sos una persona. Volvé a marcar la casilla y probá de nuevo."; err.hidden = false; window.grecaptcha.reset(rcWidget); return; }
+      } else {
+        if (+$("#aCaptcha").value !== captcha.a + captcha.b) { err.textContent = "La comprobación no coincide: resolvé la suma para crear la cuenta."; err.hidden = false; newCaptcha(); return; }
+        if (Date.now() - captcha.t < 1500) { err.textContent = "Muy rápido… volvé a intentar."; err.hidden = false; newCaptcha(); return; }
+      }
     }
     $("#authBtn").disabled = true;
     try {
@@ -112,6 +125,7 @@ if (authBox) {
 $("#logout")?.addEventListener("click", () => signOut(auth));
 onAuthStateChanged(auth, (u) => {
   user = u; if (unsubCal) { unsubCal(); unsubCal = null; }
+  myEmailHash = null; lastXP = null; clearTimeout(syncTimer);  // al cambiar de cuenta en la misma pestaña, nada de la anterior
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
@@ -379,7 +393,7 @@ async function loadAdmin() {
 // MI PLAN · días cumplidos, combos y ladder
 // =====================================================================
 let ladder = {};
-onValue(ref(db, "ladder"), (s) => { ladder = s.val() || {}; renderRank(); renderRecap(); }, () => {});
+onValue(ref(db, "ladder"), (s) => { ladder = Object.assign({}, demoLadder(), s.val() || {}); renderRank(); renderRecap(); }, () => {});
 $("#myCal")?.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-done]"); if (!b) return;
   const dt = b.dataset.done; const on = !cal?.done?.[dt]; const snap = myXP(); const stBefore = computeStats(cal?.done || {});
@@ -419,7 +433,7 @@ function renderRank() {
     <div class="rank-chips"><span class="chip hot">${ic("flame")} racha ${st.streak} ${st.streak === 1 ? "día" : "días"} · combo ${mult}</span><span class="chip">${ic("bolt")} mejor racha ${st.best}</span><span class="chip">${ic("check")} ${st.days} días cumplidos</span><span class="chip">${ic("calendar")} ${st.weeks} ${st.weeks === 1 ? "semana perfecta" : "semanas perfectas"}</span></div>
     <p class="muted small">${pos ? `Estás en el puesto <b>#${pos}</b> de ${allN}.` : "Marcá tu primer día cumplido en el calendario para entrar al ranking."}</p>`;
   const medal = (i) => (i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1));
-  $("#ladderTable").innerHTML = rows.length ? `<thead><tr><th>Puesto</th><th>Quién</th><th>Nivel</th><th>Puntos</th><th>Racha</th><th>Mejor</th><th>Días</th><th>Semanas</th></tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.uid === user.uid ? "me" : ""}"><td>${medal(i)}</td><td style="text-align:left"><span class="lad-user">${avatarHtml(pub[r.uid] || {}, r.name)}${esc(r.name)}${r.uid === user.uid ? " <small>(vos)</small>" : ""}</span></td><td>${r.level || 1}</td><td><b>${(r.points || 0).toLocaleString("es-AR")}</b></td><td>${r.streak ? `${r.streak} ${r.streak >= 7 ? "×2" : r.streak >= 3 ? "×1,5" : ""}` : "—"}</td><td>${r.best || 0}</td><td>${r.days || 0}</td><td>${r.weeks || 0}</td></tr>`).join("")}</tbody>` : `<tbody><tr><td colspan="8" class="muted">${ladderMode === "amigos" ? "Todavía no agregaste amigos." : "Todavía nadie marcó días cumplidos. ¡Sé el primero!"}</td></tr></tbody>`;
+  $("#ladderTable").innerHTML = rows.length ? `<thead><tr><th>Puesto</th><th>Quién</th><th>Nivel</th><th>Puntos</th><th>Racha</th><th>Mejor</th><th>Días</th><th>Semanas</th></tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.uid === user.uid ? "me" : ""}"><td>${medal(i)}</td><td style="text-align:left"><span class="lad-user">${avatarHtml(pub[r.uid] || {}, r.name)}<span class="lad-n">${esc(r.name)}${r.uid === user.uid ? " <small>(vos)</small>" : ""}${r.barrio ? `<small class="lad-b">${esc(r.barrio)}</small>` : ""}</span></span></td><td>${r.level || 1}</td><td><b>${(r.points || 0).toLocaleString("es-AR")}</b></td><td>${r.streak ? `${r.streak} ${r.streak >= 7 ? "×2" : r.streak >= 3 ? "×1,5" : ""}` : "—"}</td><td>${r.best || 0}</td><td>${r.days || 0}</td><td>${r.weeks || 0}</td></tr>`).join("")}</tbody>` : `<tbody><tr><td colspan="8" class="muted">${ladderMode === "amigos" ? "Todavía no agregaste amigos." : "Todavía nadie marcó días cumplidos. ¡Sé el primero!"}</td></tr></tbody>`;
 }
 
 // =====================================================================
@@ -822,7 +836,7 @@ $("#friendForm")?.addEventListener("submit", async (e) => {
   e.preventDefault(); const err = $("#friendErr"); err.hidden = true; const email = $("#friendEmail").value.trim();
   if (email.toLowerCase() === user.email.toLowerCase()) { err.textContent = "Ese sos vos."; err.hidden = false; return; }
   try {
-    const h = await sha256(email); const hit = Object.entries(pub).find(([uid, p]) => p.emailHash === h);
+    const h = await sha256(email); const hit = Object.entries(pub).find(([uid, p]) => uid !== user.uid && p.emailHash === h);
     if (!hit) { err.textContent = "No encontramos una cuenta con ese correo (tu amigo/a tiene que haber entrado al menos una vez a Mi plan)."; err.hidden = false; return; }
     await update(ref(db, `calendars/${user.uid}/friends`), { [hit[0]]: { name: hit[1].name || "", since: new Date().toISOString() } });
     $("#friendEmail").value = ""; toast(`${hit[1].name || "Amigo/a"} agregado/a.`); setTimeout(checkBadges, 800); syncPublic();
@@ -900,7 +914,7 @@ async function sendProposal(rec) {
   const c = pickCtx; const date = $("#propDate").value || c.date, slot = $("#propSlot").value || c.slot;
   try {
     await push(ref(db, `inbox/${c.propose}`), { type: "prop", from: user.uid, fromName: myName(), rec, date, slot, at: new Date().toISOString() });
-    closePicker(); toast(`Propuesta enviada a ${c.name}: ${R[rec]?.name || "plato"} para la ${slot === "cena" ? "cena" : slotName(slot)} del ${fechaLarga(date)}.`);
+    closePicker(); toast(`Propuesta enviada a ${c.name}: ${R[rec]?.name || "plato"} para ${slot === "cena" ? "la cena" : "el " + slotName(slot)} del ${fechaLarga(date)}.`);
   } catch (ex) { toast(denied(ex) ? "No se pudo enviar: esa persona tiene que estar en tus amigos (y la base tiene que tener las reglas nuevas publicadas)." : errMsg(ex)); }
 }
 function renderInbox() {
@@ -925,3 +939,40 @@ $("#inboxBox")?.addEventListener("click", async (e) => {
     if (n) toast("Propuesta rechazada.");
   } catch (ex) { toast(errMsg(ex)); }
 });
+
+
+// =====================================================================
+// LADDER · personas de ejemplo (porteños). No son cuentas: se calculan acá, día por día, con las mismas reglas
+// de puntos y XP que los usuarios reales, así la tabla avanza sola. CONFIG.demoLadder = false las saca.
+// =====================================================================
+const DEMO = [
+  ["Flor Gutiérrez", "Palermo", 0.9, "2026-09-28", 21, 0.8, 2], ["Nico Ferreyra", "Caballito", 0.78, "2026-10-01", 22, 0.5, 1],
+  ["Juli Benítez", "Villa Crespo", 0.86, "2026-10-04", 20, 0.7, 3], ["Tomi Acosta", "Belgrano", 0.6, "2026-09-30", 23, 0.3, 0],
+  ["Cami Ruiz", "Almagro", 0.93, "2026-10-07", 21, 0.9, 1], ["Lucho Romero", "San Telmo", 0.52, "2026-10-02", 23, 0.2, 0],
+  ["Agus Medina", "Núñez", 0.72, "2026-10-09", 22, 0.6, 1], ["Sofi Álvarez", "Recoleta", 0.83, "2026-10-11", 20, 0.75, 2],
+  ["Martu Domínguez", "Villa Urquiza", 0.66, "2026-10-13", 21, 0.55, 0], ["Facu Sosa", "Boedo", 0.45, "2026-10-05", 23, 0.25, 0],
+  ["Mica Herrera", "Colegiales", 0.88, "2026-10-15", 21, 0.85, 1], ["Santi Molina", "Flores", 0.5, "2026-10-17", 22, 0.35, 0],
+  ["Belu Castro", "Chacarita", 0.76, "2026-10-18", 20, 0.65, 1], ["Gonza Ríos", "Saavedra", 0.42, "2026-10-19", 23, 0.2, 0],
+];
+let demoCache = null;
+function demoLadder() {
+  if (CFG.demoLadder === false) return {};
+  if (demoCache) return demoCache;
+  const h01 = (str) => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return ((x >>> 0) % 100000) / 100000; };
+  const hourNow = new Date().getHours(); const out = {};
+  DEMO.forEach(([name, barrio, p, start, hour, pAgua, recetas], n) => {
+    const id = "demo-" + n; const done = {}; let prev = false, vasos = 0, aguaFull = 0;
+    for (let d = start; d <= todayISO; d = addDays(d, 1)) {
+      if (d === todayISO && hourNow < hour) break;  // todavía no marcó el día de hoy
+      const q = Math.min(0.97, Math.max(0.15, p + (prev ? 0.07 : -0.18)));  // rachas: cuesta menos seguir que arrancar
+      prev = h01(id + d) < q; if (prev) done[d] = true;
+      const v = h01(id + "agua" + d) < pAgua ? 1 + Math.floor(h01(id + "v" + d) * 3) : 0; vasos += v; if (v >= 3) aguaFull++;
+    }
+    const st = computeStats(done, {});
+    let xp = 0, run = 0, last = null;
+    Object.keys(done).sort().forEach((d) => { run = last && addDays(last, 1) === d ? run + 1 : 1; last = d; xp += xpDay(run); });
+    xp += st.weeks * 200 + st.retos * 100 + vasos * 10 + aguaFull * 20 + recetas * 80;
+    out[id] = { name, barrio, demo: true, level: levelOf(xp), xp, points: st.points, streak: st.streak, best: st.best, days: st.days, weeks: st.weeks };
+  });
+  return (demoCache = out);
+}

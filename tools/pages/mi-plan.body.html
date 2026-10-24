@@ -11,6 +11,7 @@
     <div class="f" id="fName"><label for="aName">Tu nombre</label><input id="aName" autocomplete="name" placeholder="Cómo te llamamos"></div>
     <div class="f"><label for="aEmail">Correo</label><input id="aEmail" type="email" autocomplete="email" required placeholder="vos@correo.com"></div>
     <div class="f"><label for="aPass">Contraseña</label><input id="aPass" type="password" autocomplete="current-password" required minlength="6" placeholder="Mínimo 6 caracteres"></div>
+    <div class="f recaptcha" id="fRecaptcha" hidden><label>Para saber que sos una persona</label><div id="recaptchaBox"></div></div>
     <div class="f captcha" id="fCaptcha" hidden><label for="aCaptcha">Para saber que sos una persona: <span id="captchaQ"></span></label><div class="captcha-row"><input id="aCaptcha" inputmode="numeric" autocomplete="off" placeholder="resultado"><button type="button" class="mini-btn" id="captchaNew" aria-label="Otra pregunta"><svg class="ic"><use href="#i-refresh"/></svg></button></div></div>
     <div class="hp" aria-hidden="true"><label for="aWeb">Sitio web</label><input id="aWeb" tabindex="-1" autocomplete="off"></div>
     <p class="auth-err" id="authErr" hidden></p>

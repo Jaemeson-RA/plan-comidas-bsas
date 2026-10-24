@@ -163,3 +163,7 @@ span.av.ini{display:inline-flex;align-items:center;justify-content:center;backgr
 .sh-prev.story{width:54px;height:96px}.sh-prev.post{width:80px;height:80px}
 .sh-prev img{width:70%}
 @media (min-width:721px){.share-sheet{align-items:center}.sh-box{border-radius:18px}}
+
+/* ladder: nombre + barrio */
+.lad-n{display:inline-flex;flex-direction:column;line-height:1.2}
+.lad-n .lad-b{color:var(--muted);font-size:.72rem;font-weight:500}
