@@ -1191,3 +1191,13 @@ main.diet-hide .rc.diet-x,main.diet-hide .hel-card.diet-x{display:none!important
 .diet-ok .ic{width:16px;height:16px;vertical-align:-3px}
 .md-diet{margin:.3rem 0 .6rem}
 .pref-box [data-prefs]{margin-bottom:.4rem}
+/* promos de tu lista: una fila que se desliza (antes 12 tarjetas apiladas: casi 3.000 px en el teléfono) */
+.promo-grid.mini{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:.6rem;margin:.7rem -1.1rem -.3rem;padding:.2rem 1.1rem .7rem;scrollbar-width:thin}
+.promo-grid.mini .promo{flex:0 0 176px;scroll-snap-align:start}
+.pp-skel-row{display:flex;gap:.6rem;overflow:hidden}
+.pp-skel-row .skel{flex:0 0 176px;height:262px}
+/* sin saltos: el pie no aparece arriba mientras el contenido se arma; el video vertical tiene su alto desde el principio */
+main{min-height:100vh}
+@media (max-width:720px){#introVideo,.hero-video video.vertical{height:min(72vh,620px);width:auto;max-width:100%;aspect-ratio:9/16}}
+.promo-plan{min-height:380px}
+@media (max-width:720px){.promo-plan{min-height:450px}}
