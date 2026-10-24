@@ -802,5 +802,521 @@
    "artist": "Gonzalo Rivero",
    "file": "img/empanadas.jpg"
   }
+ },
+ "noquis": {
+  "title": "Ñoquis de calabaza",
+  "img": {
+   "file": "img/noquis.jpg",
+   "title": "File:Gnocchi di semolino e zucca.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Gnocchi_di_semolino_e_zucca.jpg",
+   "license": "CC BY 2.0",
+   "artist": "fugzu",
+   "q": "Gnocchi di zucca"
+  },
+  "yt": [
+   {
+    "id": "E3DJ2M7GE4w",
+    "title": "Cómo hacer Ñoquis de Zapallo Calabaza - Receta paso a paso",
+    "channel": "Kevin Cocinero",
+    "len": "6:55"
+   },
+   {
+    "id": "YvwiyErV6dg",
+    "title": "ÑOQUIS DE CALABAZA / MUY FÁCILES Y DELICIOSOS!! CON TODOS LOS SECRETOS!!",
+    "channel": "Ivana y su cocina",
+    "len": "4:02"
+   },
+   {
+    "id": "yuoC6GNm_Co",
+    "title": "ÑOQUIS DE CALABAZA RELLENOS PASO A PASO",
+    "channel": "Paulina Cocina",
+    "len": "13:11"
+   },
+   {
+    "id": "lsbuIRGJH8A",
+    "title": "Ñoquis de calabaza con salsa 4 quesos - Morfi",
+    "channel": "Telefe",
+    "len": "30:47"
+   },
+   {
+    "id": "nqFnnCuBv4g",
+    "title": "ÑOQUIS de CALABAZA | Ñoquis de Zapallo - CUKit!",
+    "channel": "Cuk-it!",
+    "len": "3:47"
+   }
+  ]
+ },
+ "tortilla": {
+  "title": "Tortilla de papas",
+  "img": {
+   "file": "img/tortilla.jpg",
+   "title": "File:Tortilla de papas argentina casera.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Tortilla_de_papas_argentina_casera.jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Horacio Cambeiro",
+   "q": "tortilla de papas argentina"
+  },
+  "yt": [
+   {
+    "id": "i35SFOnFimQ",
+    "title": "La mejor tortilla de papas clásica | Felicitas Pizarro",
+    "channel": "Felicitas Pizarro",
+    "len": "6:41"
+   },
+   {
+    "id": "Nz41ndIITXM",
+    "title": "TORTILLA de PAPAS al HORNO SIN FREIR - FACIL",
+    "channel": "HoyCocinaDiego",
+    "len": "5:59"
+   },
+   {
+    "id": "pvlkYYdIBV0",
+    "title": "Tortilla de patatas - Receta de cocina española",
+    "channel": "Recetas de Cocina",
+    "len": "3:18"
+   },
+   {
+    "id": "-7zsg3jrpF0",
+    "title": "Tortilla de papas fácil",
+    "channel": "Cocineros Argentinos",
+    "len": "35:36"
+   },
+   {
+    "id": "ULle2vGte8k",
+    "title": "Tortilla de papas, la receta de tortilla Española que mas gusta en casa para desayunar, fácil y rica",
+    "channel": "Katastrofa La Cocina",
+    "len": "6:46"
+   }
+  ]
+ },
+ "albondigas": {
+  "title": "Albóndigas con fideos",
+  "img": {
+   "file": "img/albondigas.jpg",
+   "title": "File:Albóndigas de carne con salsa de tomate frito (España).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Alb%C3%B3ndigas_de_carne_con_salsa_de_tomate_frito_(Espa%C3%B1a).jpg",
+   "license": "CC BY 4.0",
+   "artist": "Juan Emilio Prades Bel",
+   "q": "albóndigas con salsa de tomate"
+  },
+  "yt": [
+   {
+    "id": "ZzQhLPEl7lQ",
+    "title": "Albóndigas de Carne: una receta increíble! (albóndigas de carne picada)",
+    "channel": "Paulina Cocina",
+    "len": "7:17"
+   },
+   {
+    "id": "6-lh9IWMrsQ",
+    "title": "Estas albondigas en salsa de tomate son más SANAS, más RÁPIDAS y llevan MENOS INGREDIENTES",
+    "channel": "¡Que Viva La Cocina!",
+    "len": "4:27"
+   },
+   {
+    "id": "M1Vzrp9zZ94",
+    "title": "Albóndigas con TOMATE La receta más sencilla y deliciosa! Lista en MINUTOS",
+    "channel": "Fuego Loco",
+    "len": "4:05"
+   },
+   {
+    "id": "z1gxonATD2U",
+    "title": "Albóndigas en salsa SUPER FACILES económicas y deliciosas",
+    "channel": "miel house",
+    "len": "8:09"
+   },
+   {
+    "id": "qd3uTFzf-5w",
+    "title": "ALBONDIGAS EN SALSA DE TOMATE 🌟 Las más fáciles y ricas",
+    "channel": "Cocina A Buenas Horas",
+    "len": "4:51"
+   }
+  ]
+ },
+ "curry": {
+  "title": "Pollo al curry con arroz",
+  "img": {
+   "file": "img/curry.jpg",
+   "title": "File:Pollo al curry con arroz.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pollo_al_curry_con_arroz.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Rafax",
+   "q": "pollo al curry con arroz"
+  },
+  "yt": [
+   {
+    "id": "qaoKiH_2Fzo",
+    "title": "Como hacer pechuga de pollo al curry ❗️ Una COMIDA rápida en tan solo 30 minutos!",
+    "channel": "¡Que Viva La Cocina!",
+    "len": "3:28"
+   },
+   {
+    "id": "1e-g8b85xuI",
+    "title": "Cómo hacer pollo al curry con leche de coco",
+    "channel": "Fabián León",
+    "len": "5:50"
+   },
+   {
+    "id": "o_PniN2lq4k",
+    "title": "POLLO AL CURRY / Receta estilo Hindu",
+    "channel": "Tanto Monta En La Cocina",
+    "len": "9:08"
+   },
+   {
+    "id": "VlPgtyZZAJI",
+    "title": "\" Pollo al Curry Jugosos, Fáciles y Rápidos”🥘🔥",
+    "channel": "Mis Recetas Deliciosas",
+    "len": "6:03"
+   },
+   {
+    "id": "ZZMKZ8o5DqI",
+    "title": "Tutorial Rápido: Cómo hacer POLLO AL CURRY! | Receta Pollo Hindú Fácil |  Tulio Recomienda",
+    "channel": "TULIO Recomienda",
+    "len": "2:18"
+   }
+  ]
+ },
+ "hamburguesas": {
+  "title": "Hamburguesas caseras con batatas al horno",
+  "img": {
+   "file": "img/hamburguesas.jpg",
+   "title": "File:Hamburguesa argentina casera.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Hamburguesa_argentina_casera.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Horacio Cambeiro",
+   "q": "hamburguesa casera"
+  },
+  "yt": [
+   {
+    "id": "bVOlmow5Gnw",
+    "title": "Hamburguesas de carne en MENOS DE 5 MINUTOS. Mira qué jugosas!",
+    "channel": "Anna recetasfaciles",
+    "len": "4:43"
+   },
+   {
+    "id": "rgmUL1g_j6M",
+    "title": "Hamburguesas Caseras Paso a Paso : Los 10 MANDAMIENTOS - Paulina Tirapostas",
+    "channel": "Paulina Cocina",
+    "len": "8:56"
+   },
+   {
+    "id": "yOUrkvCiM0k",
+    "title": "Hago Hamburguesas y las Comparo con las del Súper - Paulina vs. El Súper E33 (ÚLTIMO EPISODIO!)",
+    "channel": "Paulina Cocina",
+    "len": "11:15"
+   },
+   {
+    "id": "AhT0eELkB6M",
+    "title": "LA COCINA DE JOSELO - HAMBURGUESAS AL HORNO - COMO LO HAGO .",
+    "channel": "Luis A.",
+    "len": "2:27"
+   },
+   {
+    "id": "9IxuXsXYopY",
+    "title": "Como hacer hamburguesa casera al horno (low cost)",
+    "channel": "Bodegon de la popi",
+    "len": "3:32"
+   }
+  ]
+ },
+ "garbanzos": {
+  "title": "Ensalada de garbanzos y quinoa",
+  "img": {
+   "file": "img/garbanzos.jpg",
+   "title": "File:Hummus salad.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Hummus_salad.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Canbel",
+   "q": "ensalada de garbanzos"
+  },
+  "yt": [
+   {
+    "id": "UxXfulaEvEE",
+    "title": "¡ENSALADA de GARBANZOS muy Fácil y Nutritivo!",
+    "channel": "Cecilia Tupac",
+    "len": "5:14"
+   },
+   {
+    "id": "gRvgUZrW6DU",
+    "title": "Ensalada de Garbanzos lista en minutos y súper fresca",
+    "channel": "Cocina con Carmen",
+    "len": "2:10"
+   },
+   {
+    "id": "uOlHM8-pwsc",
+    "title": "Receta de ensalada de garbanzos - Karlos Arguiñano",
+    "channel": "Hogarmania",
+    "len": "1:02"
+   },
+   {
+    "id": "VHBMG2Zpb2w",
+    "title": "Ensalada de garbanzos y salsa vinagreta. La receta mas fresquita del verano",
+    "channel": "La cocina de Masito",
+    "len": "3:55"
+   },
+   {
+    "id": "i9W_LxysY94",
+    "title": "Tres maneras de preparar garbanzos. Recetas saludables, fáciles y deliciosas. 🤤☺️",
+    "channel": "Q'Rico recetas",
+    "len": "8:04"
+   }
+  ]
+ },
+ "berenjenas": {
+  "title": "Berenjenas a la parmesana light",
+  "img": {
+   "file": "img/berenjenas.jpg",
+   "title": "File:Melanzane alla Parmigiana.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Melanzane_alla_Parmigiana.jpg",
+   "license": "CC BY 2.0",
+   "artist": "Flickr.com user \"Blue Lotus\"",
+   "q": "berenjenas a la parmesana"
+  },
+  "yt": [
+   {
+    "id": "GkulNCGMLNg",
+    "title": "Berenjenas a la parmesana: receta tradicional italiana",
+    "channel": "Las Recetas de MJ",
+    "len": "6:13"
+   },
+   {
+    "id": "fmKqVDaKHuA",
+    "title": "Cómo Hacer las Berenjenas a la Parmesana con Julieta Oriolo | Cocina Italiana | El Gourmet",
+    "channel": "elGourmet",
+    "len": "5:46"
+   },
+   {
+    "id": "aBtGOjaVv5Q",
+    "title": "Cómo quitar el amargor a la berenjena 🍆 ¡El TRUCO de Karlos Arguiñano! - @CocinaAbiertatv",
+    "channel": "Hogarmania",
+    "len": "0:59"
+   },
+   {
+    "id": "ZGe8hYkGFLs",
+    "title": "BERENJENAS a la PARMESANA: Receta ITALIANA AUTÉNTICA! con Chef Roberta || Aroma Roma🍆🇮🇹🏛️",
+    "channel": "Chef Roberta Official",
+    "len": "7:02"
+   },
+   {
+    "id": "wCXe4jkxYDk",
+    "title": "¡La receta más fácil de Berenjenas! Sin horno - Deliciosas berenjenas cocinadas en sartén.",
+    "channel": "Casserola club",
+    "len": "3:43"
+   }
+  ]
+ },
+ "arrozpollo": {
+  "title": "Arroz con pollo",
+  "img": {
+   "file": "img/arrozpollo.jpg",
+   "title": "File:Arroz-con-Pollo.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Arroz-con-Pollo.jpg",
+   "license": "CC BY-SA 2.5",
+   "artist": "Kobako",
+   "q": "arroz con pollo"
+  },
+  "yt": [
+   {
+    "id": "4vEcK1X6VcA",
+    "title": "Mi receta de Arroz con Pollo paso a paso",
+    "channel": "Paulina Cocina",
+    "len": "14:17"
+   },
+   {
+    "id": "EGdbM2ytdHo",
+    "title": "Arroz con pollo en Cocineros Argentinos (2 de 2)",
+    "channel": "Canal Siete",
+    "len": "17:38"
+   },
+   {
+    "id": "maCoYEamMw8",
+    "title": "Hoy cocinamos: Arroz con pollo",
+    "channel": "La Cocina del 9",
+    "len": "17:25"
+   },
+   {
+    "id": "rgXc3RIxGf0",
+    "title": "El Arroz con Pollo Más Facil y Rapido (¡y Queda Brutal!)",
+    "channel": "¡Que Viva La Cocina!",
+    "len": "3:03"
+   },
+   {
+    "id": "L5C4Hrb6R3Y",
+    "title": "¡Arroz con pollo fácil y jugoso que te sorprenderá!",
+    "channel": "Cocina con Carmen",
+    "len": "1:52"
+   }
+  ]
+ },
+ "wrap": {
+  "title": "Wrap de pollo y palta",
+  "yt": [
+   {
+    "id": "NLkW7s-mRJg",
+    "title": "WRAP DE POLLO Y AGUACATE | RECETA FÁCIL Y RÁPIDA",
+    "channel": "Mission Wraps España",
+    "len": "1:10"
+   },
+   {
+    "id": "ftyMj9NPMfg",
+    "title": "Cómo hacer de manera original y rápida wraps de pollo, aguacate, tomate y mayonesa Ybarra",
+    "channel": "Recetas de Cocina Ybarra",
+    "len": "0:31"
+   },
+   {
+    "id": "VT2FRrV4LeU",
+    "title": "Receta casera de los Wraps de Pollo y Aguacate",
+    "channel": "Asopaipas. Recetas de Cocina Casera",
+    "len": "2:03"
+   },
+   {
+    "id": "H8P6Lcy1cPE",
+    "title": "Wrap de pollo con tortillas de harina. Pollo a la plancha jugoso. La mejor salsa ranchera con yogur",
+    "channel": "Recetas de Esbieta",
+    "len": "6:46"
+   },
+   {
+    "id": "jGAF2DwvRfg",
+    "title": "Sano y nutritivo: \"Wrap integral de pollo y palta\"",
+    "channel": "Cucinare",
+    "len": "1:01"
+   }
+  ],
+  "img": {
+   "file": "img/wrap.jpg",
+   "title": "File:Hani (sandwich).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Hani_(sandwich).jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "LittleT889",
+   "q": "Chicken wrap sandwich"
+  }
+ },
+ "gramajo": {
+  "title": "Revuelto gramajo light",
+  "img": {
+   "file": "img/gramajo.jpg",
+   "title": "File:Revuelto gramajo.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Revuelto_gramajo.jpg",
+   "license": "CC0",
+   "artist": "Neo139",
+   "q": "revuelto gramajo"
+  },
+  "yt": [
+   {
+    "id": "hloFV5P7yMQ",
+    "title": "Así me queda el revuelto gramajo bien cremoso 🇦🇷 Recetas de Bodegón #05",
+    "channel": "Paulina Cocina",
+    "len": "8:50"
+   },
+   {
+    "id": "0Gn6hw2eVog",
+    "title": "Cómo hacer Revuelto de Gramajo  | Recetas Rápidas",
+    "channel": "Tastemade Español",
+    "len": "0:40"
+   },
+   {
+    "id": "MbBtw4PD44s",
+    "title": "Cómo HACER el mejor REVUELTO GRAMAJO: receta rápida, fácil y rica",
+    "channel": "CLARÍN",
+    "len": "5:11"
+   },
+   {
+    "id": "s5o46lV-AdM",
+    "title": "Revuleto de gramajo exprés en Cocineros Argentinos",
+    "channel": "Canal Siete",
+    "len": "5:13"
+   },
+   {
+    "id": "wXXZsVytl9k",
+    "title": "Revuelto Gramajo: la receta original (y una versión mejorada) | Recetas de bodegón",
+    "channel": "Armando Esquivel",
+    "len": "6:23"
+   }
+  ]
+ },
+ "pescadohorno": {
+  "title": "Pescado al horno con papas",
+  "yt": [
+   {
+    "id": "rjofAbF4rlo",
+    "title": "Merluza al horno con patatas: receta fácil y rápida",
+    "channel": "Las Recetas de MJ",
+    "len": "2:03"
+   },
+   {
+    "id": "9s8s8KAJ2Ao",
+    "title": "Filetes de Merluza al Horno con Patatas y Verduras. Receta Fácil de Pescado al horno.",
+    "channel": "La Empana Light de Bego (videos)",
+    "len": "6:27"
+   },
+   {
+    "id": "qjnPWLjvpLo",
+    "title": "MERLUZA a la GALLEGA - Receta de pescado muy fácil",
+    "channel": "Paulina Cocina",
+    "len": "8:35"
+   },
+   {
+    "id": "8FKg0wJrPYA",
+    "title": "Lubina al Horno con Patatas - Pescado al Horno Fácil y Delicioso",
+    "channel": "Cocina con Carmen",
+    "len": "3:42"
+   },
+   {
+    "id": "nOjSiAFC53M",
+    "title": "Merluza al horno RECETA FÁCIL, RÁPIDA Y DELICIOSA / Video nº 40",
+    "channel": "La cocina de Masito",
+    "len": "4:38"
+   }
+  ],
+  "img": {
+   "file": "img/pescadohorno.jpg",
+   "title": "File:Ling Cod with Baked Potato (15988408872).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Ling_Cod_with_Baked_Potato_(15988408872).jpg",
+   "license": "CC BY 2.0",
+   "artist": "Prayitno / Thank you for (12 millions +) view from Los Angel",
+   "q": "Baked cod potatoes"
+  }
+ },
+ "carbonara": {
+  "title": "Carbonara cremosa",
+  "img": {
+   "file": "img/carbonara.jpg",
+   "title": "File:Spaghetti alla Carbonara (Madrid).JPG",
+   "page": "https://commons.wikimedia.org/wiki/File:Spaghetti_alla_Carbonara_(Madrid).JPG",
+   "license": "CC BY-SA 3.0",
+   "artist": "Tamorlan",
+   "q": "spaghetti alla carbonara"
+  },
+  "yt": [
+   {
+    "id": "OIs9tgALGNU",
+    "title": "La auténtica PASTA CARBONARA ya está aquí. Spaghetti listo en cuestión de 15 minutos.",
+    "channel": "¡Que Viva La Cocina!",
+    "len": "3:32"
+   },
+   {
+    "id": "PmxFfs8gYHs",
+    "title": "CARBONARA AUTÉNTICA: la Receta Romana Original (sin crema) 🇮🇹✨ || Italia con Chef Roberta",
+    "channel": "Chef Roberta Official",
+    "len": "8:30"
+   },
+   {
+    "id": "k-YdbdnQq08",
+    "title": "Espaguetis a la carbonara ¡La receta auténtica!",
+    "channel": "Las Recetas de MJ",
+    "len": "3:31"
+   },
+   {
+    "id": "2ivPPqeaidY",
+    "title": "PASTA CARBONARA AUTÉNTICA (Cena rápida)",
+    "channel": "Paulina Cocina",
+    "len": "6:06"
+   },
+   {
+    "id": "Vqaa_tWCavc",
+    "title": "Receta de pasta a la carbonara l Jorge Rausch",
+    "channel": "La cocina de Jorge Rausch",
+    "len": "9:44"
+   }
+  ]
  }
 }

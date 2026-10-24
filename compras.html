@@ -47,6 +47,9 @@
     <a href="recetas.html" data-nav="recetas"><svg class="ic"><use href="#i-recetas"/></svg>Recetas</a>
     <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Compras</a>
     <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Súper</a>
+    <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Estación</a>
+    <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
+    <a href="mi-plan.html" data-nav="miplan" class="nav-cta"><svg class="ic"><use href="#i-users"/></svg>Mi plan</a>
   </nav>
   <div class="money-ctl" title="Moneda en la que se muestran todos los precios del sitio">
     <div class="seg" id="curSeg">
@@ -73,16 +76,22 @@
 </main>
 
 <footer class="foot">
-  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a></nav>
+  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
   <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a></p>
 </footer>
 <nav class="tabbar" aria-label="Secciones">
   <a href="index.html" data-nav="inicio"><svg class="ic duo"><use href="#i-home" class="sh"/><use href="#i-home"/></svg>Inicio</a>
   <a href="plan.html" data-nav="plan"><svg class="ic duo"><use href="#i-calendar" class="sh"/><use href="#i-calendar"/></svg>Plan</a>
   <a href="recetas.html" data-nav="recetas"><svg class="ic duo"><use href="#i-recetas" class="sh"/><use href="#i-recetas"/></svg>Recetas</a>
-  <a href="compras.html" data-nav="compras"><svg class="ic duo"><use href="#i-compras" class="sh"/><use href="#i-compras"/></svg>Compras</a>
-  <a href="supermercados.html" data-nav="supermercados"><svg class="ic duo"><use href="#i-super" class="sh"/><use href="#i-super"/></svg>Súper</a>
+  <a href="mi-plan.html" data-nav="miplan"><svg class="ic duo"><use href="#i-users" class="sh"/><use href="#i-users"/></svg>Mi plan</a>
+  <button type="button" id="moreBtn" aria-expanded="false" aria-controls="moreMenu"><svg class="ic duo"><use href="#i-plus" class="sh"/><use href="#i-plus"/></svg>Más</button>
 </nav>
+<div class="more-menu" id="moreMenu" hidden>
+  <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Lista de compras</a>
+  <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados</a>
+  <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Productos de estación</a>
+  <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
+</div>
 <button class="sug-fab" id="sugFab" aria-expanded="false" aria-controls="sugPanel"><i><svg class="ic"><use href="#i-plus"/></svg></i>Sugerir un plato</button>
 <aside class="sug-panel" id="sugPanel" hidden aria-label="Sugerir un plato">
   <button class="sug-close" id="sugClose" aria-label="Cerrar">×</button>
@@ -113,6 +122,7 @@
     <div id="modalContent"></div>
   </div>
 </div>
+<script src="config.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>

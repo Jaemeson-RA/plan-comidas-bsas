@@ -11,6 +11,9 @@ META = {
  "recetas": ("Recetas · Plan de comidas Buenos Aires", "18 recetas fáciles para 2 porciones con foto, video, ingredientes y costo por porción."),
  "compras": ("Lista de compras · Plan de comidas Buenos Aires", "Lista de compras semanal armada por góndola a partir de las recetas del plan."),
  "supermercados": ("Supermercados · Plan de comidas Buenos Aires", "Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR."),
+ "temporada": ("Productos de estación · Plan de comidas Buenos Aires", "Frutas y verduras de estación en Argentina, mes por mes, y los platos del plan que las aprovechan."),
+ "nutricion": ("Nutrición · Plan de comidas Buenos Aires", "Calorías, proteínas, fibra y sal de tu calendario por semana y por mes, con aportes recomendados y nota sobre 10."),
+ "mi-plan": ("Mi plan · Plan de comidas Buenos Aires", "Creá tu cuenta y armá tu propio calendario de comidas eligiendo las recetas que quieras."),
 }
 for page, (title, desc) in META.items():
     body = open(os.path.join(root, "tools", "pages", f"{page}.body.html"), encoding="utf-8").read()
@@ -20,5 +23,7 @@ for page, (title, desc) in META.items():
         f"<title>{title}</title>\n<meta name=\"description\" content=\"{desc}\">\n"
         f"<link rel=\"icon\" href=\"{FAVICON}\">\n"
         "<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n</head>\n<body>\n" + head + "\n" + body + "\n" + foot)
+    if page not in ("mi-plan", "nutricion"):
+        html = html.replace('<script type="module" src="cuenta.js" data-only="miplan nutricion"></script>\n', "")
     open(os.path.join(root, f"{page}.html"), "w", encoding="utf-8").write(html)
     print("OK", page + ".html", len(html))

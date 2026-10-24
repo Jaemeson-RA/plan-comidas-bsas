@@ -22,7 +22,7 @@
     $$("img").forEach((im) => { if (im.complete && im.naturalWidth > 0) im.classList.add("ld"); });
   }
   document.addEventListener("load", (e) => { if (e.target.tagName === "IMG") e.target.classList.add("ld"); }, true);
-  const vt = (fn) => (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) ? document.startViewTransition(fn) : fn();
+  const vt = (fn) => { if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) { const t = document.startViewTransition(fn); t.finished.catch(() => {}); return t; } return fn(); };
   const onScroll = () => $(".top")?.classList.toggle("scrolled", window.scrollY > 8);
   window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
   if ($("#periodLabel")) $("#periodLabel").textContent = D.period.label;
@@ -94,18 +94,22 @@
     if (u === "u") return n; if (u === "pizca") return ""; return n + " " + u;
   }
   function openRecipe(id) {
-    const r = R[id];
+    const r = R[id]; if (!r) return;
+    const n = r.nut || {};
+    const nutLine = n.kcal ? `<div class="nut-line">${ic("flame")} <b>${Math.round(n.kcal)} kcal</b> · ${n.prot} g proteínas · ${n.carb} g carbohidratos${n.sug != null ? ` (${n.sug} g azúcar)` : ""} · ${n.fat} g grasas${n.sat != null ? ` (${n.sat} g sat.)` : ""} · ${n.fib} g fibra · ${n.sal} g sal <small>por porción${n.source === "ingredientes" ? ", calculado con los ingredientes" : ", estimado"}</small></div>` : "";
     $("#modalContent").innerHTML = `
       <img class="rm-img" src="${r.img}" alt="${esc(r.name)}">
       <div class="rm">
         <h2>${esc(r.name)}</h2>
-        <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("plate")}<b>${r.porciones} porciones</b></span><span>${ic("flame")}<b>${r.kcal} kcal</b> aprox./porción</span><span>${ic("tag")}<b data-ars="${r.cost}"></b> aprox./porción</span></div>
+        ${r.custom ? `<p class="muted small">Receta de la comunidad, creada por <b>${esc(r.ownerName)}</b>.</p>` : ""}
+        <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("plate")}<b>${r.porciones} porciones</b></span>${r.cost ? `<span>${ic("tag")}<b data-ars="${r.cost}"></b> aprox./porción</span>` : ""}</div>
+        ${nutLine}
         <div class="rm-cols">
           <div><h3>Ingredientes</h3><ul>${r.ing.map((i) => `<li>${qty(i) ? `<b>${qty(i)}</b> ` : ""}${esc(i.n)}</li>`).join("")}</ul></div>
-          <div><h3>Preparación</h3><ol>${r.pasos.map((p) => `<li>${esc(p)}</li>`).join("")}</ol><div class="tip">${ic("bulb")} ${esc(r.tip)}</div></div>
+          <div><h3>Preparación</h3>${r.pasos.length ? `<ol>${r.pasos.map((p) => `<li>${esc(p)}</li>`).join("")}</ol>` : `<p class="muted">Sin pasos cargados.</p>`}${r.tip ? `<div class="tip">${ic("bulb")} ${esc(r.tip)}</div>` : ""}</div>
         </div>
-        <div class="yt"><h3>Video</h3><button class="yt-thumb" data-yt="${r.yt}" aria-label="Reproducir video"><img src="https://i.ytimg.com/vi/${r.yt}/hqdefault.jpg" alt="" loading="lazy"></button></div>
-        <p class="credit">Foto: <a href="${r.credit.page}" target="_blank" rel="noopener">${esc(r.credit.title)}</a> · ${esc(r.credit.artist || "Wikimedia Commons")} · ${esc(r.credit.license)} (Wikimedia Commons). El costo se calcula con precios de supermercados online de Buenos Aires de octubre 2026 y es orientativo.</p>
+        ${r.yt ? `<div class="yt"><h3>Video</h3><button class="yt-thumb" data-yt="${r.yt}" aria-label="Reproducir video"><img src="https://i.ytimg.com/vi/${r.yt}/hqdefault.jpg" alt="" loading="lazy"></button></div>` : ""}
+        ${r.credit ? `<p class="credit">Foto: <a href="${r.credit.page}" target="_blank" rel="noopener">${esc(r.credit.title)}</a> · ${esc(r.credit.artist || "Wikimedia Commons")} · ${esc(r.credit.license)} (Wikimedia Commons). El costo se calcula con precios de supermercados online de Buenos Aires de octubre 2026 y es orientativo.</p>` : ""}
       </div>`;
     modal.hidden = false; document.body.style.overflow = "hidden"; $(".modal-box").scrollTop = 0; hidePop(); renderMoney();
   }
@@ -212,10 +216,10 @@
   // ---------- recetas por categoría ----------
   const CATS = [
     { id: "desayunos", t: "Desayunos", d: "Cuatro opciones que rotan toda la semana: dos sin cocción, dos con sartén. Entre 5 y 15 minutos.", ids: ["tostadas", "yogur", "revueltos", "panqueques"] },
-    { id: "rapidas", t: "Rápidas para la semana", d: "Listas en 25 minutos o menos, con una sartén o sin cocinar. Son las cenas de lunes a viernes.", ids: ["merluza", "atun", "omelette", "wok"] },
-    { id: "horno", t: "Al horno, una sola fuente", d: "Se arman en 10 minutos y el horno hace el resto. Conviene hacer el doble: lo que sobra es la vianda del día siguiente.", ids: ["pollohorno", "milanesas", "tarta", "salmon"] },
-    { id: "ollas", t: "Ollas y guisos", d: "Las más económicas y las que mejor se congelan en porciones.", ids: ["sopa", "lentejas"] },
-    { id: "clasicos", t: "Clásicos argentinos del finde", d: "Llevan más tiempo y más mesa: quedan para sábado y domingo.", ids: ["empanadas", "bife", "zapallitos", "pastel"] },
+    { id: "rapidas", t: "Rápidas para la semana", d: "Listas en 25 minutos o menos, con una sartén o sin cocinar. Las cenas de lunes a viernes.", ids: ["merluza", "atun", "omelette", "wok", "wrap", "garbanzos", "gramajo"] },
+    { id: "horno", t: "Al horno, una sola fuente", d: "Se arman en 10 minutos y el horno hace el resto. Conviene hacer el doble: lo que sobra es la vianda del día siguiente.", ids: ["pollohorno", "milanesas", "tarta", "salmon", "pescadohorno", "berenjenas", "hamburguesas"] },
+    { id: "ollas", t: "Ollas, guisos y arroces", d: "Las más económicas, las que mejor rinden y las que mejor se congelan en porciones.", ids: ["sopa", "lentejas", "curry", "arrozpollo", "albondigas"] },
+    { id: "clasicos", t: "Clásicos argentinos y pastas del finde", d: "Llevan más tiempo y más mesa: quedan para sábado y domingo (y los ñoquis, para el 29).", ids: ["empanadas", "bife", "zapallitos", "pastel", "noquis", "tortilla", "carbonara"] },
   ];
   function card(r) {
     return `<button class="rc" data-rec="${r.id}"><img src="${r.img}" alt="${esc(r.name)}" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4>
@@ -235,8 +239,36 @@
     const n = list.reduce((a, c) => a + c.items.length, 0);
     const key = (c, nm) => `shop:${state.week}:${c}:${nm}`;
     const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
-    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
+    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
     $("#clearWeek").addEventListener("click", () => { list.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
+    // texto plano de la lista (solo lo que falta comprar; si no hay nada tildado, todo) para pegar en Notas o WhatsApp
+    const listText = () => {
+      const anyDone = list.some((c) => c.items.some((i) => localStorage.getItem(key(c.cat, i.n)) === "1"));
+      const lines = ["Lista de compras · " + w.label, ""];
+      list.forEach((c) => {
+        const items = c.items.filter((i) => !anyDone || localStorage.getItem(key(c.cat, i.n)) !== "1");
+        if (!items.length) return;
+        lines.push(c.cat.toUpperCase());
+        items.forEach((i) => lines.push("- " + i.n + " · " + i.q));
+        lines.push("");
+      });
+      lines.push("Plan de comidas Buenos Aires · " + location.origin + location.pathname.replace(/[^/]*$/, "compras.html#semana-" + state.week));
+      return { text: lines.join("\n"), partial: anyDone };
+    };
+    const toast = (msg) => { let t = $("#toast"); if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); };
+    const copyText = async (text) => {
+      try { await navigator.clipboard.writeText(text); return true; }
+      catch (e) { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (err) {} ta.remove(); return ok; }
+    };
+    $("#copyList").addEventListener("click", async () => {
+      const { text, partial } = listText();
+      const ok = await copyText(text);
+      toast(ok ? (partial ? "Lista copiada (solo lo que falta). Pegala en Notas o WhatsApp." : "Lista copiada. Pegala en Notas o WhatsApp.") : "No se pudo copiar: mantené apretado para seleccionar.");
+    });
+    $("#shareList")?.addEventListener("click", async () => {
+      const { text } = listText();
+      try { await navigator.share({ title: "Lista de compras · " + w.label, text }); } catch (e) { if (e && e.name !== "AbortError") { await copyText(text); toast("Lista copiada."); } }
+    });
     $("#shopGrid").innerHTML = list.map((cat) => `<div class="shop-cat"><h4>${esc(cat.cat)} <small>${cat.items.length}</small></h4>
       ${cat.items.map((i) => { const dn = localStorage.getItem(key(cat.cat, i.n)) === "1"; return `<label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>`; }).join("")}</div>`).join("");
     $("#pantryList").innerHTML = D.pantry.map((p) => `<li>${esc(p)}</li>`).join("");
@@ -305,7 +337,14 @@
   }
 
   // ---------- sugerencias de platos (botón flotante) ----------
-  const SUG_TO = "contact.regenagency@gmail.com";
+  const CFG = window.CONFIG || {};
+  const SUG_TO = CFG.adminEmail || "jaemeson.dieu@gmail.com";
+  // notify(): manda un evento al Apps Script (si está configurado) que reenvía todo por correo al admin
+  window.notifyAdmin = async (payload) => {
+    if (!CFG.notifyUrl) return false;
+    try { await fetch(CFG.notifyUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ at: new Date().toISOString(), page: location.href }, payload)) }); return true; }
+    catch (e) { return false; }
+  };
   const fab = $("#sugFab"), panel = $("#sugPanel");
   if (fab && panel) {
     const fields = ["sugNombre", "sugLink", "sugIng", "sugTips", "sugDe"];
@@ -315,9 +354,15 @@
     $("#sugClose").addEventListener("click", () => toggle(false));
     fields.forEach((id) => { const el = $("#" + id); el.value = localStorage.getItem("sug:" + id) || ""; el.addEventListener("input", () => localStorage.setItem("sug:" + id, el.value)); });
     const body = () => `Plato: ${v("sugNombre")}\nReceta (link): ${v("sugLink") || "-"}\n\nIngredientes:\n${v("sugIng") || "-"}\n\nTips:\n${v("sugTips") || "-"}\n\nDe: ${v("sugDe") || "-"}\n\n(enviado desde ${location.href})`;
-    $("#sugForm").addEventListener("submit", (e) => {
+    $("#sugForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      location.href = `mailto:${SUG_TO}?subject=${encodeURIComponent("Sugerencia de plato: " + v("sugNombre"))}&body=${encodeURIComponent(body())}`;
+      const sent = await window.notifyAdmin({ type: "sugerencia", title: v("sugNombre"), plato: v("sugNombre"), link: v("sugLink"), ingredientes: v("sugIng"), tips: v("sugTips"), de: v("sugDe") });
+      if (sent) {
+        $("#sugOk").textContent = "¡Gracias! La sugerencia ya le llegó a Jaemeson. Podés mandar otra cuando quieras.";
+        fields.forEach((id) => { $("#" + id).value = ""; localStorage.removeItem("sug:" + id); });
+      } else {
+        location.href = `mailto:${SUG_TO}?subject=${encodeURIComponent("Sugerencia de plato: " + v("sugNombre"))}&body=${encodeURIComponent(body())}`;
+      }
       $("#sugOk").hidden = false;
     });
     $("#sugCopy").addEventListener("click", async () => {
@@ -325,6 +370,29 @@
       try { await navigator.clipboard.writeText(body()); b.textContent = "¡Copiado!"; } catch (err) { b.textContent = "No se pudo copiar"; }
       setTimeout(() => { b.textContent = t; }, 1600);
     });
+  }
+
+  // ---------- menú "Más" (móvil) ----------
+  const moreBtn = $("#moreBtn"), moreMenu = $("#moreMenu");
+  if (moreBtn && moreMenu) {
+    if (["compras", "supermercados", "temporada", "nutricion"].includes(page)) moreBtn.classList.add("on");
+    moreBtn.addEventListener("click", (e) => { e.stopPropagation(); moreMenu.hidden = !moreMenu.hidden; moreBtn.setAttribute("aria-expanded", !moreMenu.hidden); });
+    document.addEventListener("click", (e) => { if (!moreMenu.hidden && !e.target.closest("#moreMenu")) moreMenu.hidden = true; });
+  }
+
+  // ---------- productos de estación ----------
+  if (page === "temporada" && D.temporada) {
+    const nowM = new Date().getMonth() + 1;
+    const order = [...D.temporada].sort((a, b) => ((a.m - nowM + 12) % 12) - ((b.m - nowM + 12) % 12));
+    const normS = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    const stem = (p) => normS(p).replace(/\s*\(.*\)\s*/g, "").split(" ")[0].replace(/s$/, "");
+    const matches = (mes) => { const stems = [...mes.f, ...mes.v].map(stem).filter((x) => x.length > 3); return Object.values(R).filter((r) => r.ing.some((i) => stems.some((st) => normS(i.n).includes(st)))).slice(0, 8); };
+    $("#mesNav").innerHTML = order.map((m) => `<a href="#mes-${m.m}">${m.n}${m.m === nowM ? " <small>ahora</small>" : ""}</a>`).join("");
+    $("#meses").innerHTML = order.map((m) => { const pl = matches(m); return `<details class="card mes" id="mes-${m.m}" ${m.m === nowM ? "open" : ""}><summary><h2>${m.n}</h2>${m.m === nowM ? '<span class="now">este mes</span>' : ""}<span class="cnt">${m.f.length} frutas · ${m.v.length} verduras</span></summary>
+      <div class="cols"><div><h4>Frutas</h4>${m.f.map((p) => `<span class="prod f">${esc(p)}</span>`).join("")}</div><div><h4>Verduras</h4>${m.v.map((p) => `<span class="prod v">${esc(p)}</span>`).join("")}</div></div>
+      <div class="tip">${ic("leaf")} ${esc(m.tip)}</div>
+      ${pl.length ? `<div class="platos"><h4>Platos del plan que los aprovechan</h4><div class="grid mini">${pl.map((r) => `<button class="rc" data-rec="${r.id}"><img src="${r.img}" alt="" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4></div></button>`).join("")}</div></div>` : ""}
+    </details>`; }).join("");
   }
 
   renderMoney(); liveRates(); animateIn();

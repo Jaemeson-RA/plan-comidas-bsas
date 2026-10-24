@@ -11,14 +11,140 @@ YT = {  # video elegido por receta
  "pollohorno":"lZJpPfIkn0w","merluza":"gS3UnoERnRE","bife":"xfk1JLjQsgs","atun":"S9XU_A2l_OM",
  "sopa":"NRx0xCYgdJk","tarta":"AXrqVW-ilJA","wok":"S2shSjklAME","omelette":"SA122sMRU6A",
  "milanesas":"epaNw386VYo","lentejas":"qRHymy7Ue4E","zapallitos":"T3jbUQT_z1Q","salmon":"mPpiPFikKcs",
- "pastel":"2dK_dtOMbyg","empanadas":"T8NWbcdnbQ4"}
+ "pastel":"2dK_dtOMbyg","empanadas":"T8NWbcdnbQ4",
+ "noquis":"YvwiyErV6dg","tortilla":"i35SFOnFimQ","albondigas":"ZzQhLPEl7lQ","curry":"qaoKiH_2Fzo","hamburguesas":"rgmUL1g_j6M",
+ "garbanzos":"gRvgUZrW6DU","berenjenas":"fmKqVDaKHuA","arrozpollo":"4vEcK1X6VcA","wrap":"H8P6Lcy1cPE","gramajo":"hloFV5P7yMQ",
+ "pescadohorno":"rjofAbF4rlo","carbonara":"2ivPPqeaidY"}
+# valores nutricionales aproximados por porción: kcal, proteínas g, carbohidratos g, grasas g, fibra g, sal g
+NUT = {
+ "tostadas":(380,14,40,17,7,1.1),"yogur":(350,14,55,7,6,0.3),"revueltos":(420,24,22,26,3,1.3),"panqueques":(390,14,55,11,6,0.3),
+ "pollohorno":(520,55,30,18,7,1.2),"merluza":(380,48,10,15,4,1.0),"bife":(550,52,28,24,5,1.1),"atun":(420,38,14,22,5,1.4),
+ "sopa":(320,16,36,12,8,1.6),"tarta":(380,24,20,22,6,1.3),"wok":(480,45,45,12,5,2.4),"omelette":(400,30,10,27,2,1.2),
+ "milanesas":(520,50,38,18,4,1.4),"lentejas":(480,32,60,10,16,1.5),"zapallitos":(450,36,18,25,5,1.2),"salmon":(480,40,12,30,4,0.8),
+ "pastel":(520,36,48,20,6,1.5),"empanadas":(540,28,50,26,4,1.8),"noquis":(520,16,90,10,7,1.0),"tortilla":(480,20,42,26,5,1.1),
+ "albondigas":(580,42,62,18,6,1.6),"curry":(560,46,55,18,4,1.4),"hamburguesas":(620,44,58,24,7,1.7),"garbanzos":(450,18,55,17,13,0.9),
+ "berenjenas":(420,24,22,26,8,1.6),"arrozpollo":(560,44,65,14,5,1.8),"wrap":(480,40,38,19,7,1.3),"gramajo":(500,28,42,24,5,1.9),
+ "pescadohorno":(480,46,40,15,5,1.0),"carbonara":(650,32,70,27,3,2.1)}
+MERIENDA_NUT = (200,8,28,6,2,0.4)
+
+# ---------- BASE DE INGREDIENTES (por 100 g: kcal, prot, carb, azúcar, grasa, saturada, fibra, sal) ----------
+# Valores aproximados (tablas SARA/USDA redondeadas). 'u' = peso de una unidad en g cuando se mide por unidad.
+def ING(n, cat, kcal, prot, carb, sug, fat, sat, fib, sal, u=None, alias=()):
+    return {"n":n,"cat":cat,"por100":{"kcal":kcal,"prot":prot,"carb":carb,"sug":sug,"fat":fat,"sat":sat,"fib":fib,"sal":sal},"u":u,"alias":list(alias)}
+ING_DB = [
+ ING("pan integral","pan",250,9,43,4,3.5,0.7,7,1.1,u=30,alias=["pan integral (rodajas)"]),
+ ING("palta","verd",160,2,8.5,0.7,15,2.1,6.7,0.02,u=170),
+ ING("queso untable light","lact",150,8,5,4,11,7,0,1.0),
+ ING("tomate","verd",18,0.9,3.9,2.6,0.2,0,1.2,0.01,u=150),
+ ING("limón","verd",29,1.1,9,2.5,0.3,0,2.8,0,u=60),
+ ING("leche","lact",61,3.2,4.8,4.8,3.3,1.9,0,0.1),
+ ING("café molido","pantry",2,0.3,0,0,0,0,0,0),
+ ING("yogur natural","lact",61,3.5,4.7,4.7,3.3,2.1,0,0.1,u=120,alias=["yogur natural (pote)"]),
+ ING("avena","alm",389,17,66,1,7,1.2,10.6,0),
+ ING("banana","verd",89,1.1,23,12,0.3,0.1,2.6,0,u=120),
+ ING("miel","pantry",304,0.3,82,82,0,0,0.2,0),
+ ING("huevos","lact",143,12.6,0.7,0.4,9.5,3.1,0,0.35,u=55),
+ ING("yema de huevo","lact",322,16,3.6,0.6,27,10,0,0.1,u=18),
+ ING("manteca","lact",717,0.9,0.1,0,81,51,0,0.7,alias=["manteca o aceite","aceite o manteca"]),
+ ING("yerba mate","pantry",0,0,0,0,0,0,0,0),
+ ING("suprema de pollo","carne",120,22.5,0,0,2.6,0.6,0,0.1),
+ ING("zapallo anco / calabaza","verd",34,1,8.6,2.2,0.1,0,1.5,0,u=1500),
+ ING("zanahoria","verd",41,0.9,9.6,4.7,0.2,0,2.8,0.17,u=80),
+ ING("cebolla","verd",40,1.1,9.3,4.2,0.1,0,1.7,0.01,u=120,alias=["cebolla morada"]),
+ ING("aceite de oliva","pantry",884,0,0,0,100,14,0,0,alias=["aceite"]),
+ ING("ajo","verd",149,6.4,33,1,0.5,0.1,2.1,0.04,u=4,alias=["ajo (dientes)"]),
+ ING("filet de merluza","carne",86,17.8,0,0,1.3,0.3,0,0.3),
+ ING("espinaca","verd",23,2.9,3.6,0.4,0.4,0.1,2.2,0.2,u=300,alias=["espinaca fresca (atado)"]),
+ ING("nalga / bife magro","carne",150,21,0,0,7,2.8,0,0.15),
+ ING("atún al natural","alm",116,26,0,0,1,0.3,0,1.0,u=120,alias=["atún al natural (lata 170 g)"]),
+ ING("lechuga","verd",15,1.4,2.9,0.8,0.2,0,1.3,0.07,u=300),
+ ING("vinagre","pantry",20,0,0.9,0.4,0,0,0,0,alias=["vinagre o limón"]),
+ ING("puerro","verd",61,1.5,14,3.9,0.3,0,1.8,0.05,u=100),
+ ING("zapallito","verd",17,1.2,3.1,2.5,0.3,0.1,1,0.02,u=200,alias=["brócoli o zapallito"]),
+ ING("zapallitos redondos","verd",17,1.2,3.1,2.5,0.3,0.1,1,0.02,u=150),
+ ING("caldo de verduras (cubo)","pantry",220,10,15,5,15,8,0,45,u=10),
+ ING("acelga","verd",19,1.8,3.7,1.1,0.2,0,1.6,0.5,u=500,alias=["acelga (atado)"]),
+ ING("queso port salut light","lact",250,25,2,1,16,10,0,1.5),
+ ING("queso rallado","lact",420,38,4,0,29,19,0,2.0,alias=["queso rallado (sardo o parmesano)"]),
+ ING("champiñones","verd",22,3.1,3.3,2,0.3,0,1,0.01),
+ ING("cebolla de verdeo","verd",32,1.8,7.3,2.3,0.2,0,2.6,0.04,u=25),
+ ING("morrón rojo","verd",31,1,6,4.2,0.3,0,2.1,0.01,u=150),
+ ING("arroz","alm",365,7,80,0.1,0.7,0.2,1.3,0),
+ ING("salsa de soja","pantry",53,8,5,0.4,0.6,0.1,0.8,14),
+ ING("pan rallado","alm",395,13,72,6,5,1.2,4.5,1.8),
+ ING("lentejas secas","alm",352,25,63,2,1.1,0.2,11,0.02),
+ ING("carne picada magra","carne",170,20,0,0,10,4,0,0.17),
+ ING("tomate triturado (lata)","alm",32,1.6,7,4,0.3,0,1.5,0.3,u=400),
+ ING("salmón (filet)","carne",208,20,0,0,13,3,0,0.15),
+ ING("papa","verd",77,2,17,0.8,0.1,0,2.2,0.02,u=150),
+ ING("aceitunas verdes","alm",115,0.8,6,0,11,1.4,3.2,3.5,u=4),
+ ING("tapas para empanadas (docena)","alm",320,8,55,2,8,4,2,1.2,u=300),
+ ING("harina 0000","alm",364,10,76,0.3,1,0.2,2.7,0),
+ ING("curry en polvo","pantry",325,14,56,3,14,2,53,0.1),
+ ING("leche de coco (lata)","alm",197,2,3,2,21,19,0,0.03,u=400),
+ ING("batata","verd",86,1.6,20,4.2,0.1,0,3,0.14),
+ ING("pan de hamburguesa","pan",270,9,48,6,4,1,2.5,1.1,u=60),
+ ING("garbanzos cocidos (lata)","alm",139,7.3,22,0.3,2.6,0.3,6.4,0.6,u=240),
+ ING("quinoa","alm",368,14,64,0,6,0.7,7,0.01),
+ ING("pepino","verd",15,0.7,3.6,1.7,0.1,0,0.5,0,u=250),
+ ING("berenjena","verd",25,1,6,3.5,0.2,0,3,0,u=300),
+ ING("arvejas (lata o congeladas)","alm",81,5.4,14,5.7,0.4,0.1,5.7,0.01),
+ ING("tortillas de harina (rapiditas)","pan",310,8,50,3,8,3,3,1.6,u=45),
+ ING("jamón cocido","carne",110,18,1.5,1,3.5,1.2,0,2.3),
+ ING("fideos (spaghetti o tallarines)","alm",371,13,75,2.7,1.5,0.3,3.2,0.01,alias=["spaghetti"]),
+ ING("panceta ahumada","carne",420,13,1,0,40,14,0,2.5),
+ ING("sal","pantry",0,0,0,0,0,0,0,100),
+ ING("fruta de estación","verd",55,0.7,13,10,0.2,0,2.2,0,u=150),
+]
+for i,x in enumerate(ING_DB): x["id"] = "b%02d" % i
+ING_IDX = {}
+for x in ING_DB:
+    ING_IDX[x["n"].lower()] = x
+    for a in x["alias"]: ING_IDX[a.lower()] = x
+# cucharadas / cucharaditas en gramos según el ingrediente
+CDA = {"aceite de oliva":9,"aceite":9,"salsa de soja":15,"pan rallado":8,"harina 0000":8,"miel":20,"curry en polvo":6,"vinagre":15,"vinagre o limón":15}
+def grams_of(ing):
+    """gramos de un ingrediente de receta a partir de (q,u); None si no hay forma de saberlo"""
+    n = ing["n"].lower(); q = ing["q"]; u = ing["u"]
+    base = ING_IDX.get(n)
+    if u in ("g","ml"): return q
+    if u == "cda": return q * CDA.get(n, 10)
+    if u == "cdita": return q * (CDA.get(n, 10) / 2.5)
+    if u == "pizca": return 1.5 if "sal" in n.split() or n.startswith("sal") or ", sal" in n or " sal" in n else 0.5
+    if u == "u" and base and base["u"]: return q * base["u"]
+    return None
+def nut_from_ing(ings, porciones):
+    tot = {"kcal":0,"prot":0,"carb":0,"sug":0,"fat":0,"sat":0,"fib":0,"sal":0}; missing = []
+    for ing in ings:
+        n = ing["n"].lower(); g = grams_of(ing)
+        if g is None: missing.append(ing["n"]); continue
+        base = ING_IDX.get(n)
+        if base is None:
+            if ing["u"] == "pizca":  # condimentos: solo cuenta la sal
+                tot["sal"] += g if ("sal" in n) else 0
+                continue
+            missing.append(ing["n"]); continue
+        for k,v in base["por100"].items(): tot[k] += v * g / 100
+    return {k: round(v / porciones, 1) for k,v in tot.items()}, missing
 
 # ingredientes: (nombre, cantidad, unidad, categoría) — para 2 porciones. cat: verd, carne, lact, alm, pan, pantry
 def I(n,q,u,c): return {"n":n,"q":q,"u":u,"c":c}
 R = {}
+NUT_LOG = []
+def _nut(id, ing, porc=2):
+    est = dict(zip(["kcal","prot","carb","fat","fib","sal"],NUT[id]))
+    calc, missing = nut_from_ing(ing, porc)
+    if missing: NUT_LOG.append((id, "faltan", missing))
+    # si el cálculo cubre la receta (menos de 2 ingredientes sin dato) se usa el cálculo; si no, la estimación
+    if len(missing) <= 1 and calc["kcal"] > 120:
+        NUT_LOG.append((id, "calc", calc["kcal"], "est", est["kcal"]))
+        calc["source"] = "ingredientes"; return calc
+    est.update({"sug": None, "sat": None, "source": "estimado"}); return est
+PORCIONES = {"lentejas":4,"empanadas":4,"pastel":4,"noquis":4,"albondigas":3,"arrozpollo":3,"tortilla":3,"curry":3}
 def rec(id, name, tipo, tiempo, kcal, cost, tags, ing, pasos, tip):
-    R[id] = {"id":id,"name":name,"tipo":tipo,"tiempo":tiempo,"kcal":kcal,"cost":cost,"tags":tags,"porciones":2,
+    R[id] = {"id":id,"name":name,"tipo":tipo,"tiempo":tiempo,"kcal":kcal,"cost":cost,"tags":tags,"porciones":PORCIONES.get(id,2),
              "ing":ing,"pasos":pasos,"tip":tip,"yt":YT[id],
+             "nut":_nut(id, ing, PORCIONES.get(id,2)),
              "img":media[id]["img"]["file"],"credit":{"title":media[id]["img"]["title"].replace("File:",""),
              "page":media[id]["img"]["page"],"license":media[id]["img"]["license"],"artist":media[id]["img"]["artist"]}}
 
@@ -74,7 +200,7 @@ rec("tarta","Tarta de acelga light (sin masa o con masa integral)","plato",45,38
  "Fría también es riquísima: la porción que sobra es el almuerzo del día siguiente.")
 rec("wok","Wok de pollo y verduras con arroz","plato",25,480,3100,["rápido","una sartén"],
  [I("suprema de pollo",400,"g","carne"),I("zanahoria",1,"u","verd"),I("morrón rojo",1,"u","verd"),I("cebolla",1,"u","verd"),I("brócoli o zapallito",1,"u","verd"),
-  I("arroz",120,"g","alm"),I("salsa de soja",3,"cda","pantry"),I("ajo (dientes)",2,"u","verd"),I("jengibre (opcional)",1,"pizca","pantry"),I("aceite",1,"cda","pantry")],
+  I("arroz",120,"g","alm"),I("salsa de soja",2,"cda","pantry"),I("ajo (dientes)",2,"u","verd"),I("jengibre (opcional)",1,"pizca","pantry"),I("aceite",1,"cda","pantry")],
  ["Cocinar el arroz. Cortar el pollo en tiras y las verduras en bastones finos.","Wok o sartén grande muy caliente: dorar el pollo 4 min, retirar.","Saltear las verduras 4 min (tienen que quedar crocantes).","Volver el pollo, agregar soja, ajo y jengibre, 1 min más. Servir sobre el arroz."],
  "Las verduras que sobraron del pollo al horno van directo al wok.")
 rec("omelette","Omelette de champiñones y queso light","plato",15,400,2200,["rápido","vegetariano","proteico"],
@@ -83,7 +209,7 @@ rec("omelette","Omelette de champiñones y queso light","plato",15,400,2200,["r�
  ["Saltear los champiñones en láminas a fuego fuerte hasta que doren. Reservar.","Batir los huevos con sal y pimienta.","Volcar en sartén antiadherente a fuego medio; cuando cuaje el borde, poner champiñones, queso y verdeo en una mitad.","Doblar, 1 min más y servir con la tostada."],
  "Bandeja de champiñones en oferta = cena lista en 15 minutos.")
 rec("milanesas","Milanesas de pollo al horno con ensalada","plato",35,520,3000,["horno","clásico argentino"],
- [I("suprema de pollo",400,"g","carne"),I("huevos",1,"u","lact"),I("pan rallado",120,"g","alm"),I("ajo (dientes)",1,"u","verd"),I("perejil",1,"pizca","pantry"),
+ [I("suprema de pollo",400,"g","carne"),I("huevos",1,"u","lact"),I("pan rallado",80,"g","alm"),I("ajo (dientes)",1,"u","verd"),I("perejil",1,"pizca","pantry"),
   I("lechuga",1,"u","verd"),I("tomate",2,"u","verd"),I("aceite",1,"cda","pantry"),I("limón",1,"u","verd"),I("sal y pimienta",1,"pizca","pantry")],
  ["Abrir las supremas en filetes finos y aplastarlas un poco.","Batir el huevo con ajo, perejil, sal y pimienta. Pasar las milanesas por huevo y después por pan rallado, apretando.","Placa aceitada, horno a 220 °C: 12 min, dar vuelta, 10 min más hasta dorar.","Ensalada de lechuga y tomate con limón y oliva."],
  "Empaná el doble y congelá crudas separadas con papel: van del freezer al horno.")
@@ -113,14 +239,65 @@ rec("empanadas","Empanadas de carne al horno","plato",60,540,2800,["horno","clá
  ["Rehogar la cebolla en abundante aceite hasta transparentar. Sumar la carne y cocinar 5 min; condimentar fuerte con pimentón, comino y ají molido.","Fuera del fuego: verdeo picado. Enfriar en la heladera (ideal, 1 hora).","Rellenar las tapas con huevo duro picado y una aceituna; cerrar con repulgue o con tenedor.","Pintar con huevo. Horno a 220 °C 15-18 min."],
  "Salen 12: 3 por persona para el almuerzo del sábado y quedan 6 para la vianda del lunes.")
 
+# ---------- MÁS PLATOS ----------
+rec("noquis","Ñoquis de calabaza","plato",45,520,1900,["clásico argentino","vegetariano","29 del mes"],
+ [I("zapallo anco / calabaza",600,"g","verd"),I("harina 0000",250,"g","alm"),I("huevos",1,"u","lact"),I("queso rallado",40,"g","lact"),I("manteca",20,"g","lact"),I("nuez moscada o salvia, sal",1,"pizca","pantry")],
+ ["Cocinar la calabaza al horno (o al vapor) hasta que esté tierna; pisarla y dejar que se enfríe y pierda agua.","Mezclar con el huevo, el queso y sal; sumar la harina de a poco hasta una masa blanda que apenas no se pegue.","Hacer rollitos, cortar trozos de 2 cm y marcarlos con un tenedor.","Hervir en agua con sal: cuando flotan, 1 minuto más. Saltear en manteca con salvia o servir con salsa de tomate."],
+ "El 29 se comen ñoquis con un billete abajo del plato: tradición porteña para que no falte plata. Por eso caen el 29 de octubre y el 29 de noviembre.")
+rec("tortilla","Tortilla de papas","plato",35,480,1700,["clásico","vegetariano","rinde"],
+ [I("papa",600,"g","verd"),I("cebolla",1,"u","verd"),I("huevos",5,"u","lact"),I("aceite",3,"cda","pantry"),I("sal y pimienta",1,"pizca","pantry")],
+ ["Cortar las papas en láminas finas y la cebolla en pluma.","Cocinarlas en aceite a fuego medio-bajo 15 min, sin que doren. Escurrir bien.","Mezclar con los huevos batidos y sal; dejar reposar 5 min.","Cuajar en sartén a fuego medio 4 min, dar vuelta con un plato y 3 min más."],
+ "Jugosa adentro: sacala cuando el centro todavía tiembla un poco.")
+rec("albondigas","Albóndigas con fideos","plato",40,580,3200,["clásico","rinde","batch"],
+ [I("carne picada magra",400,"g","carne"),I("pan rallado",3,"cda","alm"),I("huevos",1,"u","lact"),I("ajo (dientes)",2,"u","verd"),I("perejil",1,"pizca","pantry"),I("cebolla",1,"u","verd"),I("tomate triturado (lata)",1,"u","alm"),I("fideos (spaghetti o tallarines)",200,"g","alm"),I("aceite de oliva",1,"cda","pantry"),I("orégano, sal, pimienta",1,"pizca","pantry")],
+ ["Mezclar la carne con pan rallado, huevo, un ajo picado, perejil y sal. Formar bolitas del tamaño de una nuez.","Dorarlas en sartén con un hilo de aceite y reservar.","En la misma sartén rehogar la cebolla y el otro ajo; sumar el tomate y el orégano. Volver las albóndigas y cocinar 20 min a fuego bajo.","Hervir los fideos al dente y servir con la salsa."],
+ "Congelá la mitad de las albóndigas crudas: otra cena resuelta.")
+rec("curry","Pollo al curry con arroz","plato",30,560,3400,["una olla","rápido"],
+ [I("suprema de pollo",400,"g","carne"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("curry en polvo",1,"cda","pantry"),I("jengibre (opcional)",1,"pizca","pantry"),I("leche de coco (lata)",0.5,"u","alm"),I("tomate",1,"u","verd"),I("arroz",150,"g","alm"),I("aceite",1,"cda","pantry"),I("sal",1,"pizca","pantry")],
+ ["Dorar el pollo en cubos y reservar.","Rehogar cebolla y ajo; agregar el curry y el jengibre 30 segundos.","Sumar la leche de coco, el tomate en cubos y el pollo. Cocinar 15 min a fuego bajo.","Servir con el arroz blanco y perejil o cilantro picado."],
+ "Si no hay leche de coco, va con un pote de yogur natural agregado fuera del fuego.")
+rec("hamburguesas","Hamburguesas caseras con batatas al horno","plato",40,620,3300,["horno","finde"],
+ [I("carne picada magra",300,"g","carne"),I("cebolla",0.5,"u","verd"),I("huevos",1,"u","lact"),I("pan rallado",2,"cda","alm"),I("pan de hamburguesa",2,"u","pan"),I("batata",400,"g","verd"),I("tomate",1,"u","verd"),I("lechuga",0.5,"u","verd"),I("queso port salut light",40,"g","lact"),I("pimentón, sal, pimienta",1,"pizca","pantry"),I("aceite de oliva",1,"cda","pantry")],
+ ["Batatas en bastones con oliva, pimentón y sal: horno a 200 °C unos 30 min.","Mezclar la carne con la cebolla rallada, el huevo, el pan rallado y sal. Formar 2 medallones sin apretar demasiado.","Plancha caliente: 4 min por lado; el queso arriba en el último minuto.","Armar con lechuga y tomate en el pan tostado."],
+ "Cuanto menos amasás la carne, más jugosa queda.")
+rec("garbanzos","Ensalada de garbanzos y quinoa","plato",20,450,2300,["vegetariano","proteico","vianda"],
+ [I("garbanzos cocidos (lata)",1,"u","alm"),I("quinoa",100,"g","alm"),I("tomate",2,"u","verd"),I("pepino",1,"u","verd"),I("cebolla morada",0.5,"u","verd"),I("perejil",1,"pizca","pantry"),I("limón",1,"u","verd"),I("aceite de oliva",2,"cda","pantry"),I("comino, sal, pimienta",1,"pizca","pantry")],
+ ["Enjuagar la quinoa y cocinarla 12 min en el doble de agua; dejar enfriar.","Cortar tomate, pepino y cebolla en cubitos.","Mezclar con los garbanzos escurridos y la quinoa.","Aliñar con oliva, limón, comino, sal y perejil."],
+ "Aguanta 2 días en la heladera: la vianda perfecta para llevar.")
+rec("berenjenas","Berenjenas a la parmesana light","plato",50,420,2600,["horno","vegetariano"],
+ [I("berenjena",2,"u","verd"),I("tomate triturado (lata)",1,"u","alm"),I("ajo (dientes)",2,"u","verd"),I("queso port salut light",120,"g","lact"),I("queso rallado",30,"g","lact"),I("albahaca u orégano",1,"pizca","pantry"),I("aceite de oliva",2,"cda","pantry"),I("sal",1,"pizca","pantry")],
+ ["Cortar las berenjenas en rodajas, salarlas 15 min y secarlas.","Dorarlas a la plancha o al horno con apenas de oliva (no fritas).","En una fuente, capas de berenjena, salsa de tomate con ajo y queso; terminar con queso rallado.","Horno a 200 °C unos 25 min hasta gratinar."],
+ "Al horno en vez de fritas: la mitad de aceite y el mismo sabor.")
+rec("arrozpollo","Arroz con pollo","plato",40,560,3000,["una olla","rinde"],
+ [I("suprema de pollo",400,"g","carne"),I("arroz",200,"g","alm"),I("cebolla",1,"u","verd"),I("morrón rojo",1,"u","verd"),I("arvejas (lata o congeladas)",150,"g","alm"),I("ajo (dientes)",2,"u","verd"),I("caldo de verduras (cubo)",1,"u","pantry"),I("pimentón, cúrcuma, sal",1,"pizca","pantry"),I("aceite",1,"cda","pantry")],
+ ["Dorar el pollo en trozos y reservar.","Rehogar cebolla, morrón y ajo; sumar el arroz y el pimentón, revolver 1 min.","Agregar 500 ml de caldo caliente y el pollo; tapar y cocinar 18 min a fuego bajo.","Arvejas 5 min antes del final. Reposar tapado 5 min."],
+ "El reposo tapado es lo que deja el arroz suelto y húmedo.")
+rec("wrap","Wrap de pollo y palta","plato",15,480,3100,["rápido","sin horno"],
+ [I("tortillas de harina (rapiditas)",2,"u","pan"),I("suprema de pollo",250,"g","carne"),I("palta",1,"u","verd"),I("lechuga",0.5,"u","verd"),I("tomate",1,"u","verd"),I("yogur natural (pote)",1,"u","lact"),I("limón",0.5,"u","verd"),I("pimentón, sal",1,"pizca","pantry")],
+ ["Pollo en tiras con pimentón y sal: plancha 6 min.","Salsa: yogur, jugo de limón, sal.","Armar sobre la tortilla: lechuga, tomate, palta, pollo, salsa.","Cerrar y dorar 1 min por lado en la sartén."],
+ "Con pollo que sobró del horno queda listo en 5 minutos.")
+rec("gramajo","Revuelto gramajo light","plato",25,500,2400,["clásico argentino","rápido"],
+ [I("papa",400,"g","verd"),I("huevos",4,"u","lact"),I("jamón cocido",100,"g","carne"),I("arvejas (lata o congeladas)",100,"g","alm"),I("cebolla",0.5,"u","verd"),I("aceite",1,"cda","pantry"),I("sal y pimienta",1,"pizca","pantry")],
+ ["Papas en bastones finos: horno o airfryer a 200 °C unos 20 min con poco aceite (en vez de fritas).","Rehogar la cebolla con el jamón en tiritas.","Sumar las papas y las arvejas.","Volcar los huevos batidos y revolver 1 minuto: tiene que quedar cremoso."],
+ "La versión de bodegón lleva papas fritas; al horno pierde la grasa y nada del sabor.")
+rec("pescadohorno","Pescado al horno con papas","plato",40,480,5200,["horno","pescado"],
+ [I("filet de merluza",500,"g","carne"),I("papa",500,"g","verd"),I("cebolla",1,"u","verd"),I("tomate",2,"u","verd"),I("limón",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite de oliva",2,"cda","pantry"),I("perejil, sal, pimienta",1,"pizca","pantry")],
+ ["Papas en rodajas finas y cebolla en pluma en una fuente con oliva y sal: horno a 200 °C 15 min.","Apoyar el pescado arriba con rodajas de tomate, ajo picado, limón y perejil.","Hornear 15 min más hasta que el pescado se deshaga con el tenedor."],
+ "También con abadejo o lenguado si está en oferta.")
+rec("carbonara","Carbonara cremosa","plato",25,650,3000,["pasta","finde"],
+ [I("spaghetti",200,"g","alm"),I("panceta ahumada",100,"g","carne"),I("huevos",2,"u","lact"),I("yema de huevo",1,"u","lact"),I("queso rallado (sardo o parmesano)",60,"g","lact"),I("pimienta negra, sal",1,"pizca","pantry")],
+ ["Dorar la panceta en cubitos a fuego medio hasta que quede crocante.","Batir los huevos, la yema, el queso y mucha pimienta.","Hervir la pasta al dente y guardar una taza del agua.","Fuera del fuego: mezclar la pasta con la panceta y la crema de huevo, aflojando con agua de cocción hasta que quede cremosa."],
+ "Nunca con la sartén al fuego cuando entra el huevo: se corta y queda revuelto.")
+
 # ---------- PLAN ----------
 start = datetime.date(2026,10,27)
 DOW = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
 MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]
 BREAK = ["tostadas","yogur","revueltos","yogur","tostadas","panqueques","revueltos"]
-PAIRS = [("pollohorno","sopa"),("merluza","tarta"),("wok","omelette"),("lentejas","atun"),("milanesas","zapallitos")]
-WEEKEND = {5:("empanadas","salmon"), 6:("bife","pastel")}
-OFFS = [0,2,4,1,3]
+LUNCH = ["pollohorno","merluza","wok","lentejas","milanesas","curry","arrozpollo","pescadohorno","albondigas","tortilla","noquis"]
+DINNER = ["sopa","tarta","omelette","atun","zapallitos","garbanzos","wrap","gramajo","hamburguesas"]
+SAT = [("empanadas","salmon"),("carbonara","berenjenas"),("empanadas","pescadohorno"),("hamburguesas","salmon"),("carbonara","garbanzos")]
+SUN = [("bife","pastel"),("noquis","tarta"),("bife","berenjenas"),("pastel","sopa"),("bife","zapallitos")]
 MERIENDA = ["Mate con 2 tostadas y queso untable","Yogur natural o una fruta","Mate con fruta (banana o manzana)","Café con leche y 2 galletas de avena","Mate con 2 tostadas y queso untable","Yogur con avena","Mate con fruta"]
 weeks = []
 for w in range(5):
@@ -128,10 +305,13 @@ for w in range(5):
     for d in range(7):
         date = start + datetime.timedelta(days=w*7+d)
         if d >= 5:
-            lunch, dinner = WEEKEND[d]
+            lunch, dinner = (SAT if d == 5 else SUN)[w]
         else:
-            lunch, dinner = PAIRS[(d+OFFS[w])%5]
-            if w % 2 == 1: lunch, dinner = dinner, lunch
+            k = w*5 + d
+            lunch, dinner = LUNCH[k % len(LUNCH)], DINNER[k % len(DINNER)]
+        if date.day == 29:  # ñoquis del 29
+            if dinner == "noquis": dinner = "sopa"
+            lunch = "noquis"
         days.append({"date":date.isoformat(),"dow":DOW[d],"label":f"{DOW[d]} {date.day} {MESES[date.month-1]}",
                      "desayuno":BREAK[(d+w)%7],"almuerzo":lunch,"merienda":MERIENDA[(d+w)%7],"cena":dinner})
     weeks.append({"n":w+1,"start":days[0]["date"],"end":days[-1]["date"],
@@ -192,6 +372,21 @@ apps = [{"name":"Rappi","url":"https://www.rappi.com.ar/","desc":"Coto, Carrefou
         {"name":"PedidosYa Market","url":"https://www.pedidosya.com.ar/","desc":"Supermercado propio de PedidosYa con entrega rápida. Buen surtido básico y promos con PedidosYa Plus."},
         {"name":"Mercado Libre Supermercado","url":"https://www.mercadolibre.com.ar/supermercado","desc":"Envío gratis superando el mínimo de 'Carrito Supermercado'; conviene para almacén no perecedero (yerba, aceite, arroz, latas)."}]
 
+# ---------- PRODUCTOS DE ESTACIÓN (Argentina, zona central / AMBA) ----------
+TEMPORADA = [
+ {"m":1,"n":"Enero","f":["durazno","ciruela","damasco","sandía","melón","uva","higo","pera Williams","cereza (últimas)"],"v":["tomate","choclo","zapallito","berenjena","morrón","pepino","chaucha","lechuga","albahaca","zapallo"],"tip":"Pleno verano: tomate y choclo al mejor precio del año. Ensaladas, humita y tartas de zapallito."},
+ {"m":2,"n":"Febrero","f":["durazno","ciruela","uva","higo","pera","melón","sandía","manzana nueva"],"v":["tomate","choclo","berenjena","morrón","pepino","zapallito","chaucha","acelga"],"tip":"Mes de las berenjenas y los morrones: escabeches y berenjenas a la parmesana."},
+ {"m":3,"n":"Marzo","f":["uva","pera","manzana","higo","membrillo","ciruela (últimas)","banana"],"v":["tomate","berenjena","morrón","zapallo","batata","chaucha","acelga","espinaca (empieza)"],"tip":"Última tanda de tomate barato: salsa casera para congelar. Llega el membrillo."},
+ {"m":4,"n":"Abril","f":["manzana","pera","membrillo","uva (últimas)","kiwi (empieza)","mandarina (empieza)","banana"],"v":["zapallo","batata","calabaza","acelga","espinaca","brócoli","coliflor","repollo","puerro"],"tip":"Arrancan las calabazas y los zapallos de guarda: sopas, purés y ñoquis de calabaza."},
+ {"m":5,"n":"Mayo","f":["mandarina","naranja","pomelo","kiwi","manzana","pera","palta"],"v":["calabaza","batata","brócoli","coliflor","repollo","espinaca","acelga","hinojo","puerro","remolacha"],"tip":"Cítricos a pleno: naranja y mandarina baratísimas. Guisos de lentejas con calabaza."},
+ {"m":6,"n":"Junio","f":["naranja","mandarina","pomelo","limón","kiwi","manzana","palta"],"v":["calabaza","brócoli","coliflor","repollo","espinaca","acelga","hinojo","puerro","zanahoria","papa"],"tip":"Invierno: tartas de acelga, pastel de papa, sopas. La palta argentina (Tucumán) está en su mejor momento."},
+ {"m":7,"n":"Julio","f":["naranja","mandarina","pomelo","limón","kiwi","palta"],"v":["brócoli","coliflor","repollo","espinaca","acelga","hinojo","puerro","alcaucil (empieza)","rabanito"],"tip":"Mes del locro y las sopas. Empiezan los alcauciles."},
+ {"m":8,"n":"Agosto","f":["naranja","mandarina","pomelo","limón","kiwi","palta","frutilla (empieza, Tucumán)"],"v":["alcaucil","brócoli","coliflor","espinaca","acelga","puerro","rabanito","habas (empiezan)"],"tip":"Alcauciles al mejor precio: hervidos con vinagreta o rellenos."},
+ {"m":9,"n":"Septiembre","f":["naranja","frutilla","kiwi (últimos)","limón","palta","pomelo"],"v":["alcaucil","espárrago","habas","arvejas","espinaca","acelga","rabanito","lechuga","remolacha"],"tip":"Primavera: espárragos, habas y arvejas frescas. Ideal para el wok y las tortillas."},
+ {"m":10,"n":"Octubre","f":["frutilla","naranja (últimas)","limón","palta","níspero","banana"],"v":["espárrago","alcaucil","arvejas","habas","chaucha (empieza)","lechuga","rúcula","zapallito (empieza)","remolacha","zanahoria"],"tip":"La frutilla está en su mejor precio: para el yogur con avena y los panqueques. Primeros zapallitos."},
+ {"m":11,"n":"Noviembre","f":["frutilla","cereza (empieza)","damasco (empieza)","níspero","banana","limón"],"v":["arvejas","chaucha","zapallito","tomate (empieza)","lechuga","rúcula","pepino (empieza)","espárrago (últimos)","choclo (fin de mes)"],"tip":"Zapallitos rellenos y ensaladas: ya hay lechuga y tomate de estación. La cereza llega cara, baja en diciembre."},
+ {"m":12,"n":"Diciembre","f":["cereza","damasco","durazno","ciruela","frutilla (últimas)","melón","sandía (empieza)","breva"],"v":["tomate","choclo","zapallito","chaucha","pepino","berenjena (empieza)","morrón","albahaca","lechuga"],"tip":"Fiestas: ensaladas frescas, tomate y choclo baratos, fruta de carozo para el postre."},
+]
 rates = {"date":"23/10/2026","usd_oficial":1550,"usd_blue":1565,"eur_oficial":1714,"eur_blue":round(1565*1714/1550),"source":"dolarapi.com"}
 sources = [
  {"t":"Precios de los supermercados: catálogos online de cada cadena consultados el 24/10/2026 (API pública de búsqueda de cada sitio). Pueden variar por sucursal y por día.","u":None},
@@ -205,7 +400,12 @@ sources = [
  {"t":"Fotos de las recetas: Wikimedia Commons, licencias Creative Commons indicadas en cada receta.","u":"https://commons.wikimedia.org/"},
 ]
 data = {"period":{"start":start.isoformat(),"end":(start+datetime.timedelta(days=34)).isoformat(),"label":"27 de octubre → 30 de noviembre de 2026"},
-        "weeks":weeks,"recipes":R,"shopping":shopping,"pantry":pantry,"stores":stores,"apps":apps,"basket":basket,"rates":rates,"sources":sources}
+        "weeks":weeks,"recipes":R,"shopping":shopping,"pantry":pantry,"stores":stores,"apps":apps,"basket":basket,"rates":rates,"sources":sources,
+        "temporada":TEMPORADA,"meriendaNut":dict(zip(["kcal","prot","carb","fat","fib","sal"],MERIENDA_NUT)),
+        "ingredientes":[{"id":x["id"],"n":x["n"],"cat":x["cat"],"por100":x["por100"],"u":x["u"],"alias":x["alias"],"source":"base"} for x in ING_DB]}
+for r in R.values():
+    r["kcal"] = int(round(r["nut"]["kcal"]))  # la tarjeta muestra el mismo número que el análisis
+for l in NUT_LOG: print("NUT", l)
 os.makedirs("site",exist_ok=True)
 with open(OUT,"w",encoding="utf-8") as f:
     f.write("window.DATA = ")

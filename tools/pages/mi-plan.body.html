@@ -1,0 +1,152 @@
+<main data-page="miplan">
+<section class="page-head">
+  <p class="kicker">Mi plan</p>
+  <h1>Tu propio <mark>calendario</mark>, tus recetas, tus ingredientes</h1>
+  <p class="lead">Con una cuenta (correo y contraseña) armás tu semana eligiendo platos, creás tus propias recetas y sumás ingredientes escaneando el código de barras del paquete. Lo que creás queda disponible para toda la comunidad del sitio, y tu calendario te sigue del teléfono a la compu.</p>
+</section>
+
+<section class="card auth" id="authBox">
+  <div class="seg" id="authSeg"><button data-mode="login" class="on">Ingresar</button><button data-mode="signup">Crear cuenta</button></div>
+  <form id="authForm" novalidate>
+    <div class="f" id="fName"><label for="aName">Tu nombre</label><input id="aName" autocomplete="name" placeholder="Cómo te llamamos"></div>
+    <div class="f"><label for="aEmail">Correo</label><input id="aEmail" type="email" autocomplete="email" required placeholder="vos@correo.com"></div>
+    <div class="f"><label for="aPass">Contraseña</label><input id="aPass" type="password" autocomplete="current-password" required minlength="6" placeholder="Mínimo 6 caracteres"></div>
+    <div class="f captcha" id="fCaptcha" hidden><label for="aCaptcha">Para saber que sos una persona: <span id="captchaQ"></span></label><div class="captcha-row"><input id="aCaptcha" inputmode="numeric" autocomplete="off" placeholder="resultado"><button type="button" class="mini-btn" id="captchaNew" aria-label="Otra pregunta"><svg class="ic"><use href="#i-refresh"/></svg></button></div></div>
+    <div class="hp" aria-hidden="true"><label for="aWeb">Sitio web</label><input id="aWeb" tabindex="-1" autocomplete="off"></div>
+    <p class="auth-err" id="authErr" hidden></p>
+    <div class="sug-actions">
+      <button class="btn" type="submit" id="authBtn">Ingresar</button>
+      <button class="mini-btn" type="button" id="authReset">Olvidé mi contraseña</button>
+    </div>
+  </form>
+  <p class="muted small" style="margin-top:.8rem">Solo guardamos tu nombre, tu correo y lo que creás acá. Nada más.</p>
+</section>
+
+<section id="planBox" hidden>
+  <div class="card ss who"><div><b id="whoName"></b> <span class="muted" id="whoEmail"></span> <span class="save-state" id="saveState"></span></div><div class="ss-actions"><a class="mini-btn" href="nutricion.html"><svg class="ic"><use href="#i-flame"/></svg> Mi nutrición</a><button class="mini-btn" id="logout">Cerrar sesión</button></div></div>
+
+  <div class="seg big" id="mpSeg">
+    <button data-tab="cal" class="on"><svg class="ic"><use href="#i-calendar"/></svg> Calendario</button>
+    <button data-tab="rec"><svg class="ic"><use href="#i-recetas"/></svg> Mis recetas</button>
+    <button data-tab="ing"><svg class="ic"><use href="#i-tag"/></svg> Mis ingredientes</button>
+  </div>
+
+  <!-- ===== Calendario ===== -->
+  <section id="tabCal" class="mp-tab">
+    <div class="plan-tools"><div class="tabs" id="myWeekTabs"></div></div>
+    <div class="week-actions">
+      <button class="mini-btn" id="fillHouse"><svg class="ic"><use href="#i-calendar"/></svg> Copiar el plan de la casa en esta semana</button>
+      <button class="mini-btn" id="clearMyWeek"><svg class="ic"><use href="#i-refresh"/></svg> Vaciar la semana</button>
+    </div>
+    <div class="my-cal" id="myCal"></div>
+    <h2 class="sub"><span class="squig">Lista de compras de esta semana</span></h2>
+    <p class="muted small">Se arma con las recetas que elegiste. Tildá lo que ya tenés; copiala o compartila a Notas o WhatsApp.</p>
+    <div class="ss-actions" style="margin:.6rem 0 1rem"><button class="mini-btn" id="myCopy"><svg class="ic"><use href="#i-copy"/></svg> Copiar lista</button><button class="mini-btn" id="myShare" hidden><svg class="ic"><use href="#i-external"/></svg> Compartir</button></div>
+    <div class="shop-grid" id="myShop"></div>
+  </section>
+
+  <!-- ===== Mis recetas ===== -->
+  <section id="tabRec" class="mp-tab" hidden>
+    <div class="ss card"><div><b>Tus recetas</b> <span class="muted">· quedan disponibles para todos y se pueden poner en cualquier calendario</span></div><div class="ss-actions"><button class="btn small-btn" id="newRecipe" style="margin:0"><svg class="ic"><use href="#i-plus"/></svg> Nueva receta</button></div></div>
+    <div class="grid" id="myRecipes"></div>
+    <h3 class="sub">De la comunidad</h3>
+    <div class="grid" id="communityRecipes"></div>
+  </section>
+
+  <!-- ===== Mis ingredientes ===== -->
+  <section id="tabIng" class="mp-tab" hidden>
+    <div class="ss card"><div><b>Ingredientes</b> <span class="muted">· la base del sitio tiene los básicos; sumá los productos que comprás con sus valores reales por 100 g</span></div><div class="ss-actions"><button class="btn small-btn" id="scanBtn" style="margin:0"><svg class="ic"><use href="#i-bolt"/></svg> Escanear código de barras</button><button class="mini-btn" id="newIng"><svg class="ic"><use href="#i-plus"/></svg> Cargar a mano</button></div></div>
+    <div class="ing-search"><input id="ingSearch" placeholder="Buscar en la base y en la comunidad… (ej. yogur, avena, atún)"><button class="mini-btn" id="offSearch"><svg class="ic"><use href="#i-external"/></svg> Buscar en Open Food Facts</button></div>
+    <div class="ing-list" id="ingList"></div>
+  </section>
+</section>
+
+<section id="adminBox" hidden class="sec">
+  <h2><span class="squig">Todos los calendarios</span></h2>
+  <p class="muted small">Solo visible para la cuenta administradora.</p>
+  <div class="basket-wrap"><table class="basket admin" id="adminTable"></table></div>
+</section>
+
+<!-- selector de platos -->
+<div class="modal" id="picker" hidden>
+  <div class="modal-bg" data-pclose></div>
+  <div class="modal-box picker-box" role="dialog" aria-modal="true">
+    <button class="modal-x" data-pclose aria-label="Cerrar">×</button>
+    <div class="rm">
+      <h2 id="pickerTitle">Elegí un plato</h2>
+      <input class="picker-search" id="pickerSearch" placeholder="Buscar… (pollo, rápido, horno, mi receta)">
+      <div class="picker-grid" id="pickerGrid"></div>
+      <div class="sug-actions"><button class="mini-btn" id="pickerClear"><svg class="ic"><use href="#i-refresh"/></svg> Dejar vacío</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- editor de recetas -->
+<div class="modal" id="recEditor" hidden>
+  <div class="modal-bg" data-eclose></div>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-x" data-eclose aria-label="Cerrar">×</button>
+    <form class="rm editor" id="recForm">
+      <h2 id="recEditorTitle">Nueva receta</h2>
+      <div class="ed-grid">
+        <div class="f wide"><label for="rName">Nombre</label><input id="rName" required placeholder="Ej.: ñoquis de ricota"></div>
+        <div class="f"><label for="rTipo">Tipo</label><select id="rTipo"><option value="plato">Almuerzo / cena</option><option value="desayuno">Desayuno / merienda</option></select></div>
+        <div class="f"><label for="rPorc">Porciones</label><input id="rPorc" type="number" min="1" max="12" value="2"></div>
+        <div class="f"><label for="rTiempo">Minutos</label><input id="rTiempo" type="number" min="1" max="300" value="30"></div>
+        <div class="f"><label for="rImg">Foto (URL, opcional)</label><input id="rImg" type="url" placeholder="https://…jpg"></div>
+      </div>
+      <h3>Ingredientes</h3>
+      <p class="muted small">Buscá un ingrediente de la base o de la comunidad y poné la cantidad. Los valores nutricionales se calculan solos. Si falta un producto, cargalo primero en «Mis ingredientes» (podés escanearlo).</p>
+      <div class="ing-pick"><input id="rIngSearch" placeholder="Buscar ingrediente… (ej. pollo, arroz, mi yogur)" autocomplete="off"><div class="ing-sugs" id="rIngSugs" hidden></div></div>
+      <div class="ing-rows" id="rIngRows"></div>
+      <div class="nut-live" id="rNutLive"></div>
+      <h3>Preparación</h3>
+      <textarea id="rPasos" rows="5" placeholder="Un paso por línea"></textarea>
+      <div class="f"><label for="rTip">Tip (opcional)</label><input id="rTip" placeholder="Un truco para que salga bien"></div>
+      <div class="f"><label for="rTags">Etiquetas (opcional, separadas por coma)</label><input id="rTags" placeholder="rápido, horno, vegetariano"></div>
+      <p class="auth-err" id="recErr" hidden></p>
+      <div class="sug-actions"><button class="btn" type="submit">Guardar receta</button><button class="mini-btn" type="button" id="recDelete" hidden>Borrar</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- escáner / alta de ingrediente -->
+<div class="modal" id="ingEditor" hidden>
+  <div class="modal-bg" data-iclose></div>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-x" data-iclose aria-label="Cerrar">×</button>
+    <div class="rm">
+      <h2 id="ingEditorTitle">Nuevo ingrediente</h2>
+      <div id="scanArea" hidden>
+        <video id="scanVideo" playsinline muted></video>
+        <p class="muted small" id="scanMsg">Apuntá la cámara al código de barras.</p>
+        <div class="sug-actions"><input id="scanManual" placeholder="o escribí el código a mano" inputmode="numeric"><button class="mini-btn" type="button" id="scanLookup">Buscar</button><button class="mini-btn" type="button" id="scanStop">Cerrar cámara</button></div>
+      </div>
+      <div id="offResults" class="off-results" hidden></div>
+      <form id="ingForm" class="editor">
+        <div class="ed-grid">
+          <div class="f wide"><label for="iName">Nombre del producto</label><input id="iName" required placeholder="Ej.: Yogur natural Ser 190 g"></div>
+          <div class="f"><label for="iMarca">Marca</label><input id="iMarca" placeholder="opcional"></div>
+          <div class="f"><label for="iCat">Góndola</label><select id="iCat"><option value="alm">Almacén</option><option value="lact">Lácteos y huevos</option><option value="verd">Verdulería</option><option value="carne">Carnicería y pescadería</option><option value="pan">Panadería</option><option value="pantry">Despensa / condimentos</option></select></div>
+          <div class="f"><label for="iCode">Código de barras</label><input id="iCode" inputmode="numeric" placeholder="opcional"></div>
+          <div class="f"><label for="iUnit">Peso de 1 unidad (g)</label><input id="iUnit" type="number" min="1" placeholder="si se usa por unidad"></div>
+        </div>
+        <h3>Por 100 g (o 100 ml)</h3>
+        <div class="ed-grid nums">
+          <div class="f"><label for="nKcal">Calorías (kcal)</label><input id="nKcal" type="number" step="0.1" min="0" required></div>
+          <div class="f"><label for="nProt">Proteínas (g)</label><input id="nProt" type="number" step="0.1" min="0" required></div>
+          <div class="f"><label for="nCarb">Carbohidratos (g)</label><input id="nCarb" type="number" step="0.1" min="0" required></div>
+          <div class="f"><label for="nSug">de los cuales azúcares (g)</label><input id="nSug" type="number" step="0.1" min="0"></div>
+          <div class="f"><label for="nFat">Grasas (g)</label><input id="nFat" type="number" step="0.1" min="0" required></div>
+          <div class="f"><label for="nSat">de las cuales saturadas (g)</label><input id="nSat" type="number" step="0.1" min="0"></div>
+          <div class="f"><label for="nFib">Fibra (g)</label><input id="nFib" type="number" step="0.1" min="0"></div>
+          <div class="f"><label for="nSal">Sal (g)</label><input id="nSal" type="number" step="0.01" min="0"></div>
+        </div>
+        <p class="muted small">Si el paquete dice «sodio» en mg: sal (g) = sodio (mg) × 2,5 ÷ 1000.</p>
+        <p class="auth-err" id="ingErr" hidden></p>
+        <div class="sug-actions"><button class="btn" type="submit">Guardar ingrediente</button><button class="mini-btn" type="button" id="ingDelete" hidden>Borrar</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+</main>

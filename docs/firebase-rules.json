@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "games":   { "$code":     { ".read": true, ".write": true } },
+    "corazon": { "$code":     { ".read": true, ".write": true } },
+    "users":   { "$username": { ".read": true, ".write": true } },
+
+    "calendars": {
+      ".read": "auth != null && auth.token.email == 'jaemeson.dieu@gmail.com'",
+      "$uid": {
+        ".read":  "auth != null && (auth.uid == $uid || auth.token.email == 'jaemeson.dieu@gmail.com')",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+
+    "recetas": {
+      ".read": true,
+      ".indexOn": ["owner", "createdAt"],
+      "$id": {
+        ".write": "auth != null && (!data.exists() && newData.child('owner').val() == auth.uid || data.child('owner').val() == auth.uid || auth.token.email == 'jaemeson.dieu@gmail.com')",
+        ".validate": "newData.hasChildren(['name', 'owner', 'ing', 'porciones']) || newData.val() == null"
+      }
+    },
+
+    "ingredientes": {
+      ".read": true,
+      ".indexOn": ["owner", "barcode"],
+      "$id": {
+        ".write": "auth != null && (!data.exists() && newData.child('owner').val() == auth.uid || data.child('owner').val() == auth.uid || auth.token.email == 'jaemeson.dieu@gmail.com')",
+        ".validate": "newData.hasChildren(['n', 'owner', 'por100']) || newData.val() == null"
+      }
+    }
+  }
+}

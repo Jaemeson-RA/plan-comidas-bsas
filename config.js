@@ -1,0 +1,17 @@
+/* Configuración pública del sitio (sin secretos: las claves de Firebase son públicas por diseño;
+   la seguridad la dan las reglas de la base de datos, ver docs/firebase-rules.json). */
+window.CONFIG = {
+  // Correo que recibe TODO: sugerencias de platos, cuentas nuevas y calendarios guardados.
+  adminEmail: "jaemeson.dieu@gmail.com",
+  // URL del Apps Script desplegado como "aplicación web" (ver docs/apps-script.gs y README).
+  // Mientras esté vacío, las sugerencias se mandan con mailto: y no hay avisos de cuentas/calendarios.
+  notifyUrl: "",
+  // Proyecto Firebase existente (viaje-del-amor): Authentication (email + contraseña) + Realtime Database.
+  firebase: {
+    apiKey: "AIzaSyDby2S1qUHAChX_RwqPRLkU8qgpmsSvQWg",
+    authDomain: "viaje-del-amor.firebaseapp.com",
+    databaseURL: "https://viaje-del-amor-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "viaje-del-amor",
+    appId: "1:1022626936571:web:40912f37c6f05cf7b8625e",
+  },
+};

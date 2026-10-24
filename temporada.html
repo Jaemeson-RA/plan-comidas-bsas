@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Productos de estación · Plan de comidas Buenos Aires</title>
+<meta name="description" content="Frutas y verduras de estación en Argentina, mes por mes, y los platos del plan que las aprovechan.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23C8402F'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="motion.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0" /> <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /> <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" /> <path d="M16 3l0 4" /> <path d="M8 3l0 4" /> <path d="M4 11l16 0" /> <path d="M8 15h2v2h-2l0 -2" /></symbol>
+<symbol id="i-recetas" viewBox="0 0 24 24"><path d="M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12m0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3" /></symbol>
+<symbol id="i-compras" viewBox="0 0 24 24"><path d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M15 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M17 17h-11v-14h-2" /> <path d="M6 5l14 1l-1 7h-13" /></symbol>
+<symbol id="i-super" viewBox="0 0 24 24"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /> <path d="M3 9l4 0" /></symbol>
+<symbol id="i-desayuno" viewBox="0 0 24 24"><path d="M3 17h1m16 0h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7m-9.7 5.7a4 4 0 0 1 8 0" /> <path d="M3 21l18 0" /> <path d="M12 9v-6l3 3m-6 0l3 -3" /></symbol>
+<symbol id="i-almuerzo" viewBox="0 0 24 24"><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /> <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></symbol>
+<symbol id="i-cena" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008" /> <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" /> <path d="M19 11h2m-1 -1v2" /></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /> <path d="M12 7v5l3 3" /></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235" /></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M6.5 7.5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /> <path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3" /></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /> <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /> <path d="M16 3.13a4 4 0 0 1 0 7.75" /> <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7" /> <path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3" /> <path d="M9.7 17l4.6 0" /></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5l0 14" /> <path d="M5 12l14 0" /></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13 -8l-13 -8" /></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10" /> <path d="M3 7l9 6l9 -6" /></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" /> <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /> <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" /></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12l14 0" /> <path d="M13 18l6 -6" /> <path d="M13 6l6 6" /></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /> <path d="M11 13l9 -9" /> <path d="M15 4h5v5" /></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /> <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0" /></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11" /></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 21c.5 -4.5 2.5 -8 7 -10" /> <path d="M9 18c6.218 0 10.5 -3.288 11 -12v-2h-4.014c-9 0 -11.986 4 -12 9c0 1 0 3 2 5h3l.014 0" /></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1" /> <path d="M12 7v10" /></symbol>
+<symbol id="i-merienda" viewBox="0 0 24 24"><path d="M7.5 10.5c-1 0-1.5 .7-1.5 1.8v2.2a5 5 0 0 0 5 5h2a5 5 0 0 0 5-5v-2.2c0-1.1-.5-1.8-1.5-1.8z"/><path d="M6.5 12.5h11"/><path d="M13 10.5l4.5-7"/><path d="M16.3 3.6l1.8 1.2"/><path d="M9.5 15.5c1.6 1 3.4 1 5 0"/></symbol>
+<symbol id="i-pot" viewBox="0 0 24 24"><path d="M4.5 10.5h15"/><path d="M5.5 10.5v5a3.5 3.5 0 0 0 3.5 3.5h6a3.5 3.5 0 0 0 3.5-3.5v-5"/><path d="M2.5 12.5h3M18.5 12.5h3"/><path d="M12 7.5v3M10 7.5h4"/><path d="M9.5 4.5c0-1 1-1 1-2M13.5 4.5c0-1 1-1 1-2"/></symbol>
+<symbol id="i-plate" viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 14 0a7 7 0 1 0-14 0"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0"/><path d="M2 8v8M22 8c-1.5 1-1.5 7 0 8"/></symbol>
+</svg>
+<header class="top">
+  <a class="brand" href="index.html"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span><span>Plan de comidas <em>Buenos Aires</em></span></a>
+  <nav class="nav">
+    <a href="plan.html" data-nav="plan"><svg class="ic"><use href="#i-calendar"/></svg>Plan</a>
+    <a href="recetas.html" data-nav="recetas"><svg class="ic"><use href="#i-recetas"/></svg>Recetas</a>
+    <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Compras</a>
+    <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Súper</a>
+    <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Estación</a>
+    <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
+    <a href="mi-plan.html" data-nav="miplan" class="nav-cta"><svg class="ic"><use href="#i-users"/></svg>Mi plan</a>
+  </nav>
+  <div class="money-ctl" title="Moneda en la que se muestran todos los precios del sitio">
+    <div class="seg" id="curSeg">
+      <button data-cur="ARS" class="on">ARS</button>
+      <button data-cur="USD">USD</button>
+      <button data-cur="EUR">EUR</button>
+    </div>
+  </div>
+</header>
+
+<main data-page="temporada">
+<section class="page-head">
+  <p class="kicker">Productos de estación</p>
+  <h1>Qué está en <mark>temporada</mark> en Argentina</h1>
+  <p class="lead">Mes por mes, las frutas y verduras que llegan al Mercado Central y a las verdulerías de Buenos Aires en su mejor momento: más sabor, mejor precio y menos kilómetros. Debajo de cada mes, los platos del plan que los aprovechan.</p>
+</section>
+<nav class="chips" id="mesNav"></nav>
+<div id="meses"></div>
+<p class="muted small" style="margin-top:1.5rem">Calendario orientativo para la zona central del país (AMBA, Buenos Aires, Santa Fe, Córdoba); en el norte y la Patagonia las fechas se corren algunas semanas. Fuentes: calendarios de estacionalidad del Mercado Central de Buenos Aires y del INTA.</p>
+</main>
+
+<footer class="foot">
+  <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
+  <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a></p>
+</footer>
+<nav class="tabbar" aria-label="Secciones">
+  <a href="index.html" data-nav="inicio"><svg class="ic duo"><use href="#i-home" class="sh"/><use href="#i-home"/></svg>Inicio</a>
+  <a href="plan.html" data-nav="plan"><svg class="ic duo"><use href="#i-calendar" class="sh"/><use href="#i-calendar"/></svg>Plan</a>
+  <a href="recetas.html" data-nav="recetas"><svg class="ic duo"><use href="#i-recetas" class="sh"/><use href="#i-recetas"/></svg>Recetas</a>
+  <a href="mi-plan.html" data-nav="miplan"><svg class="ic duo"><use href="#i-users" class="sh"/><use href="#i-users"/></svg>Mi plan</a>
+  <button type="button" id="moreBtn" aria-expanded="false" aria-controls="moreMenu"><svg class="ic duo"><use href="#i-plus" class="sh"/><use href="#i-plus"/></svg>Más</button>
+</nav>
+<div class="more-menu" id="moreMenu" hidden>
+  <a href="compras.html" data-nav="compras"><svg class="ic"><use href="#i-compras"/></svg>Lista de compras</a>
+  <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados</a>
+  <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Productos de estación</a>
+  <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
+</div>
+<button class="sug-fab" id="sugFab" aria-expanded="false" aria-controls="sugPanel"><i><svg class="ic"><use href="#i-plus"/></svg></i>Sugerir un plato</button>
+<aside class="sug-panel" id="sugPanel" hidden aria-label="Sugerir un plato">
+  <button class="sug-close" id="sugClose" aria-label="Cerrar">×</button>
+  <h3>¿Qué plato falta?</h3>
+  <p class="muted">Mandá la receta que querés sumar al plan. Se abre tu correo con todo ya escrito; si preferís, copiá el texto y pasalo por WhatsApp.</p>
+  <form id="sugForm">
+    <label for="sugNombre">Nombre del plato</label>
+    <input id="sugNombre" required placeholder="Ej.: ñoquis de calabaza">
+    <label for="sugLink">Link de la receta (video o página)</label>
+    <input id="sugLink" type="url" placeholder="https://…">
+    <label for="sugIng">Ingredientes</label>
+    <textarea id="sugIng" placeholder="Uno por línea, con cantidades si las sabés"></textarea>
+    <label for="sugTips">Tips para que salga bien</label>
+    <textarea id="sugTips" placeholder="Trucos, tiempos, qué no hacer…"></textarea>
+    <label for="sugDe">Tu nombre</label>
+    <input id="sugDe" placeholder="Para saber a quién agradecerle">
+    <div class="sug-actions">
+      <button class="btn" type="submit"><svg class="ic"><use href="#i-mail"/></svg> Enviar por correo</button>
+      <button class="mini-btn" type="button" id="sugCopy"><svg class="ic"><use href="#i-copy"/></svg> Copiar texto</button>
+    </div>
+    <p class="sug-ok" id="sugOk" hidden>Listo: se abrió tu correo con la sugerencia. Si no se abrió, usá «Copiar texto».</p>
+  </form>
+</aside>
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close></div>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-x" data-close aria-label="Cerrar">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
