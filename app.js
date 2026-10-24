@@ -196,6 +196,7 @@
     };
   }
   $$("[data-prefs]").forEach(bindPrefs);
+  window.bindPrefs = bindPrefs;
   window.addEventListener("prefs-remote", () => $$("[data-prefs]").forEach(bindPrefs));
   function openPrefs() {
     let sh = $("#prefSheet"); if (!sh) { sh = document.createElement("div"); sh.id = "prefSheet"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
@@ -706,8 +707,13 @@
   const daysTo = (iso) => Math.round((new Date(iso + "T12:00") - new Date(todayISO + "T12:00")) / 864e5);
   const venceTxt = (d) => { const n = daysTo(d); return n < 0 ? "vencido" : n === 0 ? "vence hoy" : n === 1 ? "vence mañana" : `vence ${d.slice(8)}/${d.slice(5, 7)}`; };
   window.Heladera = window.Heladera || {};
+  Object.assign(window.Heladera, {
+    list: () => fGet(),
+    add: (name, date) => { name = String(name || "").trim(); if (!name) return; const hel = fGet(); if (!hel.some((h) => fNorm(h) === fNorm(name))) { hel.push(name); fSet(hel); } if (date) { const ve = fVGet(); ve[fNorm(name)] = date; fVSet(ve); } },
+    remove: (name) => fSet(fGet().filter((h) => fNorm(h) !== fNorm(name))),
+  });
   const fAge = (h) => { const t = fAtGet()[fNorm(h)]; return t ? Math.floor((Date.now() - t) / 864e5) : null; };
-  window.Heladera = { get: fGet, has: (name) => fGet().some((h) => fHas(name, h)), toggle: (name) => { const hel = fGet(); if (hel.some((h) => fHas(name, h))) fSet(hel.filter((h) => !fHas(name, h))); else fSet([...hel, name.replace(/\s*\(.*?\)\s*/g, " ").trim()]); } };
+  Object.assign(window.Heladera, { get: fGet, has: (name) => fGet().some((h) => fHas(name, h)), toggle: (name) => { const hel = fGet(); if (hel.some((h) => fHas(name, h))) fSet(hel.filter((h) => !fHas(name, h))); else fSet([...hel, name.replace(/\s*\(.*?\)\s*/g, " ").trim()]); } });
   const xKey = (mon) => `extras:${mon}`;  // productos que agrega cada uno a la lista de esa semana
   const xGet = (mon) => { try { return JSON.parse(localStorage.getItem(xKey(mon)) || "[]"); } catch (e) { return []; } };
   const xSet = (mon, v) => { try { if (v.length) localStorage.setItem(xKey(mon), JSON.stringify(v)); else localStorage.removeItem(xKey(mon)); } catch (e) {} };
@@ -1224,6 +1230,7 @@
         ${(() => { const hel = fGet().map((h) => ({ h, v: fVence(h) })).filter((x) => x.v && daysTo(x.v) <= 2).sort((a, b) => a.v.localeCompare(b.v)); if (!hel.length) return "";
           const recs = Object.values(R).filter((r) => !r.custom && DIET.ok(r)).map((r) => ({ r, n: hel.filter((x) => r.ing.some((i) => fHas(i.n, x.h))).length })).filter((x) => x.n).sort((a, b) => b.n - a.n).slice(0, 3);
           return `<section class="ap-use"><div class="ap-h"><h2>Usá primero</h2><a href="compras.html#fridge">Heladera</a></div><div class="ap-use-items">${hel.map((x) => `<span class="fr-chip soon">${ic("snow")}${esc(x.h)}<small>${venceTxt(x.v)}</small></span>`).join("")}</div>${recs.length ? `<div class="ap-use-recs">${recs.map(({ r }) => `<button type="button" class="bt-item" data-rec="${r.id}"><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span><b>${esc(r.name)}</b><small>${r.tiempo} min</small></span></button>`).join("")}</div>` : ""}</section>`; })()}
+        ${localStorage.getItem("tutorialHecho") ? "" : `<a class="ap-tuto" href="mi-plan.html?tutorial=1"><span class="ap-tuto-ic">${ic("trophy")}</span><span><b>Primeros pasos</b><small>Tus datos, tu heladera y tu semana en 5 pasos. Al final ganás tu primer nivel.</small></span>${ic("arrow")}</a>`}
         <div class="ap-quick">
           <a class="ap-q" href="compras.html">${ic("compras")}<span><b>Tu lista</b><small>${n} productos</small></span></a>
           <a class="ap-q" href="pasos.html">${ic("bolt")}<span><b>Pasos</b><small class="ap-psq">Hoy</small></span></a>

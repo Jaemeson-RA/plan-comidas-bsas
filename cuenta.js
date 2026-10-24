@@ -129,11 +129,11 @@ onAuthStateChanged(auth, (u) => {
   user = u; if (unsubCal) { unsubCal(); unsubCal = null; }
   myEmailHash = null; lastXP = null; clearTimeout(syncTimer);  // al cambiar de cuenta en la misma pestaña, nada de la anterior
   try { if (u) localStorage.setItem("acct", "1"); else localStorage.removeItem("acct"); } catch (e) {}  // Compras carga este módulo solo si hay cuenta
-  if (!u) { try { localStorage.removeItem("notifMine"); localStorage.removeItem("miListas"); } catch (e) {} window.notifSnap?.(); window.dispatchEvent(new Event("milistas")); }  // sin cuenta, los recordatorios usan el plan de la casa
+  if (!u) { try { localStorage.removeItem("notifMine"); localStorage.removeItem("miListas"); } catch (e) {} window.notifSnap?.(); window.dispatchEvent(new Event("milistas")); if (page === "miplan" && new URLSearchParams(location.search).get("tutorial") === "1") setTimeout(() => openTuto(0), 500); }  // sin cuenta, los recordatorios usan el plan de la casa
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
-    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); syncPesos(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); syncPesos(); setTimeout(maybeTuto, 600); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
     if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
@@ -694,6 +694,7 @@ function myXP(cut) {
   dates.forEach((d) => { run = prev && (addDays(prev, 1) === d || bridged(prev, d)) ? run + 1 : 1; prev = d; xp += xpDay(run); });
   xp += st.weeks * 200 + st.retos * 100 + c.recipes * 80 + c.ings * 40 + c.vasos * 10 + c.aguaFull * 20;
   xp += Object.values(cutObj(cal?.pasos, cut)).reduce((a, p) => a + pasosXP(p), 0);
+  if (cal?.profile?.tutorial && (!cut || cal.profile.tutorial <= cut)) xp += TUTO_XP;  // primeros pasos
   const level = levelOf(xp);
   return { xp, level, st, c, next: xpForLevel(level + 1), base: xpForLevel(level) };
 }
@@ -1111,7 +1112,99 @@ const MD_KEY = "mesMedida";
 const COLACION = { kcal: 260, prot: 6, carb: 27, sug: 17, fat: 15, sat: 1.6, fib: 5, sal: 0.02 };
 const mulberry = (a) => () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const fmtX = (x) => (Math.abs(x - 1) < 0.05 ? "" : "×" + x.toLocaleString("es-AR", { maximumFractionDigits: 2 }));
+// =====================================================================
+// PRIMEROS PASOS · tutorial guiado que termina con el primer nivel (+100 XP)
+// =====================================================================
+const TUTO_XP = 100;
+const tutoDone = () => !!cal?.profile?.tutorial;
+const QUICK_HEL = ["huevos", "leche", "cebolla", "papa", "tomate", "zanahoria", "arroz", "fideos", "queso", "yogur", "pan", "banana", "manzana", "lentejas", "pollo", "espinaca"];
+let tuto = null;
+function openTuto(step) {
+  if (tutoDone() && step == null) { toast("Ya hiciste los primeros pasos. ¡Bien!"); return; }
+  tuto = { step: step ?? (user ? 1 : 0), seed: Date.now() & 0xffffff, week: null };
+  let sh = $("#tutoSheet"); if (!sh) { sh = document.createElement("div"); sh.id = "tutoSheet"; sh.className = "share-sheet app-sheet tuto"; document.body.appendChild(sh); }
+  sh.hidden = false; document.body.classList.add("no-scroll"); renderTuto();
+}
+function closeTuto(later) { const sh = $("#tutoSheet"); if (sh) sh.hidden = true; document.body.classList.remove("no-scroll"); if (later) { try { localStorage.setItem("tutorialLuego", todayISO); } catch (e) {} } tuto = null; }
+const TSTEPS = ["Bienvenida", "Tus datos", "Preferencias", "Tu heladera", "Tu semana", "¡Nivel!"];
+function renderTuto() {
+  const sh = $("#tutoSheet"); if (!sh || !tuto) return;
+  const s = tuto.step, p = loadProfile() || {};
+  const dots = `<div class="tu-dots" aria-label="Paso ${s + 1} de ${TSTEPS.length}">${TSTEPS.map((t, i) => `<i class="${i < s ? "ok" : i === s ? "on" : ""}" title="${t}"></i>`).join("")}</div>`;
+  const nav = (next, opts = {}) => `<div class="as-act tu-act">${s > 0 && s < 5 ? `<button type="button" class="mini-btn" data-tu="back">Atrás</button>` : `<button type="button" class="mini-btn" data-tu="later">Más tarde</button>`}${opts.skip ? `<button type="button" class="linkish" data-tu="skip">Saltar</button>` : ""}<button type="button" class="btn" data-tu="next"${opts.dis ? " disabled" : ""}>${next}</button></div>`;
+  let body = "";
+  if (s === 0) body = `<span class="tu-big">👋</span><h3>Bienvenido/a a Menuario</h3><p>En <b>5 pasos cortos</b> te armamos la semana a tu medida: tus datos, lo que comés, lo que tenés en la heladera y el menú desde mañana.</p><ul class="tu-list"><li>${ic("check")} Unos 2 minutos</li><li>${ic("trophy")} Al terminar ganás <b>+${TUTO_XP} XP</b> y subís al <b>nivel 2</b></li></ul>
+    ${user ? "" : `<p class="muted small">Para guardar tu semana y sumar XP necesitás una cuenta gratis (correo y contraseña). Te la pedimos en el paso siguiente.</p>`}` + nav(user ? "Empezar" : "Crear mi cuenta");
+  if (s === 1) body = `<h3>${ic("scale")} Tus datos</h3><p class="muted small">Con esto calculamos tus calorías y proteínas, tu objetivo de pasos y el largo de tu paso. No se publican.</p>
+    <form class="tu-form" id="tuForm"><label><span>Sexo</span><select id="tuS"><option value="f"${p.sexo !== "m" ? " selected" : ""}>Mujer</option><option value="m"${p.sexo === "m" ? " selected" : ""}>Varón</option></select></label>
+      <label><span>Edad</span><input id="tuE" type="number" min="14" max="99" value="${p.edad || ""}" placeholder="años" required></label>
+      <label><span>Altura</span><input id="tuA" type="number" min="130" max="220" value="${p.altura || ""}" placeholder="cm" required></label>
+      <label><span>Peso</span><input id="tuP" type="number" min="35" max="200" step="0.5" value="${p.peso || ""}" placeholder="kg" required></label>
+      <label class="wide"><span>Actividad</span><select id="tuAct">${[["1.3", "Sedentaria"], ["1.45", "Ligera: caminás, 1–2 entrenamientos"], ["1.6", "Moderada: 3–4 entrenamientos"], ["1.75", "Alta: casi todos los días"]].map(([v, l]) => `<option value="${v}"${String(p.act || "1.45") === v ? " selected" : ""}>${l}</option>`).join("")}</select></label></form>
+    <p class="auth-err" id="tuErr" hidden></p>` + nav("Siguiente");
+  if (s === 2) body = `<h3>${ic("leaf")} Lo que comés</h3><p class="muted small">Si sos vegetariano/a, vegano/a, celíaco/a o tenés alguna alergia, marcalo: las recetas y tu semana van a usar solo lo que podés comer.</p><div data-prefs></div>` + nav("Siguiente", { skip: true });
+  if (s === 3) { const hel = window.Heladera?.list() || [];
+    body = `<h3>${ic("snow")} Tu heladera</h3><p class="muted small">Tocá lo que ya tenés: no va a aparecer en tu lista de compras y te sugerimos recetas que lo aprovechan.</p>
+      <div class="tu-chips">${QUICK_HEL.map((n) => `<button type="button" class="pchip${hel.some((h) => norm(h) === norm(n)) ? " on" : ""}" data-tuhel="${n}">${n}</button>`).join("")}</div>
+      <form class="tu-add" id="tuHel"><input id="tuHq" placeholder="Otra cosa: aceite, avena…" autocomplete="off"><button class="mini-btn" type="submit">Agregar</button></form>
+      <p class="muted small">${hel.length ? `En tu heladera: ${esc(hel.join(", "))}.` : "Podés saltear este paso y cargarla después en Compras."}</p>` + nav("Siguiente", { skip: true }); }
+  if (s === 4) { const w = tuto.week;
+    body = `<h3>${ic("calendar")} Tu semana, desde mañana</h3><p class="muted small">Armamos desayuno, almuerzo y cena de los próximos 7 días para tus aportes${window.DIET?.active() ? ` y tu perfil (${esc(window.DIET.summary())})` : ""}. Después podés cambiar cualquier plato.</p>
+      ${w ? `<div class="tu-week">${w.map((d) => { const dt = new Date(d.date + "T12:00"); return `<div class="tu-day"><b>${["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][dt.getDay()]} ${dt.getDate()}</b><span>${esc(R[d.almuerzo]?.name || "")}</span><span class="muted">${esc(R[d.cena]?.name || "")}</span></div>`; }).join("")}</div>
+        <button type="button" class="linkish" data-tu="reroll">${ic("refresh")} Otra combinación</button>` : `<button type="button" class="btn ghost tu-build" data-tu="build">${ic("bolt")} Armar mi semana</button>`}` + nav(w ? "Guardar mi semana" : "Siguiente", { dis: !w }); }
+  if (s === 5) { const x = myXP();
+    body = `<div class="tu-win"><span class="tu-big">🎉</span><h3>¡Nivel ${x.level}!</h3><p>Ganaste <b>+${TUTO_XP} XP</b>. Tu semana ya está en Mi plan y tu lista de compras se armó sola.</p>
+      <div class="tu-next"><a class="ap-q" href="compras.html?lista=mi">${ic("compras")}<span><b>Tu lista</b><small>Lista para el súper</small></span></a><a class="ap-q" href="mi-plan.html">${ic("calendar")}<span><b>Tu semana</b><small>Cambiá lo que quieras</small></span></a><button type="button" class="ap-q notif-btn">${ic("bell")}<span><b>Avisos</b><small>Te recordamos</small></span></button></div>
+      <p class="muted small">Cada día que cumplas el plan, marcalo en Mi plan: sumás XP y armás tu racha.</p></div><div class="as-act"><button type="button" class="btn" data-tu="close">¡Vamos!</button></div>`; }
+  sh.innerHTML = `<div class="sh-bg"></div><div class="sh-box as-box tu-box" role="dialog" aria-modal="true" aria-label="Primeros pasos">${s < 5 ? `<button class="as-x" type="button" data-tu="later" aria-label="Cerrar">×</button>` : ""}${dots}${body}</div>`;
+  const pb = sh.querySelector("[data-prefs]"); if (pb && window.bindPrefs) window.bindPrefs(pb);
+}
+document.addEventListener("click", async (e) => {
+  if (e.target.closest("[data-open-tuto]")) { e.preventDefault(); openTuto(); return; }
+  const b = e.target.closest("#tutoSheet [data-tu], #tutoSheet [data-tuhel]"); if (!b || !tuto) return;
+  const act = b.dataset.tu, h = b.dataset.tuhel;
+  if (h) { const hel = window.Heladera?.list() || []; if (hel.some((x) => norm(x) === norm(h))) window.Heladera.remove(h); else window.Heladera.add(h); renderTuto(); return; }
+  if (act === "later") { closeTuto(true); return; }
+  if (act === "close") { closeTuto(); location.href = "index.html"; return; }
+  if (act === "back") { tuto.step = Math.max(0, tuto.step - 1); renderTuto(); return; }
+  if (act === "skip") { tuto.step++; renderTuto(); return; }
+  if (act === "build" || act === "reroll") {
+    const p = loadProfile(); if (!p) { tuto.step = 1; renderTuto(); return; }
+    if (act === "reroll") tuto.seed = (tuto.seed * 9301 + 49297) % 233280;
+    tuto.week = buildMonth(p, { per: "semana", eco: false, seed: tuto.seed }); renderTuto(); return;
+  }
+  if (act !== "next") return;
+  const s = tuto.step;
+  if (s === 0) { if (!user) { closeTuto(); try { localStorage.setItem("tutorialPend", "1"); } catch (x) {} $("#authSeg button:last-child")?.click(); $("#authBox")?.scrollIntoView({ behavior: "smooth", block: "start" }); toast("Creá tu cuenta (o ingresá) y seguimos con los primeros pasos."); return; } tuto.step = 1; renderTuto(); return; }
+  if (s === 1) {
+    const p = { ...(loadProfile() || {}), sexo: $("#tuS").value, edad: +$("#tuE").value, altura: +$("#tuA").value, peso: +$("#tuP").value, act: +$("#tuAct").value };
+    if (!(p.edad >= 14 && p.altura >= 130 && p.peso >= 35)) { const er = $("#tuErr"); er.textContent = "Completá edad, altura y peso."; er.hidden = false; return; }
+    localStorage.setItem(PROF_KEY, JSON.stringify(p)); update(ref(db, `calendars/${user.uid}/profile`), { nut: p }).catch(() => {});
+    tuto.step = 2; renderTuto(); return;
+  }
+  if (s === 2 || s === 3) { tuto.step++; renderTuto(); return; }
+  if (s === 4 && tuto.week) {
+    b.disabled = true; const snap = myXP();
+    const upd = {}; tuto.week.forEach((d) => { upd[d.date] = { desayuno: d.desayuno, almuerzo: d.almuerzo, cena: d.cena, x: d.x, colacion: d.snack ? 1 : null }; });
+    try {
+      await update(ref(db, `calendars/${user.uid}/days`), upd);
+      await update(ref(db, `calendars/${user.uid}/profile`), { tutorial: todayISO });
+      try { localStorage.setItem("tutorialHecho", "1"); localStorage.setItem("shopSrc", "mi"); localStorage.removeItem("tutorialPend"); } catch (x) {}
+      setTimeout(() => { gainXP(TUTO_XP, "primeros pasos", snap); syncPublic(); }, 400);
+      tuto.step = 5; renderTuto();
+    } catch (ex) { b.disabled = false; toast(errMsg(ex)); }
+  }
+});
+// se abre solo: la primera vez que se entra con cuenta (o al volver de crearla), o con ?tutorial=1
+function maybeTuto() {
+  if (page !== "miplan" || !user || !cal || tuto) return;
+  if (tutoDone()) { try { localStorage.setItem("tutorialHecho", "1"); } catch (e) {} return; }
+  const qs = new URLSearchParams(location.search);
+  const nuevo = !cal.days || !Object.keys(cal.days).length;  // cuenta recién creada: sin calendario todavía
+  if (qs.get("tutorial") === "1" || localStorage.getItem("tutorialPend") === "1" || (nuevo && localStorage.getItem("tutorialLuego") !== todayISO)) openTuto(1);
+}
 function mdDates(per) {
+  if (per === "semana") return Array.from({ length: 7 }, (_, i) => addDays(todayISO, i + 1));  // primeros pasos: la semana desde mañana
   if (per === "next") { const d = new Date(todayISO + "T12:00:00"); d.setDate(1); d.setMonth(d.getMonth() + 1); const y = d.getFullYear(), m = d.getMonth() + 1, n = new Date(y, m, 0).getDate(); return Array.from({ length: n }, (_, i) => `${y}-${String(m).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}`); }
   return Array.from({ length: 30 }, (_, i) => addDays(todayISO, i));
 }
