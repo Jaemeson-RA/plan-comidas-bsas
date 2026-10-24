@@ -12,6 +12,19 @@
 
   // ---------- nav activa ----------
   $$("[data-nav]").forEach((a) => a.classList.toggle("on", a.dataset.nav === page));
+
+  // ---------- movimiento: aparición al hacer scroll, fundido de imágenes, header ----------
+  const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -6% 0px", threshold: 0.05 }) : null;
+  function animateIn() {
+    const els = $$(".rc, .entry, .store, .shop-cat, .cal-cell, .steps li, .app, .dc, .cat-head, .ranking, .verdict, .explain, .today");
+    let i = 0;
+    els.forEach((el) => { if (el.classList.contains("reveal")) return; el.classList.add("reveal"); el.style.setProperty("--d", ((i++) % 8) * 45 + "ms"); if (io) io.observe(el); else el.classList.add("in"); });
+    $$("img").forEach((im) => { if (im.complete && im.naturalWidth > 0) im.classList.add("ld"); });
+  }
+  document.addEventListener("load", (e) => { if (e.target.tagName === "IMG") e.target.classList.add("ld"); }, true);
+  const vt = (fn) => (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) ? document.startViewTransition(fn) : fn();
+  const onScroll = () => $(".top")?.classList.toggle("scrolled", window.scrollY > 8);
+  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
   if ($("#periodLabel")) $("#periodLabel").textContent = D.period.label;
   if ($("#basketDate")) $("#basketDate").textContent = D.basket.date.split("-").reverse().join("/");
 
@@ -153,7 +166,7 @@
     const c = $(containerId); if (!c) return; c.innerHTML = "";
     D.weeks.forEach((w) => {
       const b = document.createElement("button"); b.textContent = w.label; b.classList.toggle("on", w.n === state.week);
-      b.addEventListener("click", () => { state.week = w.n; onPick(); }); c.appendChild(b);
+      b.addEventListener("click", () => { state.week = w.n; vt(onPick); b.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }); c.appendChild(b);
     });
   }
   function renderCalendar() {
@@ -189,9 +202,10 @@
     const cur = D.weeks.find((w) => todayISO >= w.start && todayISO <= w.end); if (cur) state.week = cur.n;
     renderCalendar(); renderWeek();
     const isMobile = window.matchMedia("(max-width: 720px)").matches;
-    const setView = (v) => { $("#calendar").hidden = v !== "cal"; $("#weekView").hidden = v !== "week"; $$("#viewSeg button").forEach((b) => b.classList.toggle("on", b.dataset.view === v)); localStorage.setItem("planView", v); };
-    setView(localStorage.getItem("planView") || (isMobile ? "week" : "cal"));
-    $("#viewSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setView(b.dataset.view); });
+    const viewKey = isMobile ? "planView_m" : "planView_d";
+    const setView = (v) => { $("#calendar").hidden = v !== "cal"; $("#weekView").hidden = v !== "week"; $$("#viewSeg button").forEach((b) => b.classList.toggle("on", b.dataset.view === v)); localStorage.setItem(viewKey, v); animateIn(); };
+    setView(localStorage.getItem(viewKey) || (isMobile ? "week" : "cal"));
+    $("#viewSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) vt(() => setView(b.dataset.view)); });
   }
 
   // ---------- recetas por categoría ----------
@@ -289,5 +303,6 @@
     $("#sources").innerHTML = D.sources.map((s) => `<li>${s.u ? `<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a>` : esc(s.t)}</li>`).join("");
   }
 
-  renderMoney(); liveRates();
+  renderMoney(); liveRates(); animateIn();
+  new MutationObserver(() => { clearTimeout(window.__ai); window.__ai = setTimeout(animateIn, 30); }).observe(document.body, { childList: true, subtree: true });
 })();

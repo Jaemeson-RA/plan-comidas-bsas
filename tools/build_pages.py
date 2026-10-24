@@ -18,6 +18,6 @@ for page, (title, desc) in META.items():
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
         f"<title>{title}</title>\n<meta name=\"description\" content=\"{desc}\">\n"
         "<link rel=\"icon\" href=\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥘</text></svg>\">\n"
-        "<link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n" + head + "\n" + body + "\n" + foot)
+        "<link rel=\"stylesheet\" href=\"style.css\">\n<link rel=\"stylesheet\" href=\"motion.css\">\n</head>\n<body>\n" + head + "\n" + body + "\n" + foot)
     open(os.path.join(root, f"{page}.html"), "w", encoding="utf-8").write(html)
     print("OK", page + ".html", len(html))
