@@ -7,6 +7,7 @@
  */
 const VTEX = { Jumbo: "www.jumbo.com.ar", Disco: "www.disco.com.ar", Vea: "www.vea.com.ar", Carrefour: "www.carrefour.com.ar", "Día": "diaonline.supermercadosdia.com.ar", "ChangoMás": "www.masonline.com.ar" };
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36";
+import { pushRoute, pushCron } from "./push.js";
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Cache-Control": "public, max-age=600" };
 
 async function vtex(store, host, q) {
@@ -168,18 +169,22 @@ async function sucursales(url) {
 
 export default {
   async fetch(req, env, ctx) {
-    if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
     const url = new URL(req.url);
+    if (req.method === "OPTIONS" && !url.pathname.startsWith("/push/")) return new Response(null, { headers: CORS });
+    if (url.pathname.startsWith("/push/")) return pushRoute(req, env, url);
     if (url.pathname === "/verify") return verify(req, env);
     if (url.pathname === "/promos") return promos(env, ctx, false);
     if (url.pathname === "/sucursales") return sucursales(url);
-    if (url.pathname !== "/search") return new Response("Plan de comidas · proxy de precios. Usar /search?q=producto o /promos", { headers: CORS });
+    if (url.pathname !== "/search") return new Response("Menuario · proxy de precios. Usar /search?q=producto, /promos o /push/*", { headers: CORS });
     const q = (url.searchParams.get("q") || "").trim().slice(0, 60);
     if (q.length < 2) return new Response(JSON.stringify({ error: "q muy corto" }), { status: 400, headers: { ...CORS, "Content-Type": "application/json" } });
     const jobs = [...Object.entries(VTEX).map(([s, h]) => vtex(s, h, q).catch(() => [])), coto(q).catch(() => [])];
     const results = (await Promise.all(jobs)).flat();
     return new Response(JSON.stringify({ q, at: new Date().toISOString(), results }), { headers: { ...CORS, "Content-Type": "application/json; charset=utf-8" } });
   },
-  // cron (wrangler.toml): cada 3 horas recorre las cadenas y guarda las promos en KV
-  async scheduled(event, env, ctx) { if (env.PROMOS) await env.PROMOS.put("promos", JSON.stringify(await buildPromos())); },
+  // crons (wrangler.toml): cada 3 horas recorre las cadenas y guarda las promos en KV; cada 15 minutos, los recordatorios
+  async scheduled(event, env, ctx) {
+    if (event.cron === "*/15 * * * *") { await pushCron(env, event.scheduledTime); return; }
+    if (env.PROMOS) await env.PROMOS.put("promos", JSON.stringify(await buildPromos()));
+  },
 };

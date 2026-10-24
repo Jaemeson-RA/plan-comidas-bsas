@@ -141,6 +141,8 @@
     if (fromPop !== true && history.state?.modal) history.back();
   }
   window.addEventListener("popstate", () => { if (!modal.hidden) closeModal(true); });
+  // enlace directo a una receta (lo usan las notificaciones): index.html?rec=<id>
+  { const q = new URLSearchParams(location.search).get("rec"); if (q && R[q]) setTimeout(() => openRecipe(q), 350); }
   document.addEventListener("click", (e) => {
     const pb = e.target.closest("[data-porc]");
     if (pb && curRec) { curPorc = Math.min(12, Math.max(1, curPorc + +pb.dataset.porc)); $("#porcN").textContent = curPorc; $("#porcN").nextElementSibling.textContent = curPorc === 1 ? "porción" : "porc."; const ul = $("#ingList"); ul.innerHTML = ingHtml(curRec, curPorc / curRec.porciones); ul.classList.remove("bump"); void ul.offsetWidth; ul.classList.add("bump"); return; }
@@ -671,6 +673,117 @@
     if (!p) { p = document.createElement("div"); p.id = "netPill"; p.className = "net-pill"; p.setAttribute("role", "status"); p.innerHTML = `${ic("refresh")} Sin conexión: ves lo último guardado`; document.body.appendChild(p); }
   };
   window.addEventListener("online", net); window.addEventListener("offline", net); net();
+
+  // ---------- recordatorios por notificación (Web Push vía el Worker) ----------
+  // Preferencias en localStorage «notifPrefs»: {on, c: {d: [días 0-6], h}, k: hora | null, m: hora | null}.
+  // La página deja en la caché «menuario-notif» el menú de los próximos 14 días y la lista de cada semana:
+  // el service worker arma el texto con eso cuando llega el push (que viene vacío).
+  const NP = "notifPrefs", API = (window.CONFIG || {}).priceApi, VAPID = (window.CONFIG || {}).vapidPublicKey;
+  const npGet = () => { try { return JSON.parse(localStorage.getItem(NP) || "null"); } catch (e) { return null; } };
+  const npSet = (v) => { try { localStorage.setItem(NP, JSON.stringify(v)); } catch (e) {} };
+  const pushOk = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window && !!API && !!VAPID;
+  const u8 = (b) => Uint8Array.from(atob(b.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
+  const wireP = (p) => ({ c: p.c && p.c.d.length ? p.c : null, k: p.k || null, m: p.m || null });
+  async function notifSnap() {
+    const p = npGet(); if (!p?.on || !("caches" in window)) return;
+    let mine = null; try { mine = JSON.parse(localStorage.getItem("notifMine") || "null"); } catch (e) {}
+    const nm = (id) => R[id]?.name || "";
+    const days = {}; for (let i = 0; i < 14; i++) {
+      const iso = addDays(todayISO, i), h = houseDay(iso), m = mine?.days?.[iso] || {};
+      const a = R[m.almuerzo] ? m.almuerzo : h.almuerzo, c = R[m.cena] ? m.cena : h.cena;
+      days[iso] = { a: nm(a), ai: a, c: nm(c), me: h.merienda };
+    }
+    const weeks = {}; [0, 7].forEach((o) => {
+      const mon = addDays(mondayOf(todayISO), o), mw = mine?.weeks?.[mon];
+      weeks[mon] = mw ? { n: mw.n, url: "mi-plan.html" } : { n: shoppingFor(weekAt(mon)).reduce((t, c) => t + c.items.length, 0), url: `compras.html#semana-${mon}` };
+    });
+    const snap = { at: new Date().toISOString(), prefs: wireP(p), days, weeks, api: API, vapid: VAPID };
+    try { await (await caches.open("menuario-notif")).put("snap", new Response(JSON.stringify(snap), { headers: { "Content-Type": "application/json" } })); } catch (e) {}
+  }
+  window.notifSnap = notifSnap;
+  async function notifSub(create) {
+    const reg = await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
+    if (!sub && create) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(VAPID) });
+    return sub;
+  }
+  const notifPost = (path, body) => fetch(API + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json().then((j) => ({ ok: r.ok, ...j })));
+  // una vez por día: renueva la suscripción en el Worker (si no, vence a los 120 días) y el menú guardado
+  (async () => {
+    const p = npGet(); if (!p?.on || !pushOk() || Notification.permission !== "granted") return;
+    await notifSnap();
+    if (localStorage.getItem("notifSync") === todayISO) return;
+    try { const sub = await notifSub(false); if (sub) { await notifPost("/push/sub", { endpoint: sub.endpoint, prefs: wireP(p) }); localStorage.setItem("notifSync", todayISO); } } catch (e) {}
+  })();
+
+  const DOWL = [[1, "Lu"], [2, "Ma"], [3, "Mi"], [4, "Ju"], [5, "Vi"], [6, "Sá"], [0, "Do"]];
+  const HOURS = Array.from({ length: 36 }, (_, i) => { const m = 360 + i * 30; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${m % 60 ? "30" : "00"}`; });
+  const hourSel = (id, v) => `<select id="${id}" class="nt-h" aria-label="Hora">${HOURS.map((h) => `<option${h === v ? " selected" : ""}>${h}</option>`).join("")}</select>`;
+  function openNotif() {
+    $("#moreMenu") && ($("#moreMenu").hidden = true);
+    const p = Object.assign({ on: false, c: { d: [6], h: "10:00" }, k: "11:30", m: null }, npGet() || {});
+    const cOn = !!(p.c && p.c.d.length), c = p.c && p.c.d.length ? p.c : { d: [6], h: "10:00" };
+    let sh = $("#notifSheet");
+    if (!sh) { sh = document.createElement("div"); sh.id = "notifSheet"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
+    const iosNeedsHome = isIOS && !standalone;
+    const blocked = !pushOk() || iosNeedsHome;
+    sh.innerHTML = `<div class="sh-bg" data-shx></div><div class="sh-box as-box nt-box" role="dialog" aria-modal="true" aria-labelledby="ntT">
+      <button class="as-x" type="button" data-shx aria-label="Cerrar">×</button>
+      <h3 id="ntT">${ic("bell")} Recordatorios</h3>
+      <p class="muted small">Te llegan como notificación aunque la app esté cerrada. Elegí cuáles querés y a qué hora.</p>
+      ${iosNeedsHome ? `<p class="nt-warn">En iPhone los avisos funcionan con Menuario agregada al inicio: en Safari tocá <b>Compartir → Agregar a inicio</b>, abrila desde el ícono y volvé acá.</p>`
+        : !pushOk() ? `<p class="nt-warn">Este navegador no permite notificaciones. Probá con Chrome en Android o con la app instalada.</p>`
+        : Notification.permission === "denied" ? `<p class="nt-warn">Las notificaciones están bloqueadas para Menuario. Activalas en los ajustes del navegador (el candado junto a la dirección, o Ajustes → Apps → Menuario → Notificaciones) y volvé a intentar.</p>` : ""}
+      <div class="nt-list"${blocked ? " inert" : ""}>
+        <section class="nt-row"><label class="nt-sw"><input type="checkbox" id="ntC"${cOn ? " checked" : ""}><span class="nt-ico">${ic("compras")}</span><span><b>Hacer las compras</b><small>Con la cantidad de productos de tu lista.</small></span></label>
+          <div class="nt-opts"><div class="nt-days" role="group" aria-label="Días">${DOWL.map(([n, t]) => `<button type="button" class="pchip${c.d.includes(n) ? " on" : ""}" data-dow="${n}" aria-pressed="${c.d.includes(n)}">${t}</button>`).join("")}</div>${hourSel("ntCh", c.h)}</div></section>
+        <section class="nt-row"><label class="nt-sw"><input type="checkbox" id="ntK"${p.k ? " checked" : ""}><span class="nt-ico">${ic("recetas")}</span><span><b>Qué se come hoy</b><small>El almuerzo y la cena, con la receta a un toque.</small></span></label>
+          <div class="nt-opts">${hourSel("ntKh", p.k || "11:30")}</div></section>
+        <section class="nt-row"><label class="nt-sw"><input type="checkbox" id="ntM"${p.m ? " checked" : ""}><span class="nt-ico">${ic("check")}</span><span><b>Marcar el día</b><small>Para no cortar la racha en Mi plan.</small></span></label>
+          <div class="nt-opts">${hourSel("ntMh", p.m || "21:30")}</div></section>
+      </div>
+      <p class="nt-msg small" id="ntMsg" role="status"></p>
+      <div class="as-act">${p.on ? `<button class="mini-btn" type="button" data-ntoff>Apagar todo</button><button class="mini-btn" type="button" data-nttest>${ic("bell")} Probar</button>` : ""}<button class="btn" type="button" data-ntsave${blocked ? " disabled" : ""}>${p.on ? "Guardar" : "Activar recordatorios"}</button></div>
+    </div>`;
+    sh.hidden = false; document.body.classList.add("no-scroll");
+    const close = () => { sh.hidden = true; document.body.classList.remove("no-scroll"); };
+    const msg = (t, bad) => { const m = $("#ntMsg"); m.textContent = t; m.classList.toggle("bad", !!bad); };
+    const sync = () => sh.querySelectorAll(".nt-row").forEach((r) => r.classList.toggle("off", !r.querySelector("input").checked));
+    sync(); sh.onchange = sync;
+    sh.onkeydown = (e) => { if (e.key === "Escape") close(); };
+    sh.onclick = async (e) => {
+      if (e.target.closest("[data-shx]")) return close();
+      const d = e.target.closest("[data-dow]"); if (d) { d.classList.toggle("on"); d.setAttribute("aria-pressed", d.classList.contains("on")); $("#ntC").checked = !!sh.querySelector("[data-dow].on"); sync(); return; }
+      const btn = e.target.closest("[data-ntsave],[data-nttest],[data-ntoff]"); if (!btn) return;
+      btn.disabled = true;
+      try {
+        if (btn.matches("[data-ntoff]")) {
+          const sub = await notifSub(false); if (sub) { await notifPost("/push/unsub", { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
+          npSet({ ...npGet(), on: false }); toastG("Listo: no te mandamos más recordatorios."); return close();
+        }
+        if (btn.matches("[data-nttest]")) {
+          const sub = await notifSub(false); if (!sub) { msg("Primero activá los recordatorios.", true); return; }
+          const r = await notifPost("/push/test", { endpoint: sub.endpoint }); msg(r.ok ? "Enviado: en unos segundos te llega una notificación de prueba." : "No se pudo mandar la prueba. Guardá de nuevo y reintentá.", !r.ok); return;
+        }
+        const np = { on: true, c: $("#ntC").checked ? { d: [...sh.querySelectorAll("[data-dow].on")].map((b) => +b.dataset.dow).sort(), h: $("#ntCh").value } : null, k: $("#ntK").checked ? $("#ntKh").value : null, m: $("#ntM").checked ? $("#ntMh").value : null };
+        if (!np.c && !np.k && !np.m) { msg("Elegí al menos un recordatorio, o tocá «Apagar todo».", true); return; }
+        const perm = await Notification.requestPermission();
+        if (perm !== "granted") { msg("Sin permiso no te podemos avisar. Aceptá las notificaciones cuando el teléfono pregunte.", true); return; }
+        const sub = await notifSub(true);
+        const r = await notifPost("/push/sub", { endpoint: sub.endpoint, prefs: wireP(np) });
+        if (!r.ok) { msg("No se pudo guardar en el servidor. Probá de nuevo en un rato.", true); return; }
+        npSet(np); localStorage.setItem("notifSync", todayISO); await notifSnap();
+        const parts = [np.c && `compras ${np.c.d.map((n) => DOWL.find((x) => x[0] === n)[1].toLowerCase()).join(", ")} a las ${np.c.h}`, np.k && `menú a las ${np.k}`, np.m && `marcar el día a las ${np.m}`].filter(Boolean);
+        toastG(`Recordatorios activados: ${parts.join(" · ")}.`); close(); renderNotifState();
+      } catch (ex) { msg("Algo falló al activar las notificaciones en este navegador.", true); }
+      finally { btn.disabled = false; }
+    };
+  }
+  function renderNotifState() {
+    const p = npGet(), on = p?.on && pushOk() && Notification.permission === "granted";
+    $$(".notif-state").forEach((el) => { el.textContent = on ? "activados" : ""; el.hidden = !on; });
+  }
+  renderNotifState();
+  document.addEventListener("click", (e) => { if (e.target.closest(".notif-btn")) { e.preventDefault(); openNotif(); } });
 
   const REM = "recordatorio";
   const remGet = () => { try { return JSON.parse(localStorage.getItem(REM) || "null"); } catch (e) { return null; } };

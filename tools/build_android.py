@@ -44,6 +44,7 @@ print(f"App: {tm['name']} ({tm['launcherName']}) · {tm['packageId']} · v{tm['a
 sdkm = os.path.join(cfg["androidSdkPath"], "cmdline-tools", "latest", "bin", "sdkmanager.bat" if os.name == "nt" else "sdkmanager")
 sh(f'"{sdkm}" "platforms;android-36" "build-tools;36.1.0" "platform-tools"')
 sh("bubblewrap build --skipPwaValidation", input=b"\n")
+sh("gradlew.bat --stop" if os.name == "nt" else "./gradlew --stop")  # que el demonio de Gradle no deje archivos trabados para la próxima
 
 apk = os.path.join(AND, "app-release-signed.apk"); aab = os.path.join(AND, "app-release-bundle.aab")
 os.makedirs(os.path.join(ROOT, "descargas"), exist_ok=True)

@@ -46,7 +46,7 @@ El plan ya no tiene fecha de fin. `data.js` trae las rotaciones (desayunos, almu
 
 - Android / Chrome: botón «Instalar la app» en el menú «Más», en el pie y en Perfil. iPhone: el botón explica «Compartir → Agregar a inicio».
 - El service worker pide primero a la red el HTML, el JS, el CSS y `data.js` (un deploy nunca queda viejo) y, sin conexión, sirve lo último guardado. Fotos, fuentes y medallas van primero a la caché. Sin conexión funcionan el plan, las recetas (las fotos que ya se vieron), las listas y la estación; Mi plan necesita conexión.
-- **Recordatorio diario** (Perfil): baja un `.ics` con un evento diario y alarma a la hora elegida, que suena aunque el sitio esté cerrado. Opcional: aviso dentro del sitio si lo abrís después de esa hora sin haber marcado el día. Las notificaciones push con el sitio cerrado necesitarían un servidor (Firebase Cloud Messaging + Functions, plan Blaze); no están.
+- **Recordatorios por notificación** (menú «Más», Compras y Perfil): hacer las compras (días y hora), qué se come hoy y marcar el día. Llegan con el sitio o la app cerrados. Ver «Recordatorios» más abajo. Sigue estando el `.ics` del Perfil para quien prefiera el calendario del teléfono.
 
 ## Gamificación (Mi plan)
 
@@ -132,6 +132,14 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 - El proyecto de Android y la clave (`android.keystore` + `keystore.env`) están FUERA de este repositorio, en `../plan-comidas-android`. Sin esa clave no se puede publicar una actualización que se instale encima de la anterior: guardar una copia.
 - Para recompilar: `python tools/build_android.py --version` (sube la versión, compila, firma y copia el APK a `descargas/`). Los cambios del sitio no necesitan una app nueva: la app siempre muestra el sitio publicado.
 - `docs/play-store.md` y `tools/build_store.py` quedan listos por si algún día se publica en Google Play.
+
+## Recordatorios (Web Push, `tools/worker/push.js`)
+
+- El navegador se suscribe con la clave pública VAPID de `config.js` y manda la dirección de la suscripción y las preferencias a `POST /push/sub` del Worker. Se guardan en KV (`PROMOS`, claves `sub:<hash>`, todo en la metadata) y vencen a los 120 días si no se vuelve a abrir el sitio (cada visita las renueva una vez por día).
+- Un cron del Worker corre cada 15 minutos (hora de Buenos Aires, UTC−3) y manda un push **vacío** a quien le toca: no hace falta cifrar contenido. Los horarios se eligen de media hora en media hora. El plan gratis de Workers deja ~45 envíos por cuarto de hora.
+- El service worker arma el texto con lo que dejó la página en la caché `menuario-notif`: el menú de los próximos 14 días (el calendario propio si hay cuenta, si no el de la casa) y cuántos productos tiene la lista de esta semana y la siguiente. Tocar la notificación abre la lista, la receta del día (`index.html?rec=<id>`) o Mi plan. Un push sin recordatorio pendiente es la prueba del panel.
+- Funciona en Chrome / Edge / Firefox (Android y compu), en la app de Android (TWA con `enableNotifications`, desde la versión 1.0.2) y en iPhone solo con Menuario agregada al inicio (iOS 16.4+).
+- Rutas: `POST /push/sub`, `POST /push/unsub`, `POST /push/test`. La clave privada es el secreto `VAPID_JWK` del Worker (copia en `../plan-comidas-android/vapid-private.json`, fuera del repo).
 
 ## Licencia y páginas legales
 

@@ -923,3 +923,32 @@ table.ladder tr.me td{background:var(--oro2)}
 .as-act .btn{font-family:inherit;cursor:pointer;margin-left:auto}
 body.no-scroll{overflow:hidden}
 .app-sheet{z-index:1000}
+/* ===== recordatorios (notificaciones) ===== */
+.sh-box.nt-box h3{display:flex;align-items:center;gap:.45rem}
+.nt-box h3 .ic{width:22px;height:22px;color:var(--verde)}
+.nt-list{display:grid;gap:.6rem;margin:.9rem 0 .4rem}
+.nt-list[inert]{opacity:.45}
+.nt-row{border:1.5px solid var(--border);border-radius:14px;background:var(--paper);padding:.7rem .8rem;transition:opacity .15s}
+.nt-sw{display:grid;grid-template-columns:auto 36px minmax(0,1fr);gap:.6rem;align-items:center;cursor:pointer}
+.nt-sw input{width:22px;height:22px;accent-color:var(--verde);margin:0}
+.nt-ico{width:36px;height:36px;border-radius:10px;background:var(--ok2);color:var(--verde);display:flex;align-items:center;justify-content:center}
+.nt-ico .ic{width:20px;height:20px}
+.nt-sw b{display:block;font-size:.98rem}
+.nt-sw small{display:block;color:var(--muted);font-size:.8rem;line-height:1.35}
+.nt-opts{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:.65rem 0 0 calc(22px + 36px + 1.2rem)}
+.nt-row.off .nt-opts{display:none}
+.nt-days{display:flex;flex-wrap:wrap;gap:.3rem}
+.nt-days .pchip{min-width:40px;padding:.35rem .5rem;justify-content:center}
+.nt-h{font:inherit;font-weight:600;border:1.5px solid var(--border);border-radius:10px;background:var(--crema);padding:.4rem .5rem;color:var(--ink);min-height:38px}
+.nt-warn{background:#FFF4E0;border:1.5px solid #F2D49B;border-radius:12px;padding:.65rem .8rem;font-size:.88rem;line-height:1.45;margin:.8rem 0 0}
+.nt-msg{min-height:1.2em;margin:.3rem 0 .2rem;color:var(--verde);font-weight:600}
+.nt-msg.bad{color:#C0492B}
+.as-act .btn[disabled]{opacity:.5;cursor:not-allowed}
+.notif-state{font-size:.72rem;font-weight:700;color:var(--verde);background:var(--ok2);border-radius:999px;padding:.1rem .45rem;margin-left:.3rem;font-style:normal}
+.notif-cta{display:flex;align-items:center;gap:.8rem;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--crema);border:1.5px dashed var(--border);border-radius:var(--r);padding:.75rem 1rem;margin:0 0 1.2rem;cursor:pointer}
+.notif-cta:hover{border-color:var(--verde)}
+.notif-cta > span:nth-child(2){flex:1;min-width:0}
+.notif-cta b{display:block}
+.notif-cta small{display:block;color:var(--muted);font-size:.85rem}
+.notif-cta > .ic{width:20px;height:20px;color:var(--verde);flex:none}
+@media (max-width:420px){.nt-opts{margin-left:0}}

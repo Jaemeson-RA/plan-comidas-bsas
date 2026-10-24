@@ -128,10 +128,11 @@ $("#logout")?.addEventListener("click", () => signOut(auth));
 onAuthStateChanged(auth, (u) => {
   user = u; if (unsubCal) { unsubCal(); unsubCal = null; }
   myEmailHash = null; lastXP = null; clearTimeout(syncTimer);  // al cambiar de cuenta en la misma pestaña, nada de la anterior
+  if (!u) { try { localStorage.removeItem("notifMine"); } catch (e) {} window.notifSnap?.(); }  // sin cuenta, los recordatorios usan el plan de la casa
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
-    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
     if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
@@ -146,6 +147,17 @@ function weekList() {
 function dayPlan(dateISO, src) {
   if (src === "mio") { const d = cal?.days?.[dateISO]; return d && SLOTS.some((s) => d[s] && R[d[s]]) ? d : null; }
   const h = houseDay(dateISO); return { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena };
+}
+// para los recordatorios: los próximos 14 días del calendario propio y cuántos productos tiene su lista (lo lee app.js → service worker)
+function saveNotifMine() {
+  try {
+    const days = {}, weeks = {};
+    for (let i = 0; i < 14; i++) { const dt = addDays(todayISO, i), d = cal?.days?.[dt]; if (d && SLOTS.some((s) => d[s] && R[d[s]])) days[dt] = { almuerzo: d.almuerzo || null, cena: d.cena || null }; }
+    [0, 7].forEach((o) => { const mon = addDays(mondayOf(todayISO), o), ds = Array.from({ length: 7 }, (_, i) => cal?.days?.[addDays(mon, i)]);
+      if (ds.some((d) => d && SLOTS.some((s) => d[s] && R[d[s]]))) weeks[mon] = { n: aggregateShopping(ds).reduce((t, c) => t + c.items.length, 0) }; });
+    localStorage.setItem("notifMine", JSON.stringify({ at: Date.now(), days, weeks }));
+    window.notifSnap?.();
+  } catch (e) {}
 }
 function aggregateShopping(days) {
   const agg = new Map();

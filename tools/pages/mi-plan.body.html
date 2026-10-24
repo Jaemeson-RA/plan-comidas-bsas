@@ -178,8 +178,10 @@
       <div class="sug-actions"><button class="btn danger" type="submit">Borrar mi cuenta para siempre</button></div>
     </form>
     <div class="card editor set-card rem-card" id="remCard">
-      <h3><svg class="ic"><use href="#i-clock"/></svg> Recordatorio diario</h3>
-      <p class="muted small">Un aviso a la noche para marcar tu día y no cortar la racha. Lo más confiable es sumarlo al calendario del teléfono: suena aunque el sitio esté cerrado.</p>
+      <h3><svg class="ic"><use href="#i-bell"/></svg> Recordatorios <small class="notif-state" hidden></small></h3>
+      <p class="muted small">Notificaciones en el teléfono para hacer las compras, saber qué se come hoy y marcar el día, aunque la app esté cerrada.</p>
+      <p><button class="btn small-btn notif-btn" type="button"><svg class="ic"><use href="#i-bell"/></svg> Elegir recordatorios</button></p>
+      <p class="muted small">¿Preferís el calendario? Sumá un aviso diario para marcar tu día:</p>
       <div class="rem-row"><label for="remHora">Hora</label><input id="remHora" type="time" value="21:00"><button class="btn small-btn" id="remIcs" type="button"><svg class="ic"><use href="#i-calendar"/></svg> Agregar al calendario del teléfono</button></div>
       <label class="snd"><input type="checkbox" id="remApp"> Avisarme también cuando abro el sitio después de esa hora</label>
       <p class="muted small install-line"><button class="mini-btn install-btn" type="button" hidden><svg class="ic"><use href="#i-download"/></svg> Instalar la app</button> Instalada, se abre a pantalla completa y el plan, las recetas y las listas funcionan sin conexión.</p>
