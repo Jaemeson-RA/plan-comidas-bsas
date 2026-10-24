@@ -30,7 +30,7 @@
 <main data-page="supermercados">
 <section class="page-head">
   <p class="kicker">Supermercados con envío a domicilio</p>
-  <h1>Dónde conviene pedir</h1>
+  <h1>Dónde <mark>conviene</mark> pedir</h1>
   <p class="lead">Comparamos siete cadenas que entregan en CABA y GBA. Primero la respuesta corta; después las condiciones de envío de cada una, por tipo de tienda; y al final, para quien quiera el detalle, el precio producto por producto.</p>
 </section>
 
@@ -84,6 +84,29 @@
   <a href="compras.html" data-nav="compras"><i>🛒</i>Compras</a>
   <a href="supermercados.html" data-nav="supermercados"><i>🚚</i>Súper</a>
 </nav>
+<button class="sug-fab" id="sugFab" aria-expanded="false" aria-controls="sugPanel"><i>+</i>Sugerir un plato</button>
+<aside class="sug-panel" id="sugPanel" hidden aria-label="Sugerir un plato">
+  <button class="sug-close" id="sugClose" aria-label="Cerrar">×</button>
+  <h3>¿Qué plato falta?</h3>
+  <p class="muted">Mandá la receta que querés sumar al plan. Se abre tu correo con todo ya escrito; si preferís, copiá el texto y pasalo por WhatsApp.</p>
+  <form id="sugForm">
+    <label for="sugNombre">Nombre del plato</label>
+    <input id="sugNombre" required placeholder="Ej.: ñoquis de calabaza">
+    <label for="sugLink">Link de la receta (video o página)</label>
+    <input id="sugLink" type="url" placeholder="https://…">
+    <label for="sugIng">Ingredientes</label>
+    <textarea id="sugIng" placeholder="Uno por línea, con cantidades si las sabés"></textarea>
+    <label for="sugTips">Tips para que salga bien</label>
+    <textarea id="sugTips" placeholder="Trucos, tiempos, qué no hacer…"></textarea>
+    <label for="sugDe">Tu nombre</label>
+    <input id="sugDe" placeholder="Para saber a quién agradecerle">
+    <div class="sug-actions">
+      <button class="btn" type="submit">Enviar por correo</button>
+      <button class="mini-btn" type="button" id="sugCopy">Copiar texto</button>
+    </div>
+    <p class="sug-ok" id="sugOk" hidden>Listo: se abrió tu correo con la sugerencia. Si no se abrió, usá «Copiar texto».</p>
+  </form>
+</aside>
 <div class="modal" id="modal" hidden>
   <div class="modal-bg" data-close></div>
   <div class="modal-box" role="dialog" aria-modal="true">

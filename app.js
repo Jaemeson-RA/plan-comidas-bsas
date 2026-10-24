@@ -303,6 +303,29 @@
     $("#sources").innerHTML = D.sources.map((s) => `<li>${s.u ? `<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a>` : esc(s.t)}</li>`).join("");
   }
 
+  // ---------- sugerencias de platos (botón flotante) ----------
+  const SUG_TO = "contact.regenagency@gmail.com";
+  const fab = $("#sugFab"), panel = $("#sugPanel");
+  if (fab && panel) {
+    const fields = ["sugNombre", "sugLink", "sugIng", "sugTips", "sugDe"];
+    const v = (id) => ($("#" + id).value || "").trim();
+    const toggle = (open) => { panel.hidden = !open; fab.classList.toggle("open", open); fab.setAttribute("aria-expanded", open); if (open) $("#sugNombre").focus(); };
+    fab.addEventListener("click", () => toggle(panel.hidden));
+    $("#sugClose").addEventListener("click", () => toggle(false));
+    fields.forEach((id) => { const el = $("#" + id); el.value = localStorage.getItem("sug:" + id) || ""; el.addEventListener("input", () => localStorage.setItem("sug:" + id, el.value)); });
+    const body = () => `Plato: ${v("sugNombre")}\nReceta (link): ${v("sugLink") || "-"}\n\nIngredientes:\n${v("sugIng") || "-"}\n\nTips:\n${v("sugTips") || "-"}\n\nDe: ${v("sugDe") || "-"}\n\n(enviado desde ${location.href})`;
+    $("#sugForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      location.href = `mailto:${SUG_TO}?subject=${encodeURIComponent("Sugerencia de plato: " + v("sugNombre"))}&body=${encodeURIComponent(body())}`;
+      $("#sugOk").hidden = false;
+    });
+    $("#sugCopy").addEventListener("click", async () => {
+      const b = $("#sugCopy"), t = b.textContent;
+      try { await navigator.clipboard.writeText(body()); b.textContent = "¡Copiado!"; } catch (err) { b.textContent = "No se pudo copiar"; }
+      setTimeout(() => { b.textContent = t; }, 1600);
+    });
+  }
+
   renderMoney(); liveRates(); animateIn();
   new MutationObserver(() => { clearTimeout(window.__ai); window.__ai = setTimeout(animateIn, 30); }).observe(document.body, { childList: true, subtree: true });
 })();
