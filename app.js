@@ -156,6 +156,8 @@
 
   // ---------- inicio ----------
   if (page === "inicio") {
+    const vid = $("#introVideo");
+    if (vid && window.matchMedia("(max-width: 720px)").matches) { vid.poster = "media/intro-vertical-poster.jpg"; vid.querySelector("source").src = "media/intro-vertical.mp4"; vid.classList.add("vertical"); vid.load(); }
     const day = D.weeks.flatMap((w) => w.days).find((d) => d.date === todayISO);
     const first = D.weeks[0].days[0];
     const d = day || first;

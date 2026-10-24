@@ -1,29 +1,38 @@
-# Video de presentación · guion de voz (39 segundos)
+# Video de presentación · guion de voz por segmentos
 
-Tono: cercano, rioplatense, ritmo ágil pero sin apuro. Grabá en un lugar silencioso, a 20–30 cm del micrófono, en una sola toma por bloque si hace falta. Dejá medio segundo de silencio al principio y al final. Formato: `.m4a`, `.mp3` o `.wav`, y guardalo como `media/voz.m4a` (o `.mp3`).
+Grabá **un archivo por segmento**, con el nombre indicado, en la carpeta `media/voz/` (formatos: `.m4a`, `.mp3` o `.wav`). Así el montaje pone cada frase sobre su escena sin cortar nada, y alarga la escena si tu frase dura un poco más.
 
-| Tiempo | Pantalla | Texto a grabar |
-|---|---|---|
-| 0:00–0:04 | Portada con el pizarrón del menú del día | **Plan de comidas Buenos Aires: qué comemos hoy, qué compramos y dónde.** |
-| 0:04–0:10 | Calendario del mes, se abre la receta de un plato | **Un mes entero de desayunos, almuerzos y cenas. Tocás un plato y tenés la receta, con foto y video.** |
-| 0:10–0:15 | Lista de compras con tildes, botón «Copiar lista» | **La lista de compras se arma sola, por góndola. La copiás y la pegás en las notas del teléfono.** |
-| 0:15–0:20 | Ranking de supermercados, precios en ARS/USD/EUR | **Comparamos siete supermercados con envío a domicilio, en pesos, dólares o euros.** |
-| 0:20–0:26 | Mi plan: calendario propio, editor de recetas, escáner de código de barras | **Con tu cuenta armás tu propio calendario, creás recetas y sumás ingredientes escaneando el paquete. Lo que creás queda para todos.** |
-| 0:26–0:29 | Ranking: días cumplidos, combos, ladder | **Marcá los días que cumpliste, sumá combos y subí en el ranking con tus amigos.** |
-| 0:29–0:35 | Nutrición: nota sobre 10, barras de proteínas, fibra, sal | **Y la nutrición te dice cuántas calorías, proteínas, fibra y sal lleva tu semana, con una nota sobre diez y qué cambiar.** |
-| 0:35–0:39 | Productos de estación → cierre con el logo | **Todo con productos de estación, de acá. Entrá y armá tu semana.** |
+Tono: cercano, rioplatense, ritmo ágil pero sin apuro. Mismo micrófono y misma distancia (20–30 cm) en todos; dejá medio segundo de silencio al principio y al final de cada archivo. Si una toma sale mal, regrabá solo ese archivo.
 
-Total hablado: ~110 palabras, cómodas en 39 segundos.
+| Archivo | Escena | Texto a grabar | Duración ideal |
+|---|---|---|---|
+| `voz_01` | Portada | **¡Bienvenido a tu plan alimentario personalizado! Acá vas a encontrar recetas fáciles, tu lista de compras, los precios de los supermercados y mucho más.** | 7–8 s |
+| `voz_02` | Inicio del sitio | **Un mes entero de desayunos, almuerzos y cenas, pensado para dos y con productos de acá.** | 5 s |
+| `voz_03` | Calendario | **En el calendario tocás un plato y se abre la receta.** | 3 s |
+| `voz_04` | Receta | **Cada receta tiene foto, video, ingredientes y el costo por porción.** | 4 s |
+| `voz_05` | Lista de compras | **La lista de compras se arma sola, por góndola. La copiás y la pegás en las notas del teléfono.** | 5 s |
+| `voz_06` | Supermercados | **Comparamos siete supermercados con envío a domicilio, en pesos, dólares o euros.** | 5 s |
+| `voz_07` | Tarjeta «Con tu cuenta» | **Y con tu cuenta, todo es tuyo.** | 2 s |
+| `voz_08` | Tus recetas | **Creá tus propias recetas: la nutrición se calcula sola.** | 3 s |
+| `voz_09` | Ingredientes / escáner | **Sumá ingredientes escaneando el código de barras del paquete.** | 3 s |
+| `voz_10` | Ranking | **Marcá los días que cumpliste, sumá combos y subí en el ranking con tus amigos.** | 4 s |
+| `voz_11` | Nutrición | **La nutrición te dice cuántas calorías, proteínas, fibra y sal lleva tu semana, con una nota sobre diez.** | 5 s |
+| `voz_12` | Productos de estación | **Todo con productos de estación, de acá.** | 2–3 s |
+| `voz_13` | Cierre | **Entrá y armá tu semana. Es gratis.** | 3 s |
+
+Total hablado: ~125 palabras, unos 50 segundos de video final (la duración exacta se ajusta a tu voz).
 
 ## Cómo se arma el video
 
-1. Las capturas de pantalla y las tarjetas de título se generan con `tools/video/capturas.py` (Playwright) y el montaje con `tools/video/montar.py` (ffmpeg: Ken Burns, fundidos, música de fondo a bajo volumen). El resultado sin voz es `media/intro.mp4`.
-2. Cuando tengas la voz grabada en `media/voz.m4a`, corré:
+1. `tools/video/capturas.py` toma las capturas (escritorio y móvil) y compone los cuadros con texto; `tools/video/montar.py` monta las dos versiones: `media/intro.mp4` (16:9, escritorio) y `media/intro-vertical.mp4` (9:16, móvil), con música de fondo suave.
+2. Con los 13 audios en `media/voz/`:
 
 ```bash
-python tools/video/montar.py --voz media/voz.m4a
+python tools/video/montar.py --voces media/voz
 ```
 
-   El script baja la música cuando entra la voz (ducking) y regenera `media/intro.mp4`. Después, commit y push: la portada lo muestra en la sección «Preguntas frecuentes».
+   Cada frase cae al inicio de su escena, la música baja mientras hablás (ducking) y la escena dura lo que dure tu frase (con un mínimo). Después, commit y push: la portada muestra el video horizontal en la compu y el vertical en el teléfono.
 
-La música es un loop instrumental generado por el propio script (sin derechos de terceros); si preferís otra, poné un `.mp3` en `media/musica.mp3` y el script la usa.
+Si preferís grabar todo de corrido en un solo archivo, también sirve: `python tools/video/montar.py --voz media/voz.m4a` (en ese caso las escenas no se ajustan a la voz, así que conviene respetar las duraciones de la tabla).
+
+La música es un loop instrumental generado por `tools/video/musica.py` (sin derechos de terceros); si preferís otra, poné un `.mp3` en `media/musica.mp3`.

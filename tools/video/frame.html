@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es-AR"><head><meta charset="UTF-8"><title>Cuadro de video</title>
+<link rel="stylesheet" href="../../style.css">
+<style>
+body{margin:0;overflow:hidden}
+body::after{display:none}
+.frame{position:relative;overflow:hidden;background-color:var(--paper);background-image:linear-gradient(rgba(31,45,42,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(31,45,42,.045) 1px,transparent 1px);background-size:40px 40px}
+.frame.h{width:1920px;height:1080px;display:grid;grid-template-columns:640px 1fr;gap:60px;padding:90px 80px;align-items:center}
+.frame.v{width:1080px;height:1920px;display:flex;flex-direction:column;align-items:center;padding:120px 80px 100px;gap:56px}
+.blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.9}
+.blob.a{width:520px;height:520px;background:var(--verde2);right:-160px;top:-180px}
+.blob.b{width:380px;height:380px;background:var(--oro2);left:-140px;bottom:-120px}
+.blob.c{width:260px;height:260px;background:var(--rojo2);right:120px;bottom:-110px}
+.cap{position:relative;z-index:2}
+.frame.v .cap{text-align:center;max-width:920px}
+.step{display:inline-flex;align-items:center;gap:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:24px;color:var(--verde3);margin-bottom:26px}
+.step i{display:inline-flex;width:46px;height:46px;border-radius:50%;background:var(--verde);color:#fff;align-items:center;justify-content:center;font-style:normal;font-size:22px;letter-spacing:0}
+.frame.v .step{justify-content:center}
+.cap h2{font-size:78px;line-height:1.05;margin:0 0 22px;letter-spacing:-.01em}
+.frame.v .cap h2{font-size:84px}
+.cap p{font-size:34px;line-height:1.35;color:var(--ink2);margin:0;font-weight:400}
+.frame.v .cap p{font-size:38px}
+.cap mark{padding:0 .1em}
+.shot{position:relative;z-index:2}
+/* ventana de navegador */
+.browser{background:#fff;border-radius:22px;box-shadow:0 30px 80px rgba(31,45,42,.22),0 0 0 1.5px var(--border);overflow:hidden;width:1120px}
+.browser .bar{height:46px;background:var(--paper2);display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid var(--border)}
+.browser .bar i{width:13px;height:13px;border-radius:50%;background:#D9D0C0}
+.browser .bar i:nth-child(1){background:#E4572E}.browser .bar i:nth-child(2){background:#F2B544}.browser .bar i:nth-child(3){background:#2F8F5B}
+.browser .bar span{margin-left:14px;background:#fff;border-radius:8px;padding:5px 16px;font-size:16px;color:var(--muted);border:1px solid var(--border)}
+.browser img{display:block;width:100%;height:700px;object-fit:cover;object-position:top}
+/* teléfono */
+.phone{width:620px;height:1280px;background:#1F2D2A;border-radius:68px;padding:18px;box-shadow:0 40px 90px rgba(31,45,42,.3);position:relative}
+.phone::before{content:"";position:absolute;top:32px;left:50%;width:170px;height:34px;margin-left:-85px;background:#1F2D2A;border-radius:0 0 22px 22px;z-index:3}
+.phone .scr{width:100%;height:100%;border-radius:52px;overflow:hidden;background:#fff}
+.phone img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.logo{position:absolute;z-index:2;display:inline-flex;align-items:center;gap:14px;font-family:var(--display);font-size:30px;background:var(--crema);border:1.5px solid var(--border);border-radius:999px;padding:10px 24px 10px 12px;box-shadow:var(--hard-sm)}
+.logo .brand-ico{width:44px;height:44px}
+.logo .brand-ico .ic{width:24px;height:24px}
+.logo em{font-style:normal;color:var(--verde3)}
+.frame.h .logo{left:80px;bottom:60px}
+.frame.v .logo{left:50%;transform:translateX(-50%);bottom:70px}
+/* tarjetas de título */
+.frame.title{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:30px;padding:120px}
+.frame.title .big{display:inline-flex;align-items:center;gap:22px;font-family:var(--display);font-size:46px}
+.frame.title .big .brand-ico{width:84px;height:84px}
+.frame.title .big .brand-ico .ic{width:46px;height:46px}
+.frame.title h1{font-size:108px;line-height:1.02;max-width:1500px;margin:0}
+.frame.title.v h1{font-size:112px;max-width:920px}
+.frame.title p{font-size:40px;color:var(--ink2);max-width:1100px;margin:0}
+.frame.title .url{display:inline-block;margin-top:20px;background:var(--verde);color:#fff;font-weight:600;font-size:38px;padding:20px 44px;border-radius:999px;box-shadow:0 14px 34px rgba(47,143,91,.35)}
+.frame.title .feats{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;max-width:1300px}
+.frame.title .feats span{background:var(--crema);border:1.5px solid var(--border);border-radius:999px;padding:16px 30px;font-weight:600;font-size:30px;box-shadow:var(--hard-sm);display:inline-flex;gap:14px;align-items:center}
+.frame.title .feats .ic{width:34px;height:34px;color:var(--verde3)}
+.sticker{position:absolute;background:var(--oro);color:var(--ink);font-family:var(--display);font-size:32px;padding:12px 30px;border-radius:14px;box-shadow:var(--hard-sm);transform:rotate(-5deg);z-index:3}
+.sticker.r{background:var(--rojo);color:#fff;transform:rotate(4deg)}
+</style></head><body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-pot" viewBox="0 0 24 24"><path d="M4.5 10.5h15"/><path d="M5.5 10.5v5a3.5 3.5 0 0 0 3.5 3.5h6a3.5 3.5 0 0 0 3.5-3.5v-5"/><path d="M2.5 12.5h3M18.5 12.5h3"/><path d="M12 7.5v3M10 7.5h4"/><path d="M9.5 4.5c0-1 1-1 1-2M13.5 4.5c0-1 1-1 1-2"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12"/><path d="M16 3l0 4"/><path d="M8 3l0 4"/><path d="M4 11l16 0"/><path d="M8 15h2v2h-2l0 -2"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z"/></symbol>
+<symbol id="i-compras" viewBox="0 0 24 24"><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 17h-11v-14h-2"/><path d="M6 5l14 1l-1 7h-13"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></symbol></svg>
+<div id="root"></div>
+<script>
+const $ = (s) => document.querySelector(s);
+const logo = `<div class="logo"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Plan de comidas <em>Buenos Aires</em></div>`;
+// window.render(spec): spec = {kind:'scene'|'intro'|'cuenta'|'cierre', o:'h'|'v', step, title, sub, img}
+window.render = (s) => {
+  const o = s.o;
+  if (s.kind === 'scene') {
+    const shot = o === 'h' ? `<div class="shot"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>jaemeson-ra.github.io/plan-comidas-bsas</span></div><img src="${s.img}"></div></div>`
+                           : `<div class="shot"><div class="phone"><div class="scr"><img src="${s.img}"></div></div></div>`;
+    $('#root').innerHTML = `<div class="frame ${o}"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div>
+      <div class="cap"><div class="step"><i>${s.step}</i>${s.kicker || ''}</div><h2>${s.title}</h2><p>${s.sub}</p></div>${shot}${o === 'h' ? logo : ''}</div>`;
+  } else if (s.kind === 'intro') {
+    $('#root').innerHTML = `<div class="frame title ${o}"><div class="blob a"></div><div class="blob b"></div><div class="big"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Plan de comidas <em>Buenos Aires</em></div>
+      <h1>Armá tu plan de comidas y compará <mark>precios</mark> en tu zona.</h1><p>Recetas fáciles, lista de compras automática y análisis nutricional. Gratis.</p>
+      <div class="sticker" style="left:${o === 'h' ? 150 : 90}px;top:${o === 'h' ? 150 : 250}px">30 recetas</div><div class="sticker r" style="right:${o === 'h' ? 150 : 90}px;bottom:${o === 'h' ? 150 : 300}px">con video</div></div>`;
+  } else if (s.kind === 'cuenta') {
+    $('#root').innerHTML = `<div class="frame title ${o}"><div class="blob a"></div><div class="blob c"></div><div class="big"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Con tu <em>cuenta</em></div>
+      <h1>Armá tu semana, creá recetas, sumá ingredientes.</h1>
+      <div class="feats"><span><svg class="ic"><use href="#i-calendar"/></svg>Tu calendario</span><span><svg class="ic"><use href="#i-tag"/></svg>Escaneá el paquete</span><span><svg class="ic"><use href="#i-bolt"/></svg>Ranking</span><span><svg class="ic"><use href="#i-flame"/></svg>Nutrición</span><span><svg class="ic"><use href="#i-compras"/></svg>Lista lista</span></div></div>`;
+  } else {
+    $('#root').innerHTML = `<div class="frame title ${o}"><div class="blob a"></div><div class="blob b"></div><div class="big"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Plan de comidas <em>Buenos Aires</em></div>
+      <h1>Entrá y armá tu <mark>semana</mark>.</h1><span class="url">jaemeson-ra.github.io/plan-comidas-bsas</span>
+      <div class="sticker" style="left:${o === 'h' ? 160 : 90}px;bottom:${o === 'h' ? 150 : 260}px">gratis</div><div class="sticker r" style="right:${o === 'h' ? 160 : 90}px;top:${o === 'h' ? 150 : 240}px">productos de estación</div></div>`;
+  }
+  return new Promise((res) => { const imgs = [...document.images]; if (!imgs.length) return setTimeout(res, 150); let n = 0; imgs.forEach((im) => { const done = () => { if (++n >= imgs.length) setTimeout(res, 150); }; im.complete ? done() : (im.onload = done, im.onerror = done); }); });
+};
+</script></body></html>
