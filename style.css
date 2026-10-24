@@ -486,3 +486,30 @@ table.basket tfoot td.best{background:var(--ok);color:#fff}
 .nut-line{background:var(--paper);border:1.5px dashed var(--ink);border-radius:8px;padding:.55rem .8rem;font-size:.9rem;margin:-.4rem 0 1.1rem;display:flex;flex-wrap:wrap;gap:.3rem .4rem;align-items:center}
 .nut-line .ic{color:var(--rojo)}
 .nut-line small{width:100%;color:var(--muted)}
+
+/* ranking / días cumplidos */
+.done-btn{display:inline-flex;align-items:center;gap:.35rem;margin-top:auto;border:1.5px solid var(--ink);background:var(--crema);border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer;color:var(--ink);align-self:flex-start}
+.done-btn .ic{width:1em;height:1em}
+.done-btn.on{background:var(--ok);color:#fff;border-color:var(--ok)}
+.done-btn.future{border-style:dashed;color:var(--muted);cursor:default;background:transparent}
+.rank-me .score-num{color:var(--ink)}
+.rank-chips{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;margin:.4rem 0 .6rem}
+.chip{display:inline-flex;align-items:center;gap:.3rem;border:1.5px solid var(--ink);border-radius:999px;padding:.25rem .7rem;font-size:.82rem;font-weight:800;background:var(--crema)}
+.chip.hot{background:var(--rojo);color:var(--crema);border-color:var(--ink)}
+.chip .ic{width:1em;height:1em}
+table.ladder td,table.ladder th{white-space:nowrap}
+table.ladder tr.me td{background:var(--oro2)}
+
+/* FAQ + video */
+.faq-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:1.4rem;align-items:start}
+.video-wrap{padding:.7rem;position:sticky;top:90px}
+.video-wrap video{width:100%;aspect-ratio:16/9;display:block;border-radius:8px;border:1.5px solid var(--ink);background:#000}
+.video-wrap p{margin:.6rem .3rem 0}
+.faq-list{display:grid;gap:.7rem}
+.q{padding:.9rem 1.1rem}
+.q summary{cursor:pointer;font-family:var(--display);font-weight:700;font-size:1.08rem;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+.q summary::-webkit-details-marker{display:none}
+.q summary::after{content:"+";font-family:var(--body);font-weight:800;color:var(--rojo);font-size:1.3rem;line-height:1}
+.q[open] summary::after{content:"–"}
+.q p{margin-top:.6rem;color:var(--ink2);font-size:.95rem}
+@media (max-width:900px){.faq-grid{grid-template-columns:1fr}.video-wrap{position:static}}

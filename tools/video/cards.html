@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es-AR"><head><meta charset="UTF-8"><title>Tarjetas video</title>
+<link rel="stylesheet" href="../../style.css">
+<style>
+body{margin:0;background-image:none;background:var(--paper)}
+body::after{display:none}
+.card-v{width:1440px;height:900px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px;position:relative;overflow:hidden;
+  background-color:var(--paper);background-image:linear-gradient(rgba(23,48,43,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(23,48,43,.07) 1px,transparent 1px);background-size:36px 36px}
+.card-v[hidden]{display:none}
+.card-v h1{font-size:96px;line-height:1.02;max-width:1100px}
+.card-v p{font-size:34px;color:var(--ink2);margin-top:28px;max-width:900px;font-weight:700}
+.logo{display:inline-flex;align-items:center;gap:18px;font-family:var(--display);font-weight:900;font-size:40px;margin-bottom:40px}
+.logo .brand-ico{width:72px;height:72px;font-size:34px;box-shadow:4px 4px 0 var(--ink)}
+.logo .brand-ico .ic{width:40px;height:40px;stroke-width:2.2}
+.logo em{font-style:normal;color:var(--rojo)}
+.sticker{position:absolute;background:var(--oro);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);font-family:var(--display);font-weight:900;font-size:30px;padding:10px 26px;transform:rotate(-4deg)}
+.sticker.b{background:var(--rojo);color:var(--crema);transform:rotate(3deg)}
+.url{display:inline-block;margin-top:40px;background:var(--ink);color:var(--crema);font-weight:800;font-size:34px;padding:16px 36px;border-radius:12px;box-shadow:6px 6px 0 var(--oro)}
+.feats{display:flex;gap:26px;margin-top:40px;flex-wrap:wrap;justify-content:center}
+.feats span{background:var(--crema);border:3px solid var(--ink);border-radius:14px;padding:16px 26px;font-weight:800;font-size:28px;box-shadow:5px 5px 0 var(--ink);display:inline-flex;gap:12px;align-items:center}
+.feats .ic{width:34px;height:34px;color:var(--rojo)}
+</style></head><body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="i-pot" viewBox="0 0 24 24"><path d="M4.5 10.5h15"/><path d="M5.5 10.5v5a3.5 3.5 0 0 0 3.5 3.5h6a3.5 3.5 0 0 0 3.5-3.5v-5"/><path d="M2.5 12.5h3M18.5 12.5h3"/><path d="M12 7.5v3M10 7.5h4"/><path d="M9.5 4.5c0-1 1-1 1-2M13.5 4.5c0-1 1-1 1-2"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12"/><path d="M16 3l0 4"/><path d="M8 3l0 4"/><path d="M4 11l16 0"/><path d="M8 15h2v2h-2l0 -2"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z"/></symbol>
+<symbol id="i-compras" viewBox="0 0 24 24"><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 17h-11v-14h-2"/><path d="M6 5l14 1l-1 7h-13"/></symbol></svg>
+<section class="card-v" id="c_intro">
+  <div class="logo"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Plan de comidas <em>Buenos Aires</em></div>
+  <h1>Qué comemos <mark>hoy</mark>, qué compramos y dónde.</h1>
+  <p>Cinco semanas de recetas fáciles con productos de acá.</p>
+  <div class="sticker" style="left:120px;top:140px">30 recetas</div>
+  <div class="sticker b" style="right:120px;bottom:150px">con video</div>
+</section>
+<section class="card-v" id="c_cuenta" hidden>
+  <div class="logo"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Con tu <em>cuenta</em></div>
+  <h1>Armá tu semana, creá recetas, sumá ingredientes.</h1>
+  <div class="feats"><span><svg class="ic"><use href="#i-calendar"/></svg>Tu calendario</span><span><svg class="ic"><use href="#i-tag"/></svg>Escaneá el paquete</span><span><svg class="ic"><use href="#i-flame"/></svg>Nota de nutrición</span><span><svg class="ic"><use href="#i-compras"/></svg>Lista lista</span></div>
+</section>
+<section class="card-v" id="c_cierre" hidden>
+  <div class="logo"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Plan de comidas <em>Buenos Aires</em></div>
+  <h1>Entrá y armá tu <mark>semana</mark>.</h1>
+  <span class="url">jaemeson-ra.github.io/plan-comidas-bsas</span>
+  <div class="sticker" style="left:140px;bottom:140px">gratis</div>
+  <div class="sticker b" style="right:140px;top:150px">productos de estación</div>
+</section>
+</body></html>

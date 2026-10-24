@@ -21,6 +21,12 @@
       }
     },
 
+    "ladder": {
+      ".read": true,
+      ".indexOn": ["points"],
+      "$uid": { ".write": "auth != null && auth.uid == $uid", ".validate": "newData.hasChildren(['name', 'points']) || newData.val() == null" }
+    },
+
     "ingredientes": {
       ".read": true,
       ".indexOn": ["owner", "barcode"],

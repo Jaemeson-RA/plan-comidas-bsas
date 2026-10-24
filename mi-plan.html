@@ -91,6 +91,7 @@
     <button data-tab="cal" class="on"><svg class="ic"><use href="#i-calendar"/></svg> Calendario</button>
     <button data-tab="rec"><svg class="ic"><use href="#i-recetas"/></svg> Mis recetas</button>
     <button data-tab="ing"><svg class="ic"><use href="#i-tag"/></svg> Mis ingredientes</button>
+    <button data-tab="rank"><svg class="ic"><use href="#i-bolt"/></svg> Ranking</button>
   </div>
 
   <!-- ===== Calendario ===== -->
@@ -122,6 +123,22 @@
     <div class="ing-list" id="ingList"></div>
   </section>
 </section>
+
+  <!-- ===== Ranking ===== -->
+  <section id="tabRank" class="mp-tab" hidden>
+    <div class="two">
+      <div class="card score rank-me" id="rankMe"></div>
+      <div class="card verdict"><h3>Cómo se suman los puntos</h3>
+        <ul class="v-list">
+          <li><b>Día cumplido</b>: en el calendario, marcás un día cuando comiste lo que habías planeado. Vale <b>10 puntos</b>.</li>
+          <li><b>Combo</b>: 3 días seguidos → cada día vale <b>×1,5</b>; 7 seguidos o más → <b>×2</b>. Si cortás la racha, el combo vuelve a empezar.</li>
+          <li><b>Semana perfecta</b> (lunes a domingo, los 7 días): <b>+50</b> de bonus.</li>
+          <li>Solo se pueden marcar días de hoy para atrás. El ranking se actualiza al instante para todos.</li>
+        </ul></div>
+    </div>
+    <h2 class="sub"><span class="squig">Ladder</span></h2>
+    <div class="basket-wrap"><table class="basket ladder" id="ladderTable"></table></div>
+  </section>
 
 <section id="adminBox" hidden class="sec">
   <h2><span class="squig">Todos los calendarios</span></h2>

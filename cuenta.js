@@ -138,13 +138,13 @@ function aggregateShopping(days) {
   out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
   return out.filter((c) => c.items.length);
 }
-function render() { if (page === "miplan") { renderMiPlan(); renderMyRecipes(); renderIngredients(); } if (page === "nutricion") renderNut(); }
+function render() { if (page === "miplan") { renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); } if (page === "nutricion") renderNut(); }
 
 // =====================================================================
 // MI PLAN · calendario
 // =====================================================================
 let myWeek = null, pickCtx = null, notifyTimer = null;
-$("#mpSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; $$("#mpSeg button").forEach((x) => x.classList.toggle("on", x === b)); ["cal", "rec", "ing"].forEach((t) => { $("#tab" + t[0].toUpperCase() + t.slice(1)).hidden = b.dataset.tab !== t; }); localStorage.setItem("mpTab", b.dataset.tab); window.dispatchEvent(new Event("scroll")); });
+$("#mpSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; $$("#mpSeg button").forEach((x) => x.classList.toggle("on", x === b)); ["cal", "rec", "ing", "rank"].forEach((t) => { $("#tab" + t[0].toUpperCase() + t.slice(1)).hidden = b.dataset.tab !== t; }); localStorage.setItem("mpTab", b.dataset.tab); window.dispatchEvent(new Event("scroll")); });
 if (page === "miplan") { const t = localStorage.getItem("mpTab"); if (t) $(`#mpSeg [data-tab="${t}"]`)?.click(); }
 function renderMiPlan() {
   const box = $("#planBox"); if (!box) return; box.hidden = !user; if (!user) return;
@@ -154,6 +154,7 @@ function renderMiPlan() {
   const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i));
   $("#myCal").innerHTML = days.map((dt, i) => { const d = cal?.days?.[dt] || {}; return `<article class="my-day${dt === todayISO ? " today" : ""}"><h4>${DOW[i]} <span>${label(dt)}</span></h4>
       ${SLOTS.map((s) => { const r = R[d[s]]; return `<button class="slot${r ? "" : " empty"}" data-date="${dt}" data-slot="${s}">${ic(s)}${r ? `<img src="${r.img}" alt=""><span>${esc(r.name)}${r.custom ? " <small>· receta de " + esc(r.ownerName) + "</small>" : ""}</span>` : `<span>+ elegir ${s}</span>`}</button>`; }).join("")}
+      ${dt <= todayISO ? `<button class="done-btn${cal?.done?.[dt] ? " on" : ""}" data-done="${dt}">${ic("check")} ${cal?.done?.[dt] ? "Día cumplido" : "Marcar cumplido"}</button>` : `<span class="done-btn future">${ic("clock")} todavía no</span>`}
     </article>`; }).join("");
   const list = aggregateShopping(days.map((dt) => cal?.days?.[dt]));
   const key = (c, n) => `myshop:${myWeek}:${c}:${n}`;
@@ -367,6 +368,47 @@ async function loadAdmin() {
     $("#adminTable").innerHTML = `<thead><tr><th>Nombre</th><th>Correo</th><th>Días armados</th><th>Última actividad</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.name)}</td><td style="text-align:left">${esc(r.email)}</td><td>${r.n}</td><td>${r.upd ? new Date(r.upd).toLocaleString("es-AR") : "—"}</td></tr>`).join("")}</tbody>`;
     $("#adminBox").hidden = false;
   } catch (e) { /* reglas sin desplegar */ }
+}
+
+// =====================================================================
+// MI PLAN · días cumplidos, combos y ladder
+// =====================================================================
+let ladder = {};
+onValue(ref(db, "ladder"), (s) => { ladder = s.val() || {}; renderRank(); }, () => {});
+$("#myCal")?.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-done]"); if (!b) return;
+  const dt = b.dataset.done; const on = !cal?.done?.[dt];
+  try {
+    await update(ref(db, `calendars/${user.uid}/done`), { [dt]: on ? true : null });
+    const done = Object.assign({}, cal?.done || {}); if (on) done[dt] = true; else delete done[dt];
+    const st = computeStats(done);
+    await set(ref(db, `ladder/${user.uid}`), { name: myName(), points: st.points, streak: st.streak, best: st.best, days: st.days, weeks: st.weeks, updatedAt: new Date().toISOString() });
+    toast(on ? (st.streak >= 7 ? `¡Día cumplido! Combo ×2: racha de ${st.streak} días.` : st.streak >= 3 ? `¡Día cumplido! Combo ×1,5: racha de ${st.streak} días.` : "¡Día cumplido! +10 puntos.") : "Día desmarcado.");
+    touched();
+  } catch (ex) { toast(errMsg(ex)); }
+});
+function computeStats(done) {
+  const dates = Object.keys(done || {}).filter((d) => done[d]).sort();
+  let points = 0, run = 0, best = 0, prev = null;
+  dates.forEach((d) => { run = (prev && addDays(prev, 1) === d) ? run + 1 : 1; prev = d; best = Math.max(best, run); points += 10 * (run >= 7 ? 2 : run >= 3 ? 1.5 : 1); });
+  let streak = 0;
+  if (dates.length) { const last = dates[dates.length - 1]; if (last === todayISO || last === addDays(todayISO, -1)) { let d = last; while (done[d]) { streak++; d = addDays(d, -1); } } }
+  const mondays = new Set(dates.map((d) => mondayOf(d))); let weeks = 0;
+  mondays.forEach((m) => { if (Array.from({ length: 7 }, (_, i) => addDays(m, i)).every((d) => done[d])) weeks++; });
+  points += weeks * 50;
+  return { points: Math.round(points), streak, best, days: dates.length, weeks };
+}
+function renderRank() {
+  if (!$("#rankMe") || !user) return;
+  const st = computeStats(cal?.done || {});
+  const rows = Object.entries(ladder).map(([uid, x]) => Object.assign({ uid }, x)).sort((a, b) => (b.points || 0) - (a.points || 0) || (b.streak || 0) - (a.streak || 0));
+  const pos = rows.findIndex((r) => r.uid === user.uid) + 1;
+  const mult = st.streak >= 7 ? "×2" : st.streak >= 3 ? "×1,5" : "×1";
+  $("#rankMe").innerHTML = `<p class="kicker">Tu puntaje</p><div class="score-num">${st.points.toLocaleString("es-AR")}<small> pts</small></div>
+    <div class="rank-chips"><span class="chip hot">${ic("flame")} racha ${st.streak} ${st.streak === 1 ? "día" : "días"} · combo ${mult}</span><span class="chip">${ic("bolt")} mejor racha ${st.best}</span><span class="chip">${ic("check")} ${st.days} días cumplidos</span><span class="chip">${ic("calendar")} ${st.weeks} ${st.weeks === 1 ? "semana perfecta" : "semanas perfectas"}</span></div>
+    <p class="muted small">${pos ? `Estás en el puesto <b>#${pos}</b> de ${rows.length}.` : "Marcá tu primer día cumplido en el calendario para entrar al ranking."}</p>`;
+  const medal = (i) => (i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1));
+  $("#ladderTable").innerHTML = rows.length ? `<thead><tr><th>Puesto</th><th>Quién</th><th>Puntos</th><th>Racha</th><th>Mejor racha</th><th>Días</th><th>Semanas perfectas</th></tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.uid === user.uid ? "me" : ""}"><td>${medal(i)}</td><td style="text-align:left">${esc(r.name)}${r.uid === user.uid ? " <small>(vos)</small>" : ""}</td><td><b>${(r.points || 0).toLocaleString("es-AR")}</b></td><td>${r.streak ? `${r.streak} ${r.streak >= 7 ? "×2" : r.streak >= 3 ? "×1,5" : ""}` : "—"}</td><td>${r.best || 0}</td><td>${r.days || 0}</td><td>${r.weeks || 0}</td></tr>`).join("")}</tbody>` : `<tbody><tr><td colspan="7" class="muted">Todavía nadie marcó días cumplidos. ¡Sé el primero!</td></tr></tbody>`;
 }
 
 // =====================================================================

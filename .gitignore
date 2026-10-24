@@ -1,3 +1,6 @@
 .claude/
 __pycache__/
 *.log
+media/frames/
+media/intro-1080.mp4
+media/musica.wav
