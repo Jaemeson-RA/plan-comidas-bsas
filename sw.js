@@ -1,5 +1,5 @@
 /* Service worker · Menuario (generado por tools/build_pwa.py, no editar a mano) */
-const V = "pc-6a87bd8484";
+const V = "pc-3a1f4435d3";
 const CORE = ["./", "index.html", "plan.html", "recetas.html", "compras.html", "supermercados.html", "temporada.html", "nutricion.html", "mi-plan.html", "terminos.html", "privacidad.html", "promos.html", "app.html", "style.css", "motion.css", "gami.css", "app.js", "ahorro.js", "cuenta.js", "config.js", "data.js", "manifest.webmanifest", "img/icons/icon-192.png", "fonts/outfit-v15-latin_latin-ext-500.woff2", "fonts/outfit-v15-latin_latin-ext-600.woff2", "fonts/outfit-v15-latin_latin-ext-700.woff2", "fonts/outfit-v15-latin_latin-ext-regular.woff2", "fonts/young-serif-v2-latin_latin-ext-regular.woff2"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
@@ -12,7 +12,7 @@ self.addEventListener("fetch", (e) => {
     if (url.hostname === "www.gstatic.com" && url.pathname.startsWith("/firebasejs/")) e.respondWith(cacheFirst(req));
     return;
   }
-  if (url.pathname.endsWith(".mp4")) return;  // los videos piden rangos: mejor sin caché
+  if (url.pathname.endsWith(".mp4") || url.pathname.endsWith(".apk")) return;  // videos (piden rangos) y la app de Android: sin caché
   e.respondWith(STATIC.test(url.pathname) ? cacheFirst(req) : networkFirst(req));
 });
 async function cacheFirst(req) {

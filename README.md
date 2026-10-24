@@ -16,6 +16,7 @@ Sitio estático (HTML + CSS + JS, sin build ni dependencias en el navegador) con
 | `promos.html` | **Promos de hoy** de las 7 cadenas (se renuevan cada 3 h): primero las de tu lista de la semana, después búsqueda, filtro por cadena y rubro, orden por descuento o precio |
 | `supermercados.html` | Buscador en vivo en 7 cadenas (3 resultados por cadena y «ver más»), **alertas de precio** con campanita, **mapa de sucursales** (ubicación o dirección, radio, filtro por cadena, cómo llegar a pie), condiciones de envío, ranking del changuito, tabla por producto |
 | `temporada.html` | Frutas y verduras de estación en Argentina, mes por mes, y platos que las usan |
+| `app.html` | Descarga de la app de Android (APK), cómo agregarla en iPhone y QR para abrirla desde la compu |
 | `nutricion.html` | Perfil (sexo, edad, altura, peso, actividad) → aportes recomendados, promedio diario de la semana o el mes, nota /10, comentarios y sugerencias. **«Tu mes a medida»**: con el perfil cargado arma un calendario del mes que cumple los aportes y se guarda en Mi plan |
 | `mi-plan.html` | Cuenta (correo + contraseña, con reCAPTCHA v2 verificado por el Worker): calendario propio, **Progreso** (semana por semana), **Mis recetas**, **Mis ingredientes** (Open Food Facts + escáner), lista de compras propia, ranking, desafío semanal, amigos, perfil con insignias y recordatorio diario |
 
@@ -122,6 +123,15 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 ## Control visual
 
 `python tools/qa_visual.py` abre cada página con Playwright (Edge) en 320, 375, 414, 768, 1024, 1280 y 1440 px, entra a Mi plan con una cuenta de prueba, abre modales y estados, y busca desbordes horizontales, elementos fuera de pantalla, superposiciones, áreas táctiles chicas, letra de menos de 11 px, imágenes rotas y errores de consola. Deja capturas y `_report.json` en `media/qa/` (fuera del repo); `python tools/qa_report.py` resume los hallazgos. Cada página trae Open Graph, Twitter Card y canonical; `build_pages.py` genera también `sitemap.xml` y `robots.txt`, y `tools/build_og.py` la imagen `img/og.jpg`.
+
+## App de Android (`descargas/menuario.apk`)
+
+- Es una Trusted Web Activity hecha con [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap): abre el sitio a pantalla completa con Chrome, con ícono, pantalla de inicio y accesos directos. Paquete `ar.menuario.app`, Android 7 o más.
+- Se baja desde `app.html` (enlace «La app» en el pie y en «Más»). Dentro de la app esos enlaces desaparecen. En iPhone se agrega desde Safari con «Agregar a inicio».
+- La pantalla completa sin barra de direcciones depende de `https://jaemeson-ra.github.io/.well-known/assetlinks.json`, publicado desde el repositorio `jaemeson-ra.github.io` con la huella de la clave de firma.
+- El proyecto de Android y la clave (`android.keystore` + `keystore.env`) están FUERA de este repositorio, en `../plan-comidas-android`. Sin esa clave no se puede publicar una actualización que se instale encima de la anterior: guardar una copia.
+- Para recompilar: `python tools/build_android.py --version` (sube la versión, compila, firma y copia el APK a `descargas/`). Los cambios del sitio no necesitan una app nueva: la app siempre muestra el sitio publicado.
+- `docs/play-store.md` y `tools/build_store.py` quedan listos por si algún día se publica en Google Play.
 
 ## Licencia y páginas legales
 

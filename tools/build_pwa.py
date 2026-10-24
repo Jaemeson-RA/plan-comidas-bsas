@@ -64,7 +64,7 @@ self.addEventListener("fetch", (e) => {
     if (url.hostname === "www.gstatic.com" && url.pathname.startsWith("/firebasejs/")) e.respondWith(cacheFirst(req));
     return;
   }
-  if (url.pathname.endsWith(".mp4")) return;  // los videos piden rangos: mejor sin caché
+  if (url.pathname.endsWith(".mp4") || url.pathname.endsWith(".apk")) return;  // videos (piden rangos) y la app de Android: sin caché
   e.respondWith(STATIC.test(url.pathname) ? cacheFirst(req) : networkFirst(req));
 });
 async function cacheFirst(req) {

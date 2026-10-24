@@ -21,6 +21,9 @@ cfg = json.load(open(os.path.join(BW, "config.json"), encoding="utf-8"))
 env = dict(os.environ, JAVA_HOME=cfg["jdkPath"], ANDROID_HOME=cfg["androidSdkPath"], ANDROID_SDK_ROOT=cfg["androidSdkPath"])
 for line in open(os.path.join(AND, "keystore.env"), encoding="utf-8"):
     if "=" in line: k, v = line.strip().split("=", 1); env[k] = v
+# Bubblewrap llama a «gradlew.bat» sin ruta: hace falta que Windows lo busque en la carpeta del proyecto
+for k in [k for k in env if k.upper() == "NODEFAULTCURRENTDIRECTORYINEXEPATH"]: env.pop(k)
+env["PATH"] = os.pathsep.join([AND, os.path.join(cfg["jdkPath"], "bin"), env.get("PATH", "")])  # gradlew.bat y jarsigner
 sh = lambda args, **kw: subprocess.run(args, cwd=AND, env=env, check=True, shell=(os.name == "nt"), **kw)
 
 tm_path = os.path.join(AND, "twa-manifest.json"); tm = json.load(open(tm_path, encoding="utf-8"))
@@ -39,7 +42,7 @@ print(f"App: {tm['name']} ({tm['launcherName']}) · {tm['packageId']} · v{tm['a
 
 # paquetes del SDK que pide el proyecto (las licencias ya tienen que estar aceptadas)
 sdkm = os.path.join(cfg["androidSdkPath"], "cmdline-tools", "latest", "bin", "sdkmanager.bat" if os.name == "nt" else "sdkmanager")
-sh(f'"{sdkm}" "platforms;android-36" "build-tools;36.0.0" "platform-tools"')
+sh(f'"{sdkm}" "platforms;android-36" "build-tools;36.1.0" "platform-tools"')
 sh("bubblewrap build --skipPwaValidation", input=b"\n")
 
 apk = os.path.join(AND, "app-release-signed.apk"); aab = os.path.join(AND, "app-release-bundle.aab")
