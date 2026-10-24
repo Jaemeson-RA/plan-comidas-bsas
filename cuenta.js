@@ -230,7 +230,7 @@ function aggregateShopping(days) {
   out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
   return out.filter((c) => c.items.length);
 }
-function render() { if (page === "miplan") { maybeAdd(); renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); renderWho(); renderPerfil(); renderFriends(); renderReto(); renderRecap(); renderInbox(); renderProg(); } if (page === "nutricion") renderNut(); }
+function render() { if (page === "miplan") { maybeAdd(); renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); renderWho(); renderPerfil(); renderFriends(); renderReto(); renderDesafios(); renderRecap(); renderInbox(); renderProg(); } if (page === "nutricion") renderNut(); }
 
 // =====================================================================
 // MI PLAN · calendario
@@ -643,7 +643,7 @@ if (page === "nutricion") {
 // GAMIFICACIÓN · XP, niveles, fichas, agua, insignias, perfil, amigos
 // =====================================================================
 let pub = {}, ladderMode = "todos", myEmailHash = null, lastXP = null;
-onValue(ref(db, "public"), (s) => { pub = s.val() || {}; renderRank(); renderFriends(); renderWho(); renderReto(); }, () => {});
+onValue(ref(db, "public"), (s) => { pub = s.val() || {}; renderRank(); renderFriends(); renderWho(); renderReto(); renderDesafios(); }, () => {});
 
 // ---- sonido (sintetizado, sin archivos) ----
 const SND_KEY = "sonidos";
@@ -695,8 +695,9 @@ function myXP(cut) {
   xp += st.weeks * 200 + st.retos * 100 + c.recipes * 80 + c.ings * 40 + c.vasos * 10 + c.aguaFull * 20;
   xp += Object.values(cutObj(cal?.pasos, cut)).reduce((a, p) => a + pasosXP(p), 0);
   if (cal?.profile?.tutorial && (!cut || cal.profile.tutorial <= cut)) xp += TUTO_XP;  // primeros pasos
+  const desN = desafiosDone(cut); xp += desN * DES_XP;  // desafíos del mes
   const level = levelOf(xp);
-  return { xp, level, st, c, next: xpForLevel(level + 1), base: xpForLevel(level) };
+  return { xp, level, st, c, des: desN, next: xpForLevel(level + 1), base: xpForLevel(level) };
 }
 const fichasDisponibles = () => { if (!cal) return 0; const { level } = myXP(); const used = Object.keys(cal?.libre || {}).length; return Math.max(0, (level - 1) - used); };
 
@@ -788,6 +789,11 @@ function medalSvg(b, on, size = 84) {
   return `<span class="medal${on ? "" : " locked"}" style="width:${size}px;height:${Math.round(size * 1.25)}px"><img src="${medalSrc(b)}" alt="${esc(b.t)} · ${TIER[b.tier || 1]}" loading="lazy">${on ? "" : `<svg class="ic lock"><use href="#i-lock"/></svg>`}</span>`;
 }
 const BADGES = [
+  { id: "des1", tier: 1, t: "Primer desafío", d: "Un desafío del mes cumplido", ic: "target", test: (m) => m.des >= 1 },
+  { id: "des3", tier: 2, t: "Retador/a", d: "3 desafíos del mes cumplidos", ic: "target", test: (m) => m.des >= 3 },
+  { id: "des6", tier: 3, t: "Imparable", d: "6 desafíos del mes cumplidos", ic: "target", test: (m) => m.des >= 6 },
+  { id: "des12", tier: 4, t: "Un año de desafíos", d: "12 desafíos del mes cumplidos", ic: "target", test: (m) => m.des >= 12 },
+  { id: "des24", tier: 5, t: "Leyenda", d: "24 desafíos del mes cumplidos", ic: "target", test: (m) => m.des >= 24 },
   { id: "racha3", tier: 1, t: "Tres seguidos", d: "3 días cumplidos seguidos", ic: "flame", test: (m) => m.st.best >= 3 },
   { id: "racha7", tier: 2, t: "Una semana", d: "7 días seguidos", ic: "flame", test: (m) => m.st.best >= 7 },
   { id: "racha15", tier: 3, t: "Quincena", d: "15 días seguidos", ic: "flame", test: (m) => m.st.best >= 15 },
@@ -939,7 +945,7 @@ function syncPublic() {
     try {
       if (!myEmailHash) myEmailHash = await sha256(user.email);
       const x = myXP(); const badges = earnedBadges();
-      await set(ref(db, `public/${user.uid}`), { name: myName(), photo: cal?.profile?.photo || null, level: x.level, xp: x.xp, streak: x.st.streak, best: x.st.best, days: x.st.days, badges, emailHash: myEmailHash, week: { start: mondayOf(todayISO), done: weekDone(cal?.done, mondayOf(todayISO)) }, updatedAt: new Date().toISOString() });
+      await set(ref(db, `public/${user.uid}`), { name: myName(), photo: cal?.profile?.photo || null, level: x.level, xp: x.xp, streak: x.st.streak, best: x.st.best, days: x.st.days, badges, emailHash: myEmailHash, week: { start: mondayOf(todayISO), done: weekDone(cal?.done, mondayOf(todayISO)) }, des: { ym: todayISO.slice(0, 7), v: Object.fromEntries(desafios(todayISO.slice(0, 7)).map((x) => [x.id, x.v])) }, updatedAt: new Date().toISOString() });
       await update(ref(db, `ladder/${user.uid}`), { name: myName(), level: x.level, xp: x.xp, points: x.st.points, streak: x.st.streak, best: x.st.best, days: x.st.days, weeks: x.st.weeks, updatedAt: new Date().toISOString() });
     } catch (e) { /* reglas sin desplegar */ }
   }, 800);
@@ -953,6 +959,49 @@ onAuthStateChanged(auth, (u) => { if (u) setTimeout(() => { if (cal) { lastXP = 
 // =====================================================================
 const slotName = (sl) => ({ desayuno: "desayuno", almuerzo: "almuerzo", cena: "cena" }[sl] || sl);
 const fechaLarga = (d) => `${DOW[(new Date(d + "T12:00:00").getDay() + 6) % 7].toLowerCase()} ${label(d)}`;
+// =====================================================================
+// DESAFÍOS DEL MES: «Constancia» siempre y dos que rotan; +150 XP cada uno (se calcula con los datos, como el resto del XP)
+// =====================================================================
+const DES_XP = 150;
+const cenaVeg = (c, d) => { const id = c.days?.[d]?.cena || window.PLAN?.houseDay(d)?.cena; const r = R[id]; if (!r || !window.DIET) return false; const f = window.DIET.flags(r); return !["carne", "ave", "pescado", "mariscos"].some((k) => f.has(k)); };
+const DES_POOL = {
+  constancia: { t: "Constancia", n: 20, ic: "check", d: (n) => `Cumplí ${n} días del plan este mes`, calc: (c, days) => days.filter((d) => c.done?.[d]).length },
+  pasos: { t: "A caminar", n: 10, ic: "bolt", d: (n) => `${n} días con tu objetivo de pasos`, calc: (c, days) => days.filter((d) => { const p = c.pasos?.[d]; return p && p.s >= (p.g || 8000); }).length },
+  verde: { t: "Más verde", n: 8, ic: "leaf", d: (n) => `${n} días cumplidos con cena sin carne ni pescado`, calc: (c, days) => days.filter((d) => c.done?.[d] && cenaVeg(c, d)).length },
+  agua: { t: "Hidratación", n: 15, ic: "droplet", d: (n) => `${n} días con los 3 vasos de agua`, calc: (c, days) => days.filter((d) => (c.agua?.[d] || 0) >= 3).length },
+  racha: { t: "Sin cortar", n: 10, ic: "flame", d: (n) => `Una racha de ${n} días seguidos`, calc: (c, days) => { let best = 0, run = 0; days.forEach((d) => { if (c.done?.[d] || c.libre?.[d]) { run++; best = Math.max(best, run); } else run = 0; }); return best; } },
+};
+const DES_ROTA = ["pasos", "verde", "agua", "racha"];
+const desFor = (ym) => { const k = +ym.slice(0, 4) * 12 + +ym.slice(5, 7); return ["constancia", DES_ROTA[k % 4], DES_ROTA[(k + 1) % 4]]; };
+const ymNext = (ym) => { const [y, m] = ym.split("-").map(Number); return m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, "0")}`; };
+const ymDays = (ym, cut) => { const [y, m] = ym.split("-").map(Number); const n = new Date(y, m, 0).getDate(); const lim = cut || todayISO; return Array.from({ length: n }, (_, i) => `${ym}-${String(i + 1).padStart(2, "0")}`).filter((d) => d <= lim); };
+function desafios(ym, cut) {
+  return desFor(ym).map((id) => { const D = DES_POOL[id]; const v = Math.min(D.n, D.calc(cal || {}, ymDays(ym, cut))); return { id, t: D.t, d: D.d(D.n), n: D.n, v, ok: v >= D.n, ic: D.ic }; });
+}
+function desafiosDone(cut) {
+  if (!cal) return 0;
+  const keys = [...Object.keys(cal.done || {}), ...Object.keys(cal.pasos || {}), ...Object.keys(cal.agua || {})].sort(); if (!keys.length) return 0;
+  let ym = keys[0].slice(0, 7), n = 0; const last = (cut || todayISO).slice(0, 7);
+  for (let k = 0; ym <= last && k < 120; k++, ym = ymNext(ym)) n += desafios(ym, cut).filter((x) => x.ok).length;
+  return n;
+}
+const MESES_D = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+function renderDesafios() {
+  const box = $("#desCard"); if (!box || !user || !cal) return;
+  const ym = todayISO.slice(0, 7), list = desafios(ym), [y, m] = ym.split("-").map(Number);
+  const left = new Date(y, m, 0).getDate() - +todayISO.slice(8) + 1;
+  const fr = Object.keys(cal?.friends || {}).map((fid) => ({ fid, p: pub[fid] || {}, name: pub[fid]?.name || cal.friends[fid]?.name || "amigo/a" })).filter((f) => f.p.des?.ym === ym);
+  // aviso cuando se completa uno (una sola vez por desafío y por mes)
+  const seenK = "desOk:" + (user?.uid || "") + ":" + ym; let seen = []; try { seen = JSON.parse(localStorage.getItem(seenK) || "[]"); } catch (e) {}
+  const nuevos = list.filter((x) => x.ok && !seen.includes(x.id));
+  if (nuevos.length) { try { localStorage.setItem(seenK, JSON.stringify([...seen, ...nuevos.map((x) => x.id)])); } catch (e) {} if (seen.length || nuevos.length < list.filter((x) => x.ok).length || sessionStorage.getItem("desInit")) toast(`¡Desafío cumplido: ${nuevos.map((x) => x.t).join(" y ")}! +${DES_XP * nuevos.length} XP`); }
+  sessionStorage.setItem("desInit", "1");
+  box.innerHTML = `<div class="reto-head"><div><p class="kicker">Desafíos de ${MESES_D[m - 1]}</p><h3>Tres desafíos, +${DES_XP} XP cada uno</h3><p class="muted small">${left === 1 ? "Queda hoy." : `Quedan ${left} días.`} El mes que viene cambian dos de los tres.${fr.length ? "" : " Con amigos agregados ves cómo van ellos."}</p></div></div>
+    <div class="des-list">${list.map((x) => { const others = fr.map((f) => ({ name: f.name, v: f.p.des.v?.[x.id] || 0, photo: f.p.photo })).sort((a, b) => b.v - a.v).slice(0, 3);
+      return `<div class="des-item${x.ok ? " ok" : ""}"><span class="des-ic">${ic(x.ok ? "trophy" : x.ic)}</span><div class="des-b"><b>${esc(x.t)}</b><small>${esc(x.d)}</small>
+        <div class="des-bar" aria-label="${x.v} de ${x.n}"><i style="width:${Math.round(x.v / x.n * 100)}%"></i></div><small class="des-n">${x.ok ? `¡Cumplido! +${DES_XP} XP` : `${x.v} de ${x.n}`}</small>
+        ${others.length ? `<div class="des-fr">${others.map((o) => `<span title="${esc(o.name)}: ${o.v} de ${x.n}">${avatarHtml(o, o.name)}<em>${o.v}</em></span>`).join("")}</div>` : ""}</div></div>`; }).join("")}</div>`;
+}
 function renderReto() {
   const box = $("#retoCard"); if (!box || !user || !cal) return;
   const mon = mondayOf(todayISO), end = addDays(mon, 6);

@@ -27,14 +27,15 @@ TIER = {
 FAM = {
     "flame": ("#E4572E", "#FFFFFF"), "check": ("#2F8F5B", "#FFFFFF"), "calendar": ("#F2B544", INK),
     "recetas": ("#B8432A", "#FFFFFF"), "tag": ("#9A6E12", "#FFFFFF"), "droplet": ("#4A97C9", "#FFFFFF"),
-    "users": ("#23704A", "#FFFFFF"), "trophy": ("#1F2D2A", "#F2B544"),
+    "users": ("#23704A", "#FFFFFF"), "trophy": ("#1F2D2A", "#F2B544"), "target": ("#2F6F8F", "#FFFFFF"),
 }
 BADGES = [("racha3", 1, "flame"), ("racha7", 2, "flame"), ("racha15", 3, "flame"), ("racha30", 4, "flame"), ("racha60", 5, "flame"),
           ("dias10", 1, "check"), ("dias30", 2, "check"), ("dias100", 4, "check"),
           ("semana1", 2, "calendar"), ("semana4", 4, "calendar"), ("plan7", 1, "calendar"),
           ("receta1", 1, "recetas"), ("receta5", 2, "recetas"), ("receta15", 4, "recetas"),
           ("ing1", 1, "tag"), ("ing10", 3, "tag"), ("agua1", 1, "droplet"), ("agua7", 2, "droplet"), ("agua30", 4, "droplet"),
-          ("amigo1", 1, "users"), ("amigo5", 3, "users"), ("nivel5", 3, "trophy"), ("nivel10", 5, "trophy")]
+          ("amigo1", 1, "users"), ("amigo5", 3, "users"), ("nivel5", 3, "trophy"), ("nivel10", 5, "trophy"),
+          ("des1", 1, "target"), ("des3", 2, "target"), ("des6", 3, "target"), ("des12", 4, "target"), ("des24", 5, "target")]
 
 def icon_paths(name):
     m = re.search(r'<symbol id="i-%s"[^>]*>(.*?)</symbol>' % name, SPRITE, re.S)

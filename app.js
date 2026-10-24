@@ -1214,7 +1214,7 @@
     const CATS_APP = [
       ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "bolt", "Mes a medida"], ["temporada.html", "leaf", "Estación"], ["plan.html#batch", "pot", "Batch del domingo"]]],
       ["Comprar", "c2", [["compras.html", "compras", "Lista"], ["compras.html#comparar", "coin", "Comparar precios"], ["promos.html", "tag", "Promos"], ["supermercados.html#mapa", "pin", "Sucursales"]]],
-      ["Vos", "c3", [["mi-plan.html", "users", "Mi plan"], ["mi-plan.html#prog", "chart", "Progreso"], ["nutricion.html", "flame", "Nutrición"], ["mi-plan.html#rank", "trophy", "Ranking"], ["pasos.html", "bolt", "Pasos"]]],
+      ["Vos", "c3", [["mi-plan.html", "users", "Mi plan"], ["mi-plan.html#prog", "chart", "Progreso"], ["nutricion.html", "flame", "Nutrición"], ["mi-plan.html#rank", "trophy", "Ranking"], ["pasos.html", "bolt", "Pasos"], ["mi-plan.html#rank", "target", "Desafíos"]]],
     ];
     const grid = () => CATS_APP.map(([t, c, items]) => `<section class="ap-cat ${c}"><h2>${t}</h2><div class="ap-grid">${items.map(([href, i, l]) => `<a class="ap-tile" href="${href}"><span class="ap-ic">${ic(i)}</span><span class="ap-l">${l}</span></a>`).join("")}</div></section>`).join("");
     const renderAppHome = () => {
