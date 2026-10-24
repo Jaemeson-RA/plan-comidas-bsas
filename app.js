@@ -721,34 +721,43 @@
   const cleanName = (n) => n.replace(/\s*\(.*?\)\s*/g, " ").trim();
   const myLists = () => { try { return JSON.parse(localStorage.getItem("miListas") || "null"); } catch (e) { return null; } };
   state.src = new URLSearchParams(location.search).get("lista") === "mi" ? "mi" : (localStorage.getItem("shopSrc") || "casa");
+  // tildes de la lista: en este dispositivo, o compartidos en tiempo real si la lista es compartida
+  const shCtx = () => { const S = window.SH; if (!S || !S.uid) return null; if (state.src && state.src.startsWith("sh:")) { const o = state.src.slice(3); return S.others?.[o] ? { owner: o, data: S.others[o] } : null; } if (S.mine && Object.keys(S.mine.members || {}).some((u) => u !== S.uid)) return { owner: S.uid, data: S.mine }; return null; };
+  const tkHash = (k) => { let h = 5381; for (let i = 0; i < k.length; i++) h = ((h << 5) + h + k.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+  const isDone = (k) => { const c = shCtx(); if (c) return !!c.data.ticks?.[k.split(":")[1]]?.[tkHash(k)]; return localStorage.getItem(k) === "1"; };
+  const setDone = (k, v) => { const c = shCtx(); if (c) { window.SH.tick(c.owner, k.split(":")[1], tkHash(k), v); return; } if (v) localStorage.setItem(k, "1"); else localStorage.removeItem(k); };
   function renderShopping() {
     if (!$("#shopGrid")) return;
     renderWeekTabs("#shopTabs", renderShopping);
     const w = D.weeks.find((x) => x.start === state.week) || D.weeks[0], my = myLists();
-    const mine = state.src === "mi" && !!my, mw = mine ? my.weeks?.[w.start] : null;  // si cuenta.js todavía no trajo el calendario, se muestra el de la casa y se cambia solo cuando llega
+    const shO = state.src && state.src.startsWith("sh:") ? window.SH?.others?.[state.src.slice(3)] : null;  // la lista que me compartieron
+    const mine = !shO && state.src === "mi" && !!my, mw = mine ? my.weeks?.[w.start] : null;  // si cuenta.js todavía no trajo el calendario, se muestra el de la casa y se cambia solo cuando llega
     const extras = xGet(w.start);
-    const full = [...(mine ? (mw ? mw.list : []) : shoppingFor(w)), ...(extras.length ? [{ c: "otros", cat: "Otros (agregados por vos)", items: extras.map((x, k) => ({ n: x.n, q: x.q || "", extra: k })) }] : [])];
+    const full = shO ? (shO.weeks?.[w.start]?.list || []) : [...(mine ? (mw ? mw.list : []) : shoppingFor(w)), ...(extras.length ? [{ c: "otros", cat: "Otros (agregados por vos)", items: extras.map((x, k) => ({ n: x.n, q: x.q || "", extra: k })) }] : [])];
+    // si comparto mi lista, la publico para que la vean y la tilden (solo si cambió)
+    if (!shO && window.SH?.mine && Object.keys(window.SH.mine.members || {}).some((u) => u !== window.SH.uid)) window.SH.publish(w.start, { label: w.label, list: full });
     const hel = fGet();
     // origen de la lista: solo aparece si hay un calendario propio guardado en este dispositivo
     const srcBox = $("#shopSrc");
-    if (srcBox) { srcBox.hidden = !my; if (my) srcBox.innerHTML = `<span class="muted small">Lista de</span><div class="seg"><button type="button" data-src="casa" class="${mine ? "" : "on"}">Plan de la casa</button><button type="button" data-src="mi" class="${mine ? "on" : ""}">Mi calendario</button></div>`; }
+    const shOthers = Object.entries(window.SH?.others || {});
+    if (srcBox) { srcBox.hidden = !my && !shOthers.length; srcBox.innerHTML = `<span class="muted small">Lista de</span><div class="seg"><button type="button" data-src="casa" class="${!mine && !shO ? "on" : ""}">Plan de la casa</button>${my ? `<button type="button" data-src="mi" class="${mine ? "on" : ""}">Mi calendario</button>` : ""}${shOthers.map(([o, x]) => `<button type="button" data-src="sh:${o}" class="${state.src === "sh:" + o ? "on" : ""}">${ic("users")} ${esc(x.name || "compartida")}</button>`).join("")}</div>${shCtx() ? `<span class="sh-live">${ic("users")} compartida</span>` : ""}`; }
     // lo que está en la heladera no se compra: fuera de la cuenta, del comparador y del texto copiado
     const list = full.map((c) => ({ ...c, items: c.items.filter((i) => !inFridge(i.n, hel)) })).filter((c) => c.items.length);
-    const label = (mine ? "Mi calendario · " : "Lista de compras · ") + w.label;
+    const label = (shO ? `Lista de ${shO.name} · ` : mine ? "Mi calendario · " : "Lista de compras · ") + w.label;
     window.__shop = { label, start: w.start, list, src: state.src }; window.dispatchEvent(new Event("shoplist"));
     const n = list.reduce((a, c) => a + c.items.length, 0), nf = full.reduce((a, c) => a + c.items.length, 0) - n;
     const key = (c, nm) => `shop:${w.start}:${c}:${nm}`;
-    const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
+    const done = list.reduce((a, c) => a + c.items.filter((i) => isDone(key(c.cat, i.n))).length, 0);
     $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</b><span class="muted">${HOG() > 1 ? ` · para ${HOG()}` : ""} · ${n} productos${nf ? ` · <span class="ss-fr">${ic("snow")} ${nf} en la heladera</span>` : ""} · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="${mine ? "mi-plan.html" : `plan.html?semana=${w.start}`}">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="printList">${ic("printer")} Imprimir</button><button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button>${done ? `<button class="mini-btn ss-tofr" id="toFridge">${ic("snow")} Guardar lo tildado en la heladera</button>` : ""}</div></div>`;
-    $("#toFridge")?.addEventListener("click", () => { const hel = fGet(); let k = 0; list.forEach((c) => c.items.forEach((i) => { if (localStorage.getItem(key(c.cat, i.n)) === "1") { if (!inFridge(i.n, hel)) { hel.push(cleanName(i.n)); k++; } localStorage.removeItem(key(c.cat, i.n)); } })); fSet(hel); renderShopping(); toastG(k === 1 ? "1 producto guardado en la heladera." : `${k} productos guardados en la heladera.`); });
+    $("#toFridge")?.addEventListener("click", () => { const hel = fGet(); let k = 0; list.forEach((c) => c.items.forEach((i) => { if (isDone(key(c.cat, i.n))) { if (!inFridge(i.n, hel)) { hel.push(cleanName(i.n)); k++; } setDone(key(c.cat, i.n), false); } })); fSet(hel); renderShopping(); toastG(k === 1 ? "1 producto guardado en la heladera." : `${k} productos guardados en la heladera.`); });
     $("#printList")?.addEventListener("click", () => window.print());
-    $("#clearWeek").addEventListener("click", () => { full.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
+    $("#clearWeek").addEventListener("click", () => { full.forEach((c) => c.items.forEach((i) => setDone(key(c.cat, i.n), false))); renderShopping(); });
     // texto plano de la lista (solo lo que falta comprar; si no hay nada tildado, todo) para pegar en Notas o WhatsApp
     const listText = () => {
-      const anyDone = list.some((c) => c.items.some((i) => localStorage.getItem(key(c.cat, i.n)) === "1"));
+      const anyDone = list.some((c) => c.items.some((i) => isDone(key(c.cat, i.n))));
       const lines = [label, ""];
       list.forEach((c) => {
-        const items = c.items.filter((i) => !anyDone || localStorage.getItem(key(c.cat, i.n)) !== "1");
+        const items = c.items.filter((i) => !anyDone || !isDone(key(c.cat, i.n)));
         if (!items.length) return;
         lines.push(c.cat.toUpperCase());
         items.forEach((i) => lines.push("- " + i.n + " · " + i.q));
@@ -773,9 +782,9 @@
       try { await navigator.share({ title: label, text }); } catch (e) { if (e && e.name !== "AbortError") { await copyText(text); toast("Lista copiada."); } }
     });
     $("#shopGrid").innerHTML = full.length ? full.map((cat) => `<div class="shop-cat"><h4>${esc(cat.cat)} <small>${cat.items.filter((i) => !inFridge(i.n, hel)).length}</small></h4>
-      ${cat.items.map((i) => { const fz = inFridge(i.n, hel), dn = !fz && localStorage.getItem(key(cat.cat, i.n)) === "1";
+      ${cat.items.map((i) => { const fz = inFridge(i.n, hel), dn = !fz && isDone(key(cat.cat, i.n));
         return `<div class="sh-row${fz ? " fz" : ""}"><label class="${dn ? "done" : ""}"><input type="checkbox" data-k="${esc(key(cat.cat, i.n))}" ${dn ? "checked" : ""}${fz ? " disabled" : ""}><span>${esc(i.n)}</span><em class="q">${esc(i.q)}</em></label>${i.extra != null ? `<button type="button" class="x-del" data-xdel="${i.extra}" aria-label="Sacar ${esc(i.n)} de la lista">×</button>` : ""}${fz ? `<button type="button" class="fz-btn" data-fz="${esc(i.n)}" aria-pressed="true" title="Está en tu heladera (tocá para sacarlo)" aria-label="Sacar ${esc(i.n)} de la heladera">${ic("snow")}</button>` : ""}</div>`; }).join("")}</div>`).join("")
-      : `<div class="card shop-empty"><p><b>Tu calendario no tiene platos esa semana.</b></p><p class="muted small">Armala en <a href="mi-plan.html">Mi plan</a> o mirá la lista del plan de la casa.</p></div>`;
+      : shO ? `<div class="card shop-empty"><p><b>${esc(shO.name)} todavía no armó la lista de esa semana.</b></p><p class="muted small">Aparece acá apenas la abra en Compras.</p></div>` : `<div class="card shop-empty"><p><b>Tu calendario no tiene platos esa semana.</b></p><p class="muted small">Armala en <a href="mi-plan.html">Mi plan</a> o mirá la lista del plan de la casa.</p></div>`;
     $("#shopGrid").insertAdjacentHTML("beforeend", `<form class="card x-form" id="xForm"><label for="xQ"><b>¿Falta algo?</b> <span class="muted small">Sumalo a la lista de esta semana: se copia, se comparte y entra en el comparador.</span></label><div><input id="xQ" placeholder="Ej.: café, papel higiénico, detergente" autocomplete="off"><input id="xN" placeholder="Cantidad" autocomplete="off" aria-label="Cantidad (opcional)"><button class="btn" type="submit">Agregar</button></div></form>`);
     $("#pantryList").innerHTML = D.pantry.map((p) => `<li>${esc(p)}</li>`).join("");
     // la tarjeta de la heladera
@@ -792,6 +801,7 @@
     if (!D.weeks.some((w) => w.start === state.week)) { D.weeks.push(weekAt(state.week)); D.weeks.sort((a, b) => a.start.localeCompare(b.start)); }
     renderShopping();
     window.addEventListener("milistas", () => renderShopping());  // cuenta.js trajo (o borró) el calendario propio
+    window.addEventListener("shared", () => renderShopping());  // la lista compartida cambió (tildes de otros, miembros)
     const reweeks = () => { D.weeks = [-1, 0, 1, 2, 3].map((i) => weekAt(addDays(base, i * 7))); if (!D.weeks.some((w) => w.start === state.week)) { D.weeks.push(weekAt(state.week)); D.weeks.sort((a, b) => a.start.localeCompare(b.start)); } renderShopping(); };
     window.addEventListener("plan-swap", reweeks); window.addEventListener("hogar", reweeks);
     if ($("#shopHog")) $("#shopHog").innerHTML = hogHTML();
@@ -833,8 +843,8 @@
     $("#frForm")?.addEventListener("submit", (e) => { e.preventDefault(); const hel = fGet(), dv = $("#frD")?.value, names = String($("#frQ").value).split(/[,;]/).map((x) => x.trim()).filter(Boolean); names.forEach((v) => { if (!hel.some((h) => fNorm(h) === fNorm(v))) hel.push(v); }); fSet(hel); if (dv) { const ve = fVGet(); names.forEach((v) => { ve[fNorm(v)] = dv; }); fVSet(ve); } $("#frQ").value = ""; if ($("#frD")) $("#frD").value = ""; renderShopping(); });
     $("#shopGrid").addEventListener("change", (e) => {
       const cb = e.target; if (cb.type !== "checkbox") return;
-      localStorage.setItem(cb.dataset.k, cb.checked ? "1" : "0"); cb.closest("label").classList.toggle("done", cb.checked);
-      const s = $("#shopSummary .muted"); if (s) { const w = D.weeks.find((x) => x.start === state.week); const list = window.__shop?.list || shoppingFor(w); const key = (c, nm) => `shop:${w.start}:${c}:${nm}`; const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0); s.textContent = s.textContent.replace(/\d+ tildados/, done + " tildados"); }
+      setDone(cb.dataset.k, cb.checked); cb.closest("label").classList.toggle("done", cb.checked);
+      const s = $("#shopSummary .muted"); if (s) { const w = D.weeks.find((x) => x.start === state.week); const list = window.__shop?.list || shoppingFor(w); const key = (c, nm) => `shop:${w.start}:${c}:${nm}`; const done = list.reduce((a, c) => a + c.items.filter((i) => isDone(key(c.cat, i.n))).length, 0); s.textContent = s.textContent.replace(/\d+ tildados/, done + " tildados"); }
     });
   }
 

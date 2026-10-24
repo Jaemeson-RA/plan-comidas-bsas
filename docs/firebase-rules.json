@@ -74,6 +74,20 @@
           ".validate": "newData.val() == null || newData.hasChildren(['from', 'rec', 'date', 'slot'])"
         }
       }
+    },
+    "shared": {
+      "$owner": {
+        ".read": "auth != null && (auth.uid == $owner || data.child('members').child(auth.uid).exists())",
+        "members": {
+          ".write": "auth != null && auth.uid == $owner"
+        },
+        "weeks": {
+          ".write": "auth != null && auth.uid == $owner"
+        },
+        "ticks": {
+          ".write": "auth != null && (auth.uid == $owner || root.child('shared').child($owner).child('members').child(auth.uid).exists())"
+        }
+      }
     }
   }
 }

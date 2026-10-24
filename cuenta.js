@@ -129,11 +129,12 @@ onAuthStateChanged(auth, (u) => {
   user = u; if (unsubCal) { unsubCal(); unsubCal = null; }
   myEmailHash = null; lastXP = null; clearTimeout(syncTimer);  // al cambiar de cuenta en la misma pestaña, nada de la anterior
   try { if (u) localStorage.setItem("acct", "1"); else localStorage.removeItem("acct"); } catch (e) {}  // Compras carga este módulo solo si hay cuenta
+  if (!u) { shWatch(); }
   if (!u) { try { localStorage.removeItem("notifMine"); localStorage.removeItem("miListas"); } catch (e) {} window.notifSnap?.(); window.dispatchEvent(new Event("milistas")); if (page === "miplan" && new URLSearchParams(location.search).get("tutorial") === "1") setTimeout(() => openTuto(0), 500); }  // sin cuenta, los recordatorios usan el plan de la casa
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
-    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); syncPesos(); setTimeout(maybeTuto, 600); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); syncPesos(); shWatch(); renderShareBox(); setTimeout(maybeTuto, 600); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
     if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
@@ -1056,9 +1057,10 @@ function renderInbox() {
   const box = $("#inboxBox"); if (!box || !user) return;
   const items = Object.entries(inbox || {}).sort((a, b) => (b[1].at || "").localeCompare(a[1].at || ""));
   box.hidden = !items.length; if (!items.length) { box.innerHTML = ""; return; }
-  const props = items.filter(([, x]) => x.type !== "resp").length;
-  box.innerHTML = `<h3>${ic("mail")} ${props ? (props === 1 ? "Te propusieron un plato" : `Te propusieron ${props} platos`) : "Respuestas a tus propuestas"}</h3>` + items.map(([k, x]) => {
+  const props = items.filter(([, x]) => x.type !== "resp" && x.type !== "lista").length, listas = items.filter(([, x]) => x.type === "lista").length;
+  box.innerHTML = `<h3>${ic("mail")} ${props ? (props === 1 ? "Te propusieron un plato" : `Te propusieron ${props} platos`) : listas ? "Te compartieron una lista" : "Respuestas a tus propuestas"}</h3>` + items.map(([k, x]) => {
     const r = R[x.rec]; const cuando = `${x.slot === "cena" ? "la cena" : "el " + slotName(x.slot)} del ${fechaLarga(x.date)}`;
+    if (x.type === "lista") return `<div class="inb">${ic("users")}<span><b>${esc(x.fromName || "Un amigo/a")}</b> te compartió su lista de compras: la ven y la tildan juntos.</span><div class="inb-act"><button class="btn small-btn" data-inb-yes="${k}">Aceptar</button><button class="mini-btn" data-inb-no="${k}">No, gracias</button></div></div>`;
     if (x.type === "resp") return `<div class="inb resp">${ic(x.ok ? "check" : "x")}<span><b>${esc(x.fromName || "Tu amigo/a")}</b> ${x.ok ? "aceptó" : "no aceptó"} tu propuesta: ${esc(r?.name || "un plato")} para ${cuando}.</span><button class="mini-btn" data-inb-ok="${k}">Entendido</button></div>`;
     return `<div class="inb">${r ? `<img src="${r.img}"${srcs(r)} alt="" loading="lazy">` : ""}<span><b>${esc(x.fromName || "Un amigo/a")}</b> te propone <b>${esc(r?.name || "un plato")}</b> para ${cuando}.</span>
       <div class="inb-act"><button class="btn small-btn" data-inb-yes="${k}">Aceptar</button><button class="mini-btn" data-inb-no="${k}">No, gracias</button>${r ? `<button class="mini-btn" data-rec="${x.rec}">Ver receta</button>` : ""}</div></div>`;
@@ -1068,6 +1070,7 @@ $("#inboxBox")?.addEventListener("click", async (e) => {
   const y = e.target.closest("[data-inb-yes]"), n = e.target.closest("[data-inb-no]"), ok = e.target.closest("[data-inb-ok]");
   const k = y?.dataset.inbYes || n?.dataset.inbNo || ok?.dataset.inbOk; if (!k || !inbox[k]) return; const x = inbox[k];
   try {
+    if (x.type === "lista") { if (y) { await update(ref(db, `calendars/${user.uid}/compartidas`), { [x.from]: x.fromName || "amigo/a" }); toast(`Listo: en Compras elegí «${x.fromName || "su lista"}» arriba de la lista.`); } await remove(ref(db, `inbox/${user.uid}/${k}`)); return; }
     if (y) { await update(ref(db, `calendars/${user.uid}/days/${x.date}`), { [x.slot]: x.rec }); touched(`Listo: ${R[x.rec]?.name || "el plato"} quedó en tu calendario (${fechaLarga(x.date)}).`); }
     if (y || n) push(ref(db, `inbox/${x.from}`), { type: "resp", from: user.uid, fromName: myName(), rec: x.rec, date: x.date, slot: x.slot, ok: !!y, at: new Date().toISOString() }).catch(() => {});
     await remove(ref(db, `inbox/${user.uid}/${k}`));
@@ -1075,6 +1078,62 @@ $("#inboxBox")?.addEventListener("click", async (e) => {
   } catch (ex) { toast(errMsg(ex)); }
 });
 
+
+// =====================================================================
+// LISTA COMPARTIDA: shared/{dueño} = {members: {uid: nombre}, weeks: {lunes: {label, list}}, ticks: {lunes: {hash: {by, at}}}}
+// =====================================================================
+const SH = { uid: null, mine: null, others: {} };
+window.SH = SH;
+let shUnsubs = [], shSig = "", shFireT = 0;
+const shFire = () => { clearTimeout(shFireT); shFireT = setTimeout(() => { window.dispatchEvent(new Event("shared")); renderShareBox(); }, 60); };
+function shWatch() {
+  const sig = (user?.uid || "") + "|" + Object.keys(cal?.compartidas || {}).sort().join(",");
+  if (sig === shSig) return; shSig = sig;
+  shUnsubs.forEach((f) => f()); shUnsubs = []; SH.mine = null; SH.others = {}; SH.uid = user?.uid || null;
+  if (!user) { shFire(); return; }
+  shUnsubs.push(onValue(ref(db, `shared/${user.uid}`), (s) => { SH.mine = s.val() || null; shFire(); }, () => { SH.mine = null; shFire(); }));
+  Object.entries(cal?.compartidas || {}).forEach(([o, name]) => shUnsubs.push(onValue(ref(db, `shared/${o}`), (s) => { const v = s.val(); if (v) SH.others[o] = { ...v, name }; else delete SH.others[o]; shFire(); }, () => { delete SH.others[o]; shSig = ""; shFire(); })));
+}
+SH.tick = (owner, mon, h, v) => set(ref(db, `shared/${owner}/ticks/${mon}/${h}`), v ? { by: myName(), at: Date.now() } : null).catch((e) => toast(errMsg(e)));
+const shPubT = {};
+SH.publish = (mon, data) => {
+  clearTimeout(shPubT[mon]);
+  shPubT[mon] = setTimeout(() => {
+    const prev = SH.mine?.weeks?.[mon]; const json = JSON.stringify(data.list);
+    if (prev && JSON.stringify(prev.list) === json) return;
+    const upd = { [`weeks/${mon}`]: { label: data.label, list: JSON.parse(json), at: Date.now() } };
+    Object.keys(SH.mine?.weeks || {}).forEach((k) => { if (k < addDays(mondayOf(todayISO), -14)) { upd[`weeks/${k}`] = null; upd[`ticks/${k}`] = null; } });  // lo viejo se borra
+    update(ref(db, `shared/${user.uid}`), upd).catch(() => {});
+  }, 1200);
+};
+function renderShareBox() {
+  const box = $("#shareBox"); if (!box) return;
+  if (!user || !cal) { box.hidden = true; return; }
+  const members = Object.entries(SH.mine?.members || {}).filter(([u]) => u !== user.uid);
+  const friends = Object.keys(cal?.friends || {}).map((fid) => ({ fid, name: pub[fid]?.name || cal.friends[fid]?.name || "amigo/a" }));
+  const free = friends.filter((f) => !members.some(([u]) => u === f.fid));
+  const others = Object.entries(SH.others || {});
+  box.hidden = false;
+  box.innerHTML = `<div class="sh-head"><span class="hel-ico">${ic("users")}</span><div><h3>Lista compartida</h3><p class="muted small">Para la casa, la pareja o los compañeros de depto: todos ven la misma lista y lo que tilda uno lo ve el otro al instante.</p></div></div>
+    ${members.length ? `<p class="small">Compartís tu lista con: ${members.map(([u, n]) => `<span class="sh-mem">${esc(n)} <button type="button" data-shrm="${u}" aria-label="Dejar de compartir con ${esc(n)}">×</button></span>`).join(" ")}</p>` : ""}
+    ${free.length ? `<div class="sh-add"><span class="muted small">${members.length ? "Sumar a" : "Compartir con"}:</span>${free.map((f) => `<button type="button" class="pchip" data-shadd="${f.fid}" data-shname="${esc(f.name)}">${esc(f.name)}</button>`).join("")}</div>`
+      : friends.length ? "" : `<p class="muted small">Para compartirla, primero agregá a esa persona como amigo/a en <a href="mi-plan.html#rank">Mi plan → Ranking</a>.</p>`}
+    ${others.length ? `<p class="small">${others.map(([, x]) => `<b>${esc(x.name)}</b>`).join(" y ")} ${others.length === 1 ? "te compartió su lista" : "te compartieron sus listas"}: elegila arriba en «Lista de». <button type="button" class="linkish" data-shleave>Dejar de ver</button></p>` : ""}`;
+}
+$("#shareBox")?.addEventListener("click", async (e) => {
+  const add = e.target.closest("[data-shadd]"), rm = e.target.closest("[data-shrm]"), lv = e.target.closest("[data-shleave]");
+  try {
+    if (add) {
+      const fid = add.dataset.shadd, name = add.dataset.shname;
+      await update(ref(db, `shared/${user.uid}/members`), { [user.uid]: myName(), [fid]: name });
+      await push(ref(db, `inbox/${fid}`), { type: "lista", from: user.uid, fromName: myName(), rec: "lista", date: todayISO, slot: "lista", at: new Date().toISOString() });
+      toast(`Listo: le mandamos tu lista a ${name}. La ve apenas acepte.`);
+      window.dispatchEvent(new Event("shared"));
+    }
+    if (rm) { await remove(ref(db, `shared/${user.uid}/members/${rm.dataset.shrm}`)); toast("Dejaste de compartir la lista con esa persona."); }
+    if (lv) { const upd = {}; Object.keys(cal?.compartidas || {}).forEach((o) => { upd[o] = null; }); await update(ref(db, `calendars/${user.uid}/compartidas`), upd); if (String(localStorage.getItem("shopSrc") || "").startsWith("sh:")) localStorage.setItem("shopSrc", "casa"); toast("Listo: ya no ves listas compartidas."); }
+  } catch (ex) { toast(/permission/i.test(String(ex)) ? "Falta publicar las reglas nuevas de la base de datos (docs/firebase-rules.json)." : errMsg(ex)); }
+});
 
 // =====================================================================
 // LADDER · personas de ejemplo (porteños). No son cuentas: se calculan acá, día por día, con las mismas reglas

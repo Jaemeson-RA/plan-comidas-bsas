@@ -1326,3 +1326,13 @@ main{min-height:100vh}
 .des-fr span{display:inline-flex;align-items:center;gap:.25rem;font-size:.78rem;font-weight:700}
 .des-fr .av{width:24px;height:24px;font-size:.7rem}
 .des-fr em{font-style:normal}
+
+/* ===== lista compartida ===== */
+.share-card{padding:.9rem 1rem;margin:0 0 .9rem}
+.sh-head{display:flex;gap:.75rem;align-items:flex-start}.sh-head h3{margin:0 0 .15rem}.sh-head p{margin:0}
+.sh-add{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:.6rem}.sh-add .pchip{font-family:inherit;cursor:pointer}
+.sh-mem{display:inline-flex;align-items:center;gap:.2rem;background:var(--ok2);color:var(--verde);border-radius:999px;padding:.15rem .3rem .15rem .6rem;font-weight:700}
+.sh-mem button{border:0;background:none;color:inherit;cursor:pointer;font-size:1rem;line-height:1}
+.sh-live{display:inline-flex;align-items:center;gap:.25rem;font-size:.76rem;font-weight:700;color:var(--verde);background:var(--ok2);border-radius:999px;padding:.2rem .55rem}
+.sh-live .ic{width:14px;height:14px}
+.shop-src .seg .ic{width:14px;height:14px;vertical-align:-2px}
