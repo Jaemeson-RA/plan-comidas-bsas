@@ -1,0 +1,806 @@
+{
+ "tostadas": {
+  "title": "Café con leche y tostadas integrales",
+  "img": {
+   "file": "img/tostadas.jpg",
+   "title": "File:Café con leche and tostadas.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Caf%C3%A9_con_leche_and_tostadas.jpg",
+   "license": "CC BY-SA 2.0",
+   "artist": "Jorge Gonzalez",
+   "q": "café con leche tostadas",
+   "w": 4083,
+   "h": 2717
+  },
+  "yt": [
+   {
+    "id": "w9EndORX8f0",
+    "title": "¿La tostada de aguacate para el desayuno NO ES SALUDABLE? | Dr. Steven Gundry",
+    "channel": "Dr. Gundry en Español",
+    "len": "11:41"
+   },
+   {
+    "id": "oe18SYFTJEU",
+    "title": "Tostada de Aguacate para desayunos y meriendas - Cocinandoporlavida",
+    "channel": "Cocinandoporlavida",
+    "len": "3:00"
+   },
+   {
+    "id": "10dEsdLqDR4",
+    "title": "Tosta de AGUACATE 🥑cena rápida, saludable y riquísima‼️",
+    "channel": "El Vecino Cocinero",
+    "len": "2:00"
+   },
+   {
+    "id": "rtWvDxVwt_A",
+    "title": "La TOSTADA con AGUACATE más rica y saludable en 5 minutos",
+    "channel": "DAP",
+    "len": "1:19"
+   },
+   {
+    "id": "0svXuUQ3z40",
+    "title": "Desayuno Saludable- Tostadas de Aguacate",
+    "channel": "Roxy MorningStar",
+    "len": "0:42"
+   }
+  ]
+ },
+ "yogur": {
+  "title": "Yogur con avena y banana",
+  "yt": [
+   {
+    "id": "vnoG8Obfces",
+    "title": "Tortitas de AVENA Fáciles y Esponjosas para Desayunos y Meriendas",
+    "channel": "Fuego Loco",
+    "len": "5:27"
+   },
+   {
+    "id": "x3tAkLlP3HA",
+    "title": "¡No comas pan! ¡Prepara esta deliciosa receta para el desayuno!",
+    "channel": "Super Gustoso",
+    "len": "3:02"
+   },
+   {
+    "id": "JR8KVF-bKJc",
+    "title": "7 desayunos saludables con avena |  fáciles, ricos y perfectos para la semana",
+    "channel": "Michela Perleche",
+    "len": "18:18"
+   },
+   {
+    "id": "cXBk-SGyNa4",
+    "title": "Mezcla AVENA, YOGUR Y MANZANA y te ENCANTARÁ - SIN AZÚCAR NI HARINA - ¡Fácil, Rápido, Saludable!",
+    "channel": "Patricia Leite Nutrición Deliciosa",
+    "len": "4:08"
+   },
+   {
+    "id": "xzCv9SnLzaU",
+    "title": "Si tienes 2 huevos y 1 taza de avena, ¡haz esta receta de menos de 5 minutos!",
+    "channel": "Super Gustoso",
+    "len": "3:06"
+   }
+  ],
+  "img": {
+   "file": "img/yogur.jpg",
+   "title": "File:Muesli.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Muesli.jpg",
+   "license": "CC BY-SA 2.5",
+   "artist": "Original description was: I, VirtualSteve took this photogra",
+   "q": "Overnight oats",
+   "w": 1922,
+   "h": 1842
+  }
+ },
+ "revueltos": {
+  "title": "Huevos revueltos con pan integral",
+  "img": {
+   "file": "img/revueltos.jpg",
+   "title": "File:-2012-12-05 Scrambled eggs on toast, Trimingham, Norfolk.JPG",
+   "page": "https://commons.wikimedia.org/wiki/File:-2012-12-05_Scrambled_eggs_on_toast,_Trimingham,_Norfolk.JPG",
+   "license": "CC BY-SA 4.0",
+   "artist": "Kolforn (Kolforn)\nI'd appreciate if you could mail me (Kolfo",
+   "q": "scrambled eggs toast plate",
+   "w": 5152,
+   "h": 3864
+  },
+  "yt": [
+   {
+    "id": "4TyfZli-n_c",
+    "title": "HUEVOS REVUELTOS PERFECTOS - ¡Huevo, Paulina!",
+    "channel": "Paulina Cocina",
+    "len": "4:51"
+   },
+   {
+    "id": "-aXckoInFdU",
+    "title": "Los mejores huevos revueltos de tu vida | UMAMI",
+    "channel": "Umami",
+    "len": "8:31"
+   },
+   {
+    "id": "mCRLG6Nu7b4",
+    "title": "Como hacer HUEVOS REVUELTOS",
+    "channel": "HoyCocinaDiego",
+    "len": "1:48"
+   },
+   {
+    "id": "7nFcA_3of5g",
+    "title": "10 Maneras De Cocinar Huevos Profesionales",
+    "channel": "Alfredo",
+    "len": "11:57"
+   },
+   {
+    "id": "pqlL-oddUVg",
+    "title": "Huevos revueltos estilo Gordon Ramsay  - potrocattaneo",
+    "channel": "Potro Cattaneo",
+    "len": "6:06"
+   }
+  ]
+ },
+ "panqueques": {
+  "title": "Panqueques de avena y banana",
+  "img": {
+   "file": "img/panqueques.jpg",
+   "title": "File:Pancakes, Ehrenbach.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pancakes,_Ehrenbach.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Gerda Arendt",
+   "q": "oatmeal pancakes",
+   "w": 3808,
+   "h": 2856
+  },
+  "yt": [
+   {
+    "id": "abXvVyaHZ50",
+    "title": "Cómo hacer PANCAKE DE AVENA Y BANANA",
+    "channel": "Cocineros Argentinos",
+    "len": "6:57"
+   },
+   {
+    "id": "MqDtnEtmuvw",
+    "title": "PANCAKES DE AVENA Y BANANO ESPONJOSOS 🥞 - saludables sin harina ni azúcar |  ÑAM! Recetas",
+    "channel": "Los de ÑAM!",
+    "len": "5:19"
+   },
+   {
+    "id": "pNaK0V0QY2Y",
+    "title": "Como Preparar PANCAKES de AVENA y Banano SALUDABLES! [Fácil y Rico] ComiArte👉 2021",
+    "channel": "ComiArte",
+    "len": "4:58"
+   },
+   {
+    "id": "vHvx-yGDJS0",
+    "title": "Tortitas de AVENA y PLÁTANO  SIN AZÚCAR Facilísimas!",
+    "channel": "Fuego Loco",
+    "len": "3:51"
+   },
+   {
+    "id": "3BVR1HbJblk",
+    "title": "Pancakes de avena con 3 Ingredientes! Esponjosos y saludables -",
+    "channel": "Estefi Colombo",
+    "len": "5:23"
+   }
+  ]
+ },
+ "pollohorno": {
+  "title": "Pollo al horno con calabaza y zanahoria",
+  "yt": [
+   {
+    "id": "QmwVcYQltcA",
+    "title": "Masterclass del Pollo al Horno: hasta la pechuga queda húmeda",
+    "channel": "Paulina Cocina",
+    "len": "10:47"
+   },
+   {
+    "id": "lZJpPfIkn0w",
+    "title": "Pollo con verduras al horno fácil ¡Rápido y Exquisito!",
+    "channel": "Y hoy qué comemos ",
+    "len": "3:07"
+   },
+   {
+    "id": "a7Q0OyO_byw",
+    "title": "Pollo al ajillo con guarnición de  calabaza especiada",
+    "channel": "La cocina de Masito",
+    "len": "2:17"
+   },
+   {
+    "id": "MN6W8lYYNkY",
+    "title": "POLLO AL HORNO CON PAPAS Y VERDURAS❗️Una comida completa con una receta fácil❗️",
+    "channel": "El Sazón De Mi Cocina",
+    "len": "6:09"
+   },
+   {
+    "id": "Xt3DzvcpwLo",
+    "title": "El POLLO ASADO que mas hacemos en casa MUY FACIL Y RICO",
+    "channel": "La cocina de Masito",
+    "len": "3:36"
+   }
+  ],
+  "img": {
+   "file": "img/pollohorno.jpg",
+   "title": "File:Butterfly chicken with roasted vegetables - Massachusetts.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Butterfly_chicken_with_roasted_vegetables_-_Massachusetts.jpg",
+   "license": "CC0",
+   "artist": "Daderot",
+   "q": "roast chicken with vegetables",
+   "w": 2015,
+   "h": 2028
+  }
+ },
+ "merluza": {
+  "title": "Merluza a la plancha con ensalada",
+  "img": {
+   "file": "img/merluza.jpg",
+   "title": "File:Merluza a la plancha - moverelbigote.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Merluza_a_la_plancha_-_moverelbigote.jpg",
+   "license": "CC BY 2.0",
+   "artist": "Javier Leiva (www.moverelbigote.com) from Vic, Barcelona",
+   "q": "merluza a la plancha",
+   "w": 2592,
+   "h": 1936
+  },
+  "yt": [
+   {
+    "id": "IKvMxQYAb-o",
+    "title": "Los TRES TRUCOS para hacer el mejor PESCADO A LA PLANCHA: nunca se pega y queda la piel crujiente",
+    "channel": "DAP",
+    "len": "5:54"
+   },
+   {
+    "id": "PU64uk_7UWE",
+    "title": "FILETE DE MERLUZA A LA PLANCHA FÁCIL Y RÁPIDO",
+    "channel": "La Cocina Me Fascina",
+    "len": "1:12"
+   },
+   {
+    "id": "KU_jeixPT4w",
+    "title": "No frías más el Pescado, hazlo asi de rico, nutritivo y fácil",
+    "channel": "Jugos y Más TV",
+    "len": "4:06"
+   },
+   {
+    "id": "gS3UnoERnRE",
+    "title": "MERLUZA A LA PLANCHA con ajo y perejil 🐟 Receta fácil y rápida",
+    "channel": "Rico Rico Recetas",
+    "len": "3:17"
+   },
+   {
+    "id": "GCzm8LYS_lk",
+    "title": "MERLUZA A LA PLANCHA",
+    "channel": "TXOMIN GARCIA",
+    "len": "1:32"
+   }
+  ]
+ },
+ "bife": {
+  "title": "Bife de nalga con puré de zapallo",
+  "img": {
+   "file": "img/bife.jpg",
+   "title": "File:Bife de chorizo con arroz blanco y huevos fritos (plato argentino).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Bife_de_chorizo_con_arroz_blanco_y_huevos_fritos_(plato_argentino).jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Horacio Cambeiro",
+   "q": "bife de chorizo plato",
+   "w": 4000,
+   "h": 3000
+  },
+  "yt": [
+   {
+    "id": "xfk1JLjQsgs",
+    "title": "Como hacer bife de chorizo con calabazas a la plancha y ensalada de tomate",
+    "channel": "Pedro Lambertini",
+    "len": "7:02"
+   },
+   {
+    "id": "sZf08EBi9v8",
+    "title": "CALABAZA a la PLANCHA - Vuestra receta de temporada // Cocinatis",
+    "channel": "Cocinatis",
+    "len": "1:54"
+   },
+   {
+    "id": "KXvYeOHH0C4",
+    "title": "✅ Este es el PURÉ de CALABAZA CORRECTO!! ► Sirve en estas Recetas con Calabaza",
+    "channel": "Cocina Guru",
+    "len": "5:42"
+   },
+   {
+    "id": "k0tYbsTovQk",
+    "title": "Receta de hoy: Ojo de bife, puré de calabaza y polenta con hongos frita",
+    "channel": "La Cocina del 9",
+    "len": "30:13"
+   },
+   {
+    "id": "3btbb-Gy7I8",
+    "title": "Bife de chorizo a la plancha: 10 TRUCOS / Recetas de carne - Paulina Cocina",
+    "channel": "Paulina Cocina",
+    "len": "5:21"
+   }
+  ]
+ },
+ "atun": {
+  "title": "Ensalada completa de atún y huevo",
+  "yt": [
+   {
+    "id": "XUL3d9pI6hQ",
+    "title": "ENSALADA DE ATÚN | Vicky Receta Fácil",
+    "channel": "VICKY RECETA FACIL",
+    "len": "6:30"
+   },
+   {
+    "id": "S9XU_A2l_OM",
+    "title": "Como hacer Ensalada de Atún Super Fácil",
+    "channel": "Cocina Sin Excusas",
+    "len": "3:37"
+   },
+   {
+    "id": "RjUEFjcweX4",
+    "title": "🥗La mejor ensalada de atún. ¡Exquisita y deliciosa! 😋🤤",
+    "channel": "Q'Rico recetas",
+    "len": "3:06"
+   },
+   {
+    "id": "dBSuAuLXfIw",
+    "title": "🥗La más deliciosa ensalada de atún. ¡Fácil y saludable! 🤤😋",
+    "channel": "Q'Rico recetas",
+    "len": "3:03"
+   },
+   {
+    "id": "ETZ3Jx_P8yk",
+    "title": "ENSALADA DE ATUN FACIL FRESCA Y NUTRITIVA | Vicky Receta Facil",
+    "channel": "VICKY RECETA FACIL",
+    "len": "5:16"
+   }
+  ],
+  "img": {
+   "file": "img/atun.jpg",
+   "title": "File:Veggie+Tuna salad.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Veggie%2BTuna_salad.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Ansh014",
+   "q": "ensalada de atún",
+   "w": 3264,
+   "h": 2448
+  }
+ },
+ "sopa": {
+  "title": "Sopa de verduras con huevo duro",
+  "img": {
+   "file": "img/sopa.jpg",
+   "title": "File:Traditional Vegetable Soup from Argentina.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Traditional_Vegetable_Soup_from_Argentina.jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Horacio Cambeiro",
+   "q": "vegetable soup bowl",
+   "w": 4000,
+   "h": 2896
+  },
+  "yt": [
+   {
+    "id": "NRx0xCYgdJk",
+    "title": "Receta: Sopa de verduras - Morfi",
+    "channel": "Telefe",
+    "len": "2:12"
+   },
+   {
+    "id": "_ph-LgZcCFI",
+    "title": "😋 Cómo Hacer SOPA DE VERDURAS Casera ► Receta Saludable con 🥕🌽🥔🧄 y +",
+    "channel": "Cocina Guru",
+    "len": "3:40"
+   },
+   {
+    "id": "oatBAAdnnYc",
+    "title": "SOPA DE POLLO Y VEGETALES",
+    "channel": "Cocineros Argentinos",
+    "len": "20:44"
+   },
+   {
+    "id": "0L0CFw2bPNE",
+    "title": "Como hacer una sopa de verduras casera - comidas rapidas y faciles de preparar",
+    "channel": "¡Que Viva La Cocina!",
+    "len": "3:05"
+   },
+   {
+    "id": "HPLPKe3PVJo",
+    "title": "Sopa de verduras | Como preparar sopa de verduras | recetas para toda ocasión",
+    "channel": "Recetas para toda ocasion",
+    "len": "4:20"
+   }
+  ]
+ },
+ "tarta": {
+  "title": "Tarta de acelga light",
+  "img": {
+   "title": "File:Tarta pascualina de verduras típica de Argentina.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Tarta_pascualina_de_verduras_t%C3%ADpica_de_Argentina.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Horacio Cambeiro",
+   "file": "img/tarta.jpg"
+  },
+  "yt": [
+   {
+    "id": "jQQoHtVhQVM",
+    "title": "Tarta de acelga | PASO A PASO EN MINUTOS!",
+    "channel": "Recetas Materas",
+    "len": "1:56"
+   },
+   {
+    "id": "BIxrjL1e-aw",
+    "title": "BUDIN DE ACELGA  ECONÓMICO / DELICIOSO / Silvana Cocina",
+    "channel": "SilvanaCocina",
+    "len": "5:25"
+   },
+   {
+    "id": "AXrqVW-ilJA",
+    "title": "Cómo hacer TARTA DE ACELGA tipo pascualina: CREMOSA Y RICA",
+    "channel": "Paulina Cocina",
+    "len": "13:51"
+   },
+   {
+    "id": "MvajKqEfQhU",
+    "title": "TARTA SALUDABLE DE ACELGA Y POLLO",
+    "channel": "Natalí sosa.",
+    "len": "4:31"
+   },
+   {
+    "id": "7zf8dBWWoFs",
+    "title": "Tarta de acelga sin desperdicios | #EscuelaDeCocina",
+    "channel": "La Cocina del 9",
+    "len": "21:26"
+   }
+  ]
+ },
+ "wok": {
+  "title": "Wok de pollo y verduras",
+  "img": {
+   "file": "img/wok.jpg",
+   "title": "File:Kai phat khing.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Kai_phat_khing.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Takeaway",
+   "q": "chicken stir fry vegetables",
+   "w": 1925,
+   "h": 1532
+  },
+  "yt": [
+   {
+    "id": "S2shSjklAME",
+    "title": "Wok de pollo",
+    "channel": "Gonzalo DAmbrosio",
+    "len": "5:24"
+   },
+   {
+    "id": "dYV2wW9XZAc",
+    "title": "WOK de VEGETALES 🥕 PLATO RICO, NUTRITIVO y SALUDABLE por Iwao Komiyama | El Gourmet",
+    "channel": "elGourmet",
+    "len": "5:51"
+   },
+   {
+    "id": "OPfHDGXoNSA",
+    "title": "CHOP SUEY DE POLLO Y VEGETALES ESTILO ORIENTAL | Receta fácil y rápida",
+    "channel": "Rico Rico Recetas",
+    "len": "3:44"
+   },
+   {
+    "id": "YzM5ASZfvHs",
+    "title": "Salteado de Pollo con Verduras, Fácil, Rápido y Delicioso!!",
+    "channel": "El Mundo En Recetas",
+    "len": "1:41"
+   },
+   {
+    "id": "bDdX7Q1YzIc",
+    "title": "Verduras Salteadas (Wok De Vegetales) 🥬 🍆 🌶️ : Hacé Esto Para Que Te Queden Crocantes Pero Cocidas",
+    "channel": "Paulina Cocina",
+    "len": "10:40"
+   }
+  ]
+ },
+ "omelette": {
+  "title": "Omelette de champiñones y queso",
+  "yt": [
+   {
+    "id": "sTP9udTmXTM",
+    "title": "OMELETTE de CHAMPIÑONES y QUESO 🧀  PERFECTO con setas",
+    "channel": "enlacocinaconmarco",
+    "len": "9:20"
+   },
+   {
+    "id": "SA122sMRU6A",
+    "title": "Omelette De Champiñones | Desayuno Rápido @LaCocinaMeFascina",
+    "channel": "La Cocina Me Fascina",
+    "len": "1:39"
+   },
+   {
+    "id": "MNCKunms3XA",
+    "title": "Receta De Desayuno Omelette De Champiñones - Come Y Adelgaza",
+    "channel": "MetabolismoTV",
+    "len": "4:02"
+   },
+   {
+    "id": "EfybfRnAMNk",
+    "title": "OMELETTE DE CHAMPIÑONES | Vicky Receta Facil",
+    "channel": "VICKY RECETA FACIL",
+    "len": "7:36"
+   },
+   {
+    "id": "3rmGE0bh5mg",
+    "title": "Receta con  Champiñones fácil y deliciosa",
+    "channel": "Mis Recetas Deliciosas",
+    "len": "2:25"
+   }
+  ],
+  "img": {
+   "file": "img/omelette.jpg",
+   "title": "File:Mushroom Omelette - Breakfast At Tiffany's Brighton.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Mushroom_Omelette_-_Breakfast_At_Tiffany%27s_Brighton.jpg",
+   "license": "CC0",
+   "artist": "Andy Li",
+   "q": "mushroom omelette",
+   "w": 4032,
+   "h": 3024
+  }
+ },
+ "milanesas": {
+  "title": "Milanesas de pollo al horno",
+  "yt": [
+   {
+    "id": "TuSTCA3cq8Q",
+    "title": "Milanesas de Pollo AL HORNO FACILES Y RICAS👌",
+    "channel": "Norma Rojas",
+    "len": "4:50"
+   },
+   {
+    "id": "epaNw386VYo",
+    "title": "Cómo hacer una milanesa al HORNO y que no sea una SUELA",
+    "channel": "Paulina Cocina",
+    "len": "12:53"
+   },
+   {
+    "id": "7r5iraxXW1k",
+    "title": "Cómo hacer MILANESAS de POLLO | AL ESTILO ARGENTINO 🇦🇷",
+    "channel": "SoyGabs",
+    "len": "12:56"
+   },
+   {
+    "id": "pa7aFXmxyyg",
+    "title": "Milanesas de pollo al horno | Delicioso",
+    "channel": "Esto es Delicioso",
+    "len": "0:59"
+   },
+   {
+    "id": "9GUgt2fAK3c",
+    "title": "Así se Preparan Las Milanesas Argentinas al HORNO. Paso a paso. / Destinos con Sabor Argentina",
+    "channel": "Destinos con Sabor",
+    "len": "5:19"
+   }
+  ],
+  "img": {
+   "file": "img/milanesas.jpg",
+   "title": "File:Chicken milanesa of Argentina.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Chicken_milanesa_of_Argentina.jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Federico L.",
+   "q": "Milanesa de pollo",
+   "w": 1200,
+   "h": 900
+  }
+ },
+ "lentejas": {
+  "title": "Guiso de lentejas",
+  "yt": [
+   {
+    "id": "qRHymy7Ue4E",
+    "title": "CÓMO HACER GUISO DE LENTEJAS (CON CARNE)",
+    "channel": "Paulina Cocina",
+    "len": "13:07"
+   },
+   {
+    "id": "C_uPO7y5yro",
+    "title": "Cómo hacer GUISO DE LENTEJAS 🍲 Súper SABROSO!!! | Libro de Recetas |",
+    "channel": "Libro de Recetas",
+    "len": "4:17"
+   },
+   {
+    "id": "Tz59lt_nQjg",
+    "title": "GUISO de LENTEJAS 🍲 PLATO IDEAL para una TEMPORADA FRÍA | El Gourmet",
+    "channel": "elGourmet",
+    "len": "9:46"
+   },
+   {
+    "id": "EedUS98BVTo",
+    "title": "Guiso de lentejas SUPER FÁCIL delicioso",
+    "channel": "miel house",
+    "len": "6:33"
+   },
+   {
+    "id": "KddzDl2vKqs",
+    "title": "¡Así se hace el guiso de lentejas más rico del mundo! 🌍 Fácil, casero y delicioso",
+    "channel": "LA RUSA COCINA",
+    "len": "7:34"
+   }
+  ],
+  "img": {
+   "file": "img/lentejas.jpg",
+   "title": "File:Guiso de lentejas argentino con chorizo.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Guiso_de_lentejas_argentino_con_chorizo.jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Horacio Cambeiro",
+   "q": "guiso de lentejas",
+   "w": 4000,
+   "h": 3000
+  }
+ },
+ "zapallitos": {
+  "title": "Zapallitos rellenos",
+  "yt": [
+   {
+    "id": "5U_iBv5mFfc",
+    "title": "Así se prepara el verdadero zapallito relleno 🤤👩‍🍳",
+    "channel": "América TV",
+    "len": "9:41"
+   },
+   {
+    "id": "T3jbUQT_z1Q",
+    "title": "ZAPALLITOS RELLENOS - Súper sanos y ricos",
+    "channel": "Paulina Cocina",
+    "len": "8:59"
+   },
+   {
+    "id": "VyvzUDAJbEE",
+    "title": "\"Zapallitos rellenos\" ¡Una locura!",
+    "channel": "Cucinare",
+    "len": "1:41"
+   },
+   {
+    "id": "0koW9CS4EAY",
+    "title": "ZAPALLITOS RELLENOS para enamorar",
+    "channel": "miel house",
+    "len": "7:23"
+   },
+   {
+    "id": "lTeptgEq_lg",
+    "title": "CÓMO HAGO ZAPALLITOS RELLENOS",
+    "channel": "Cocineros Argentinos",
+    "len": "23:19"
+   }
+  ],
+  "img": {
+   "file": "img/zapallitos.jpg",
+   "title": "File:Zapallitos de tronco rellenos con carne, cebolla y queso cremoso (75169).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Zapallitos_de_tronco_rellenos_con_carne,_cebolla_y_queso_cremoso_(75169).jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Horacio Cambeiro",
+   "q": "zapallitos rellenos",
+   "w": 4000,
+   "h": 3000
+  }
+ },
+ "salmon": {
+  "title": "Salmón al papillote con verduras",
+  "yt": [
+   {
+    "id": "aZFl5TZyTUg",
+    "title": "SALMÓN AL PAPILLOTE CON VERDURAS, RECETA SANA Y RÁPIDA",
+    "channel": "Cocina con Sandra",
+    "len": "4:48"
+   },
+   {
+    "id": "qs-gmEi7eXA",
+    "title": "Receta de pescado al papillote - Karlos Arguiñano",
+    "channel": "Hogarmania",
+    "len": "2:33"
+   },
+   {
+    "id": "ClkaF2oJAMc",
+    "title": "Como hacer SALMON EN PAPILLOTE al HORNO FACIL Y RAPIDO | RECETA",
+    "channel": "Rico Rico Recetas",
+    "len": "4:34"
+   },
+   {
+    "id": "mPpiPFikKcs",
+    "title": "Salmón al papillote al horno con verduras (fácil y jugoso)",
+    "channel": "¡Que Viva La Cocina!",
+    "len": "4:44"
+   },
+   {
+    "id": "pl0VVQsGZCs",
+    "title": "Salmón con verduras al papillote, Nutt - Consejo Nutricional",
+    "channel": "Nutt - Consejo Nutricional",
+    "len": "3:16"
+   }
+  ],
+  "img": {
+   "file": "img/salmon.jpg",
+   "title": "File:02021 0652 (1) Kuskus with baked salmon and vegetable.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:02021_0652_(1)_Kuskus_with_baked_salmon_and_vegetable.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Silar",
+   "q": "Baked salmon vegetables",
+   "w": 4928,
+   "h": 3264
+  }
+ },
+ "pastel": {
+  "title": "Pastel de papa light",
+  "yt": [
+   {
+    "id": "XtQsqkNgV9A",
+    "title": "PASTEL DE PAPAS receta de la abuela MUY FACIL",
+    "channel": "miel house",
+    "len": "4:20"
+   },
+   {
+    "id": "2dK_dtOMbyg",
+    "title": "PASTEL DE PAPA NIVEL DIOS - #Paulina1Millón",
+    "channel": "Paulina Cocina",
+    "len": "13:48"
+   },
+   {
+    "id": "zROzCWo6zE4",
+    "title": "El Secreto del Pastel de Papas Jugoso – ¡Receta Súper Fácil!",
+    "channel": "LA RUSA COCINA",
+    "len": "8:01"
+   },
+   {
+    "id": "HP7nXkWUcmI",
+    "title": "PASTEL DE PAPAS  casero SUPER FACIL riquísimo",
+    "channel": "miel house",
+    "len": "8:15"
+   },
+   {
+    "id": "KXRyBqw3WoU",
+    "title": "Pastel de Papa como se hacía antes | Receta clásica",
+    "channel": "El Pastificio de Nicola",
+    "len": "10:11"
+   }
+  ],
+  "img": {
+   "file": "img/pastel.jpg",
+   "title": "File:Pastel de papa (porción).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pastel_de_papa_(porci%C3%B3n).jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Horacio Cambeiro",
+   "q": "Pastel de papa",
+   "w": 4032,
+   "h": 2268
+  }
+ },
+ "empanadas": {
+  "title": "Empanadas de carne al horno",
+  "yt": [
+   {
+    "id": "T8NWbcdnbQ4",
+    "title": "Empanadas Argentinas de Carne para Horno / Baked Beef Empanadas",
+    "channel": "El Pastificio de Nicola",
+    "len": "11:41"
+   },
+   {
+    "id": "sz3XPr2Pk1g",
+    "title": "La verdadera receta de las empanadas de carne | Dolli y Gross: Cocina entre amigos | El Gourmet",
+    "channel": "elGourmet",
+    "len": "10:55"
+   },
+   {
+    "id": "YAnsG-8H6kw",
+    "title": "El Secreto para que las Empanadas de Carne Queden Jugosas – Receta Fácil  Masa y Relleno Tradicional",
+    "channel": "LA RUSA COCINA",
+    "len": "8:02"
+   },
+   {
+    "id": "uweI51hZ5Ug",
+    "title": "Las MEJORES EMPANADAS de CARNE 🥟 de la mano de Christian Petersen | El Gourmet",
+    "channel": "elGourmet",
+    "len": "11:13"
+   },
+   {
+    "id": "Oq2fUsdqt6A",
+    "title": "Empanadas Argentinas de Carne",
+    "channel": "Tasty Latam",
+    "len": "2:57"
+   }
+  ],
+  "img": {
+   "title": "File:Empanadas salteñas 1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Empanadas_salte%C3%B1as_1.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Gonzalo Rivero",
+   "file": "img/empanadas.jpg"
+  }
+ }
+}

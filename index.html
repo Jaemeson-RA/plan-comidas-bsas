@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan de comidas · Buenos Aires</title>
+<meta name="description" content="Plan de comidas de 5 semanas para Buenos Aires: recetas fáciles con productos de acá, lista de compras semanal y comparativa de supermercados con envío a domicilio en ARS, USD y EUR.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥘</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#inicio"><span class="brand-ico">🥘</span><span>Plan de comidas <em>Buenos Aires</em></span></a>
+  <nav class="nav">
+    <a href="#plan">Plan semanal</a>
+    <a href="#recetas">Recetas</a>
+    <a href="#compras">Compras</a>
+    <a href="#supermercados">Supermercados</a>
+  </nav>
+  <div class="money-ctl" title="Moneda en la que se muestran los precios">
+    <div class="seg" id="curSeg">
+      <button data-cur="ARS" class="on">ARS</button>
+      <button data-cur="USD">USD</button>
+      <button data-cur="EUR">EUR</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="inicio" class="hero">
+  <div class="hero-txt">
+    <p class="kicker">Buenos Aires · <span id="periodLabel"></span></p>
+    <h1>Comer bien, simple y con lo que hay en el barrio.</h1>
+    <p class="lead">Cinco semanas de desayunos, almuerzos y cenas con productos argentinos de todos los días. Cada receta tiene foto, video, ingredientes para 2 personas y costo aproximado por porción. Al final, qué supermercado conviene para pedir a domicilio.</p>
+    <div class="hero-cta">
+      <a class="btn" href="#plan">Ver el plan</a>
+      <a class="btn ghost" href="#supermercados">Comparar supermercados</a>
+    </div>
+  </div>
+  <aside class="rates card" id="ratesCard">
+    <h3>Cotización del día</h3>
+    <div class="rate-mode seg" id="modeSeg">
+      <button data-mode="blue" class="on">Blue</button>
+      <button data-mode="oficial">Oficial</button>
+    </div>
+    <dl>
+      <div><dt>1 USD</dt><dd id="rUsd">—</dd></div>
+      <div><dt>1 EUR</dt><dd id="rEur">—</dd></div>
+    </dl>
+    <p class="muted small" id="ratesNote">Cargando…</p>
+  </aside>
+</section>
+
+<section id="plan" class="sec">
+  <div class="sec-head">
+    <h2>Plan semanal</h2>
+    <p class="muted">Tocá un plato para ver la receta. Los fines de semana quedan los platos que llevan más tiempo (empanadas, pastel de papa). Las porciones son para 2.</p>
+  </div>
+  <div class="tabs" id="weekTabs"></div>
+  <div class="plan-wrap">
+    <table class="plan" id="planTable">
+      <thead><tr><th>Día</th><th>Desayuno</th><th>Almuerzo</th><th>Merienda</th><th>Cena</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="plan-cards" id="planCards"></div>
+</section>
+
+<section id="recetas" class="sec">
+  <div class="sec-head">
+    <h2>Recetas</h2>
+    <p class="muted">18 recetas, todas para 2 porciones. El costo por porción se calcula con los precios actuales del supermercado más barato y se muestra en la moneda que elijas arriba.</p>
+  </div>
+  <div class="chips" id="recChips">
+    <button data-f="all" class="on">Todas</button>
+    <button data-f="desayuno">Desayunos</button>
+    <button data-f="plato">Almuerzos y cenas</button>
+    <button data-f="rápido">Rápidas (≤ 20 min)</button>
+    <button data-f="económico">Económicas</button>
+  </div>
+  <div class="grid" id="recGrid"></div>
+</section>
+
+<section id="compras" class="sec">
+  <div class="sec-head">
+    <h2>Lista de compras</h2>
+    <p class="muted">Generada a partir de las recetas de cada semana (más yogur, fruta y pan para las meriendas). Tildá lo que ya tenés: se guarda en este dispositivo.</p>
+  </div>
+  <div class="tabs" id="shopTabs"></div>
+  <div class="shop-grid" id="shopGrid"></div>
+  <details class="pantry card">
+    <summary>Despensa: revisar que haya antes de pedir</summary>
+    <ul id="pantryList"></ul>
+  </details>
+</section>
+
+<section id="supermercados" class="sec">
+  <div class="sec-head">
+    <h2>Supermercados con envío a domicilio</h2>
+    <p class="muted">Siete cadenas que entregan en CABA y GBA. Primero las condiciones de envío (lo que publica cada una); después, cuánto sale en cada una el mismo changuito semanal de 20 productos básicos del plan, con precios tomados de sus catálogos online el <strong id="basketDate"></strong>.</p>
+  </div>
+
+  <div class="ranking card" id="ranking"></div>
+
+  <h3 class="sub">Condiciones de envío</h3>
+  <div class="stores" id="stores"></div>
+
+  <h3 class="sub">Apps de delivery (para compras chicas o urgentes)</h3>
+  <div class="apps" id="apps"></div>
+
+  <h3 class="sub">El changuito semanal, producto por producto</h3>
+  <p class="muted small">Precio normalizado a la misma unidad (por kg, por paquete o por 170 g) para que sean comparables. Tocá el precio para ver el producto en el sitio de la cadena. Verde = el más barato de la fila. Un asterisco indica que la búsqueda no encontró el producto y se usa el promedio de las otras cadenas.</p>
+  <div class="basket-wrap">
+    <table class="basket" id="basketTable"></table>
+  </div>
+</section>
+
+<section class="sec sources">
+  <h3 class="sub">Fuentes y método</h3>
+  <ul id="sources"></ul>
+  <p class="muted small">Los precios de supermercados cambian todos los días en Argentina y pueden diferir por sucursal y zona de entrega: usá la comparativa como orden de magnitud, no como lista de precios. Las conversiones usan la cotización blue por defecto porque es la que se obtiene al cambiar euros o dólares en efectivo; podés pasar a oficial arriba.</p>
+</section>
+</main>
+
+<footer class="foot">
+  <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a></p>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close></div>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-x" data-close aria-label="Cerrar">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
