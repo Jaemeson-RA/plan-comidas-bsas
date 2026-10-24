@@ -1,44 +1,78 @@
 {
   "rules": {
-    "games":   { "$code":     { ".read": true, ".write": true } },
-    "corazon": { "$code":     { ".read": true, ".write": true } },
-    "users":   { "$username": { ".read": true, ".write": true } },
-
+    "games": {
+      "$code": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "corazon": {
+      "$code": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "users": {
+      "$username": {
+        ".read": true,
+        ".write": true
+      }
+    },
     "calendars": {
       ".read": "auth != null && auth.token.email == 'jaemeson.dieu@gmail.com'",
       "$uid": {
-        ".read":  "auth != null && (auth.uid == $uid || auth.token.email == 'jaemeson.dieu@gmail.com')",
+        ".read": "auth != null && (auth.uid == $uid || auth.token.email == 'jaemeson.dieu@gmail.com')",
         ".write": "auth != null && auth.uid == $uid"
       }
     },
-
     "recetas": {
       ".read": true,
-      ".indexOn": ["owner", "createdAt"],
+      ".indexOn": [
+        "owner",
+        "createdAt"
+      ],
       "$id": {
         ".write": "auth != null && (!data.exists() && newData.child('owner').val() == auth.uid || data.child('owner').val() == auth.uid || auth.token.email == 'jaemeson.dieu@gmail.com')",
         ".validate": "newData.hasChildren(['name', 'owner', 'ing', 'porciones']) || newData.val() == null"
       }
     },
-
     "public": {
       ".read": true,
-      ".indexOn": ["emailHash"],
-      "$uid": { ".write": "auth != null && auth.uid == $uid" }
+      ".indexOn": [
+        "emailHash"
+      ],
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid"
+      }
     },
-
     "ladder": {
       ".read": true,
-      ".indexOn": ["points"],
-      "$uid": { ".write": "auth != null && auth.uid == $uid", ".validate": "newData.hasChildren(['name', 'points']) || newData.val() == null" }
+      ".indexOn": [
+        "points"
+      ],
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid",
+        ".validate": "newData.hasChildren(['name', 'points']) || newData.val() == null"
+      }
     },
-
     "ingredientes": {
       ".read": true,
-      ".indexOn": ["owner", "barcode"],
+      ".indexOn": [
+        "owner",
+        "barcode"
+      ],
       "$id": {
         ".write": "auth != null && (!data.exists() && newData.child('owner').val() == auth.uid || data.child('owner').val() == auth.uid || auth.token.email == 'jaemeson.dieu@gmail.com')",
         ".validate": "newData.hasChildren(['n', 'owner', 'por100']) || newData.val() == null"
+      }
+    },
+    "inbox": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        "$id": {
+          ".write": "auth != null && (auth.uid == $uid || (!data.exists() && newData.child('from').val() == auth.uid && root.child('calendars').child(auth.uid).child('friends').child($uid).exists()))",
+          ".validate": "newData.val() == null || newData.hasChildren(['from', 'rec', 'date', 'slot'])"
+        }
       }
     }
   }

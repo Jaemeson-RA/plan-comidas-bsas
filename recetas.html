@@ -4,8 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recetas · Plan de comidas Buenos Aires</title>
-<meta name="description" content="30 recetas fáciles para una persona, con foto, video, ingredientes, nutrición y costo por porción.">
+<meta name="description" content="30 recetas fáciles para una persona, con foto, video, nutrición y costo, y un buscador por lo que hay en tu heladera.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%232F8F5B'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2F8F5B">
+<link rel="apple-touch-icon" href="img/icons/apple-touch-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Plan BA">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="motion.css">
 <link rel="stylesheet" href="gami.css">
@@ -47,6 +53,9 @@
 <symbol id="i-share" viewBox="0 0 24 24"><path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M8.7 10.7l6.6 -3.4" /> <path d="M8.7 13.3l6.6 3.4" /></symbol>
 <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873l-6.158 -3.245" /></symbol>
 <symbol id="i-medal" viewBox="0 0 24 24"><path d="M12 4v3m-4 -3v6m8 -6v6" /> <path d="M12 18.5l-3 1.5l.5 -3.5l-2 -2l3 -.5l1.5 -3l1.5 3l3 .5l-2 2l.5 3.5l-3 -1.5" /></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /> <path d="M9 17v1a3 3 0 0 0 6 0v-1" /></symbol>
+<symbol id="i-fridge" viewBox="0 0 24 24"><path d="M5 5a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -14" /> <path d="M5 10h14" /> <path d="M9 13v3" /> <path d="M9 6v1" /></symbol>
+<symbol id="i-arrowup" viewBox="0 0 24 24"><path d="M12 5l0 14" /> <path d="M18 11l-6 -6" /> <path d="M6 11l6 -6" /></symbol>
 <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /> <path d="M9 12h12l-3 -3" /> <path d="M18 15l3 -3" /></symbol>
 <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></symbol>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6l-12 12" /> <path d="M6 6l12 12" /></symbol>
@@ -80,13 +89,21 @@
   <h1>18 recetas, <mark>cinco categorías</mark></h1>
   <p class="lead">Cantidades para una persona, con productos que se consiguen en cualquier súper de Buenos Aires. Tocá una tarjeta para ver ingredientes, pasos y video. El costo por porción se calcula con los precios actuales del supermercado más barato.</p>
 </section>
+<section class="card heladera" id="heladera">
+  <div class="hel-head"><span class="hel-ico"><svg class="ic"><use href="#i-fridge"/></svg></span><div><p class="kicker">¿Qué hay en tu heladera?</p><h2>Cociná con lo que tenés</h2>
+  <p class="muted small">Sumá lo que te quedó y te mostramos las recetas que más lo aprovechan, con lo que te falta comprar.</p></div></div>
+  <form class="hel-form" id="helForm"><input id="helQ" list="helList" placeholder="Ej.: zapallito, huevos, arroz" autocomplete="off" aria-label="Ingrediente que tenés"><button class="btn small-btn" type="submit">Agregar</button><datalist id="helList"></datalist></form>
+  <div class="hel-chips" id="helChips"></div>
+  <div class="hel-quick" id="helQuick"></div>
+  <div id="helRes"></div>
+</section>
 <nav class="chips" id="catNav"></nav>
 <div id="recSections"></div>
 </main>
 
 <footer class="foot">
   <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
-  <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a></p>
+  <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a> <button type="button" class="mini-btn install-btn" hidden>Instalar la app</button></p>
 </footer>
 <nav class="tabbar" aria-label="Secciones">
   <a href="index.html" data-nav="inicio"><svg class="ic duo"><use href="#i-home" class="sh"/><use href="#i-home"/></svg>Inicio</a>
@@ -100,6 +117,7 @@
   <a href="supermercados.html" data-nav="supermercados"><svg class="ic"><use href="#i-super"/></svg>Supermercados</a>
   <a href="temporada.html" data-nav="temporada"><svg class="ic"><use href="#i-leaf"/></svg>Productos de estación</a>
   <a href="nutricion.html" data-nav="nutricion"><svg class="ic"><use href="#i-flame"/></svg>Nutrición</a>
+  <button type="button" class="more-sug install-btn" hidden><svg class="ic"><use href="#i-arrow"/></svg>Instalar la app</button>
   <button type="button" id="moreSug" class="more-sug"><svg class="ic"><use href="#i-plus"/></svg>Sugerir un plato</button>
 </div>
 <button class="sug-fab" id="sugFab" aria-expanded="false" aria-controls="sugPanel" aria-label="Sugerir un plato"><i><svg class="ic"><use href="#i-plus"/></svg></i><span>Sugerir un plato</span></button>

@@ -1,0 +1,62 @@
+{
+ "name": "Plan de comidas · Buenos Aires",
+ "short_name": "Plan BA",
+ "lang": "es-AR",
+ "description": "Tu plan de comidas, recetas, lista de compras y precios de supermercados de Buenos Aires.",
+ "start_url": "./index.html?app=1",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#FBF7F0",
+ "theme_color": "#2F8F5B",
+ "icons": [
+  {
+   "src": "img/icons/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "img/icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "img/icons/maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ],
+ "shortcuts": [
+  {
+   "name": "Menú de hoy",
+   "url": "./plan.html?app=1",
+   "icons": [
+    {
+     "src": "img/icons/icon-192.png",
+     "sizes": "192x192"
+    }
+   ]
+  },
+  {
+   "name": "Lista de compras",
+   "url": "./compras.html?app=1",
+   "icons": [
+    {
+     "src": "img/icons/icon-192.png",
+     "sizes": "192x192"
+    }
+   ]
+  },
+  {
+   "name": "Mi plan",
+   "url": "./mi-plan.html?app=1",
+   "icons": [
+    {
+     "src": "img/icons/icon-192.png",
+     "sizes": "192x192"
+    }
+   ]
+  }
+ ]
+}

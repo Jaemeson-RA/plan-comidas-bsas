@@ -6,7 +6,7 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const page = $("main")?.dataset.page || "inicio";
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayISO = (() => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); })();  // hora local, no UTC
   const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   const longDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); const dt = new Date(y, m - 1, d); return ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"][dt.getDay()] + " " + d + " de " + MESES[m - 1]; };
 
@@ -22,7 +22,8 @@
     $$("img").forEach((im) => { if (im.complete && im.naturalWidth > 0) im.classList.add("ld"); });
   }
   document.addEventListener("load", (e) => { if (e.target.tagName === "IMG") e.target.classList.add("ld"); }, true);
-  const vt = (fn) => { if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) { const t = document.startViewTransition(fn); t.finished.catch(() => {}); return t; } return fn(); };
+  const toastG = (msg) => { let t = $("#toast"); if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3600); };
+  const vt = (fn) => { if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) { const t = document.startViewTransition(fn); [t.finished, t.ready, t.updateCallbackDone].forEach((p) => p?.catch?.(() => {})); return t; } return fn(); };
   const onScroll = () => $(".top")?.classList.toggle("scrolled", window.scrollY > 8);
   window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
   if ($("#periodLabel")) $("#periodLabel").textContent = D.period.label;
@@ -82,7 +83,7 @@
   // ---------- helpers de receta ----------
   function mealBtn(id, cls = "meal") {
     const r = R[id];
-    return `<button class="${cls}" data-rec="${id}"><img src="${r.img}" alt="" loading="lazy"><span>${esc(r.name)}</span></button>`;
+    return `<button class="${cls}" data-rec="${id}"><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span>${esc(r.name)}</span></button>`;
   }
   const ic = (n, cls = "") => `<svg class="ic ${cls}"><use href="#i-${n}"/></svg>`;
   const ICON = { desayuno: ic("desayuno"), almuerzo: ic("almuerzo"), merienda: ic("merienda"), cena: ic("cena") };
@@ -98,7 +99,7 @@
     const n = r.nut || {};
     const nutLine = n.kcal ? `<div class="nut-line">${ic("flame")} <b>${Math.round(n.kcal)} kcal</b> · ${n.prot} g proteínas · ${n.carb} g carbohidratos${n.sug != null ? ` (${n.sug} g azúcar)` : ""} · ${n.fat} g grasas${n.sat != null ? ` (${n.sat} g sat.)` : ""} · ${n.fib} g fibra · ${n.sal} g sal <small>por porción${n.source === "ingredientes" ? ", calculado con los ingredientes" : ", estimado"}</small></div>` : "";
     $("#modalContent").innerHTML = `
-      <img class="rm-img" src="${r.img}" alt="${esc(r.name)}">
+      <img class="rm-img" src="${r.img}"${r.srcset ? ` srcset="${r.srcset}" sizes="(max-width:720px) 100vw, 640px"` : ""} alt="${esc(r.name)}">
       <div class="rm">
         <h2>${esc(r.name)}</h2>
         ${r.custom ? `<p class="muted small">Receta de la comunidad, creada por <b>${esc(r.ownerName)}</b>.</p>` : ""}
@@ -112,8 +113,10 @@
         ${r.credit ? `<p class="credit">Foto: <a href="${r.credit.page}" target="_blank" rel="noopener">${esc(r.credit.title)}</a> · ${esc(r.credit.artist || "Wikimedia Commons")} · ${esc(r.credit.license)} (Wikimedia Commons). El costo se calcula con precios de supermercados online de Buenos Aires de octubre 2026 y es orientativo.</p>` : ""}
       </div>`;
     modal.hidden = false; document.body.style.overflow = "hidden"; $(".modal-box").scrollTop = 0; hidePop(); renderMoney();
+    if (!history.state?.modal) history.pushState({ modal: 1 }, "");
   }
-  function closeModal() { modal.hidden = true; document.body.style.overflow = ""; $("#modalContent").innerHTML = ""; }
+  function closeModal(fromPop) { if (modal.hidden) return; modal.hidden = true; document.body.style.overflow = ""; $("#modalContent").innerHTML = ""; if (fromPop !== true && history.state?.modal) history.back(); }
+  window.addEventListener("popstate", () => { if (!modal.hidden) closeModal(true); });
   document.addEventListener("click", (e) => {
     const rec = e.target.closest("[data-rec]"); if (rec) { openRecipe(rec.dataset.rec); return; }
     if (e.target.closest("[data-close]")) closeModal();
@@ -133,7 +136,7 @@
   function showPop(el) {
     if (!pop || window.matchMedia("(hover: none)").matches) return;
     const r = R[el.dataset.rec]; if (!r) return;
-    pop.innerHTML = `<img src="${r.img}" alt=""><div class="pb"><b>${esc(r.name)}</b><span>${ic("clock")} ${r.tiempo} min · ${ic("flame")} ${r.kcal} kcal · ${ic("tag")} ${fmt(r.cost)}/porción</span><em>${r.tags.slice(0, 3).map(esc).join(" · ")}</em><small>tocá para abrir la receta</small></div>`;
+    pop.innerHTML = `<img src="${r.img}"${srcs(r)} alt=""><div class="pb"><b>${esc(r.name)}</b><span>${ic("clock")} ${r.tiempo} min · ${ic("flame")} ${r.kcal} kcal · ${ic("tag")} ${fmt(r.cost)}/porción</span><em>${r.tags.slice(0, 3).map(esc).join(" · ")}</em><small>tocá para abrir la receta</small></div>`;
     pop.hidden = false;
     const b = el.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
     let x = b.left + b.width / 2 - pw / 2, y = b.top - ph - 10;
@@ -154,40 +157,71 @@
     window.addEventListener("scroll", hidePop, { passive: true });
   }
 
+  // ---------- plan continuo: se genera desde las rotaciones de data.js (nunca se termina) ----------
+  const ROT = D.rot, DOWS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"], MES3 = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  const parseISO = (iso) => { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d, 12); };
+  const fmtISO = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const addDays = (iso, n) => { const d = parseISO(iso); d.setDate(d.getDate() + n); return fmtISO(d); };
+  const mondayOf = (iso) => { const d = parseISO(iso); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return fmtISO(d); };
+  const mod = (a, b) => ((a % b) + b) % b;
+  const EPOCH = mondayOf(ROT.epoch);
+  const lab = (iso) => `${+iso.slice(8)} ${MES3[+iso.slice(5, 7) - 1]}`;
+  function houseDay(iso) {
+    const idx = Math.round((parseISO(iso) - parseISO(EPOCH)) / 864e5); const w = Math.floor(idx / 7), d = mod(idx, 7);
+    let lunch, dinner;
+    if (d >= 5) [lunch, dinner] = (d === 5 ? ROT.sat : ROT.sun)[mod(w, ROT.sat.length)];
+    else { const k = w * 5 + d; lunch = ROT.lunch[mod(k, ROT.lunch.length)]; dinner = ROT.dinner[mod(k, ROT.dinner.length)]; }
+    if (iso.slice(8) === "29") { if (dinner === "noquis") dinner = "sopa"; lunch = "noquis"; }  // ñoquis del 29
+    return { date: iso, dow: DOWS[d], label: `${DOWS[d]} ${lab(iso)}`, desayuno: ROT.break[mod(d + w, 7)], almuerzo: lunch, merienda: ROT.merienda[mod(d + w, 7)], cena: dinner };
+  }
+  function weekAt(monday) { const days = Array.from({ length: 7 }, (_, i) => houseDay(addDays(monday, i))); return { start: monday, end: days[6].date, label: `${lab(monday)} → ${lab(days[6].date)}`, days }; }
+  function monthWeeks(ym) { const out = []; let m = mondayOf(ym + "-01"); while (m.slice(0, 7) <= ym && out.length < 6) { out.push(weekAt(m)); m = addDays(m, 7); } return out; }
+  const SHOP_CATS = { verd: "Verdulería", carne: "Carnicería y pescadería", lact: "Lácteos y huevos", alm: "Almacén", pan: "Panadería" };
+  function shoppingFor(week) {
+    const agg = new Map();
+    week.days.forEach((d) => ["desayuno", "almuerzo", "cena"].forEach((s) => (R[d[s]]?.ing || []).forEach((i) => { if (i.c === "pantry") return; const k = `${i.c}|${i.n}|${i.u}`; agg.set(k, (agg.get(k) || 0) + i.q); })));
+    [["lact|yogur natural (pote)|u", 2], ["verd|fruta de estación (manzana, naranja, banana)|u", 4], ["pan|pan integral (rodajas)|u", 4]].forEach(([k, q]) => agg.set(k, (agg.get(k) || 0) + q));  // meriendas
+    const fmtq = (q, u) => { q = Math.round(q * 10) / 10; if ((u === "g" || u === "ml") && q >= 1000) return `${q / 1000} ${u === "g" ? "kg" : "L"}`; return u === "u" ? `${q} u` : `${q} ${u}`; };
+    const out = Object.keys(SHOP_CATS).map((c) => ({ c, cat: SHOP_CATS[c], items: [] }));
+    [...agg.entries()].forEach(([k, q]) => { const [c, n, u] = k.split("|"); (out.find((x) => x.c === c) || out[3]).items.push({ n, q: fmtq(q, u), raw: q, u }); });
+    out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
+    return out.filter((c) => c.items.length).map(({ cat, items }) => ({ cat, items }));
+  }
+  const srcs = (r) => (r && r.srcset ? ` srcset="${r.srcset}" sizes="(max-width:720px) 46vw, 320px"` : "");
+  window.PLAN = { houseDay, weekAt, monthWeeks, shoppingFor, mondayOf, addDays, lab };
+  const monthLabel = (ym) => MESES[+ym.slice(5, 7) - 1][0].toUpperCase() + MESES[+ym.slice(5, 7) - 1].slice(1) + " " + ym.slice(0, 4);
+  const weekTag = (w) => { const cur = mondayOf(todayISO); return w.start === cur ? "Esta semana" : w.start === addDays(cur, 7) ? "La que viene" : w.start === addDays(cur, -7) ? "La pasada" : ""; };
+
+
   // ---------- inicio ----------
   if (page === "inicio") {
     const vid = $("#introVideo");
     if (vid && window.matchMedia("(max-width: 720px)").matches) { vid.poster = "media/intro-vertical-poster.jpg"; vid.querySelector("source").src = "media/intro-vertical.mp4"; vid.classList.add("vertical"); vid.load(); }
-    const day = D.weeks.flatMap((w) => w.days).find((d) => d.date === todayISO);
-    const first = D.weeks[0].days[0];
-    const d = day || first;
-    const title = day ? "Hoy, " + longDate(d.date) : "El plan arranca el " + longDate(first.date);
-    $("#today").innerHTML = `<div class="t-head"><p class="kicker">${day ? "Menú de hoy" : "Primer día del plan"}</p><h3>${title}</h3></div>
+    const d = houseDay(todayISO);
+    $("#today").innerHTML = `<div class="t-head"><p class="kicker">Menú de hoy</p><h3>${"Hoy, " + longDate(d.date)}</h3></div>
       ${["desayuno", "almuerzo", "cena"].map((m) => `<div class="t-row"><small>${ICON[m]} ${m}</small>${mealBtn(d[m])}</div>`).join("")}
       <div class="t-row mer"><small>${ICON.merienda} merienda</small><span class="muted">${esc(d.merienda)}</span></div>
-      <a class="btn small-btn" href="plan.html">Ver la semana →</a>`;
+      <a class="btn small-btn" href="plan.html">Ver la semana →</a><a class="mini-btn" href="plan.html?dia=${addDays(todayISO, 1)}">${ic("arrow")} Mañana: ${esc(R[houseDay(addDays(todayISO, 1)).almuerzo].name)}</a>`;
   }
 
   // ---------- plan: calendario + semana ----------
   function renderWeekTabs(containerId, onPick) {
     const c = $(containerId); if (!c) return; c.innerHTML = "";
     D.weeks.forEach((w) => {
-      const b = document.createElement("button"); b.textContent = w.label; b.classList.toggle("on", w.n === state.week);
-      b.addEventListener("click", () => { state.week = w.n; vt(onPick); b.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }); c.appendChild(b);
+      const b = document.createElement("button"); const t = weekTag(w); b.innerHTML = (t ? `<small>${t} · </small>` : "") + esc(w.label); b.classList.toggle("on", w.start === state.week);
+      b.addEventListener("click", () => { state.week = w.start; vt(onPick); b.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }); c.appendChild(b);
     });
   }
   function renderCalendar() {
     const c = $("#calendar"); if (!c) return;
-    const dows = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-    let html = `<div class="cal-head">${dows.map((d) => `<div>${d}</div>`).join("")}</div>`;
+    let html = `<div class="cal-head">${DOWS.map((d) => `<div>${d}</div>`).join("")}</div>`;
     D.weeks.forEach((w) => {
-      html += `<div class="cal-week-label"><span>${esc(w.label)}</span><a class="mini-btn" href="compras.html#semana-${w.n}">${ic("compras")} Lista de compras de la semana ${w.n}</a></div>`;
+      html += `<div class="cal-week-label"><span>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</span><a class="mini-btn" href="compras.html#semana-${w.start}">${ic("compras")} Lista de compras de esta semana</a></div>`;
       html += `<div class="cal-row">` + w.days.map((d) => {
-        const n = +d.date.slice(8), m = +d.date.slice(5, 7);
-        const first = n === 1 || d === D.weeks[0].days[0];
-        return `<div class="cal-cell${d.date === todayISO ? " today" : ""}${d.dow === "Sábado" || d.dow === "Domingo" ? " wk" : ""}">
-          <div class="cal-date"><b>${n}</b>${first ? `<span>${MESES[m - 1].slice(0, 3)}</span>` : ""}${d.date === todayISO ? `<span class="hoy">hoy</span>` : ""}</div>
-          ${["desayuno", "almuerzo", "cena"].map((k) => `<button class="cm" data-rec="${d[k]}" title="${esc(R[d[k]].name)}"><i>${ICON[k]}</i><img src="${R[d[k]].img}" alt="" loading="lazy"><span>${esc(R[d[k]].name)}</span></button>`).join("")}
+        const n = +d.date.slice(8), m = +d.date.slice(5, 7); const out = d.date.slice(0, 7) !== state.ym;
+        return `<div class="cal-cell${d.date === todayISO ? " today" : ""}${d.dow === "Sábado" || d.dow === "Domingo" ? " wk" : ""}${out ? " out" : ""}">
+          <div class="cal-date"><b>${n}</b>${n === 1 || out ? `<span>${MESES[m - 1].slice(0, 3)}</span>` : ""}${d.date === todayISO ? `<span class="hoy">hoy</span>` : ""}</div>
+          ${["desayuno", "almuerzo", "cena"].map((k) => `<button class="cm" data-rec="${d[k]}" title="${esc(R[d[k]].name)}"><i>${ICON[k]}</i><img src="${R[d[k]].img}"${srcs(R[d[k]])} alt="" loading="lazy"><span>${esc(R[d[k]].name)}</span></button>`).join("")}
           <div class="cm mer"><i>${ICON.merienda}</i><span>${esc(d.merienda)}</span></div>
         </div>`; }).join("") + `</div>`;
     });
@@ -196,22 +230,30 @@
   function renderWeek() {
     if (!$("#planTable")) return;
     renderWeekTabs("#weekTabs", renderWeek);
-    const w = D.weeks[state.week - 1];
+    const w = D.weeks.find((x) => x.start === state.week) || D.weeks[0];
     $("#planTable tbody").innerHTML = w.days.map((d) => `
-      <tr><td class="day${d.date === todayISO ? " today" : ""}">${d.dow}<span>${d.label.replace(d.dow + " ", "")}</span></td>
+      <tr><td class="day${d.date === todayISO ? " today" : ""}">${d.dow}<span>${lab(d.date)}</span></td>
         <td>${mealBtn(d.desayuno)}</td><td>${mealBtn(d.almuerzo)}</td><td class="muted">${esc(d.merienda)}</td><td>${mealBtn(d.cena)}</td></tr>`).join("");
     $("#planCards").innerHTML = w.days.map((d) => `
-      <article class="dc${d.date === todayISO ? " today" : ""}"><h4>${esc(d.label)}</h4>
+      <article class="dc${d.date === todayISO ? " today" : ""}"><h4>${esc(d.label)}${d.date === todayISO ? ' <span class="hoy">hoy</span>' : ""}</h4>
         <div class="row"><small>Desayuno</small>${mealBtn(d.desayuno)}</div><div class="row"><small>Almuerzo</small>${mealBtn(d.almuerzo)}</div>
         <div class="row"><small>Merienda</small><span class="muted">${esc(d.merienda)}</span></div><div class="row"><small>Cena</small>${mealBtn(d.cena)}</div></article>`).join("");
   }
   if (page === "plan") {
-    const cur = D.weeks.find((w) => todayISO >= w.start && todayISO <= w.end); if (cur) state.week = cur.n;
-    renderCalendar(); renderWeek();
+    const qs = new URLSearchParams(location.search); const want = qs.get("semana") || qs.get("dia");
+    state.ym = (want || todayISO).slice(0, 7); state.week = mondayOf(want || todayISO);
+    const renderPlanPage = () => {
+      D.weeks = monthWeeks(state.ym); if (!D.weeks.some((w) => w.start === state.week)) state.week = D.weeks[0].start;
+      $("#monthLabel").textContent = monthLabel(state.ym); renderCalendar(); renderWeek();
+    };
+    const shiftMonth = (n) => { const d = parseISO(state.ym + "-01"); d.setMonth(d.getMonth() + n); state.ym = fmtISO(d).slice(0, 7); state.week = n === 0 ? mondayOf(todayISO) : mondayOf(state.ym + "-01"); vt(renderPlanPage); };
+    $("#mPrev").addEventListener("click", () => shiftMonth(-1)); $("#mNext").addEventListener("click", () => shiftMonth(1)); $("#mHoy").addEventListener("click", () => shiftMonth(0));
+    renderPlanPage();
     const isMobile = window.matchMedia("(max-width: 720px)").matches;
     const viewKey = isMobile ? "planView_m" : "planView_d";
     const setView = (v) => { $("#calendar").hidden = v !== "cal"; $("#weekView").hidden = v !== "week"; $$("#viewSeg button").forEach((b) => b.classList.toggle("on", b.dataset.view === v)); localStorage.setItem(viewKey, v); animateIn(); };
     setView(localStorage.getItem(viewKey) || (isMobile ? "week" : "cal"));
+    if (isMobile && !$("#calendar").hidden && state.ym === todayISO.slice(0, 7)) setTimeout(() => $(".cal-cell.today")?.scrollIntoView({ block: "center" }), 250);
     $("#viewSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) vt(() => setView(b.dataset.view)); });
   }
 
@@ -224,12 +266,45 @@
     { id: "clasicos", t: "Clásicos argentinos y pastas del finde", d: "Llevan más tiempo y más mesa: quedan para sábado y domingo (y los ñoquis, para el 29).", ids: ["empanadas", "bife", "zapallitos", "pastel", "noquis", "tortilla", "carbonara"] },
   ];
   function card(r) {
-    return `<button class="rc" data-rec="${r.id}"><img src="${r.img}" alt="${esc(r.name)}" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4>
+    return `<button class="rc" data-rec="${r.id}"><img src="${r.img}"${srcs(r)} alt="${esc(r.name)}" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4>
       <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("flame")}<b>${r.kcal}</b> kcal</span><span>${ic("tag")}<b data-ars="${r.cost}"></b>/porción</span></div>
       <div>${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div></div></button>`;
   }
   if (page === "recetas") {
+    const h1 = $(".page-head h1"); if (h1) h1.innerHTML = `${Object.keys(R).length} recetas, <mark>cinco categorías</mark>`;
     $("#catNav").innerHTML = CATS.map((c) => `<a href="#${c.id}">${esc(c.t)} <small>${c.ids.length}</small></a>`).join("");
+    // ---------- «¿qué hay en tu heladera?»: recetas que aprovechan lo que tenés ----------
+    const normH = (s) => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\(.*?\)/g, " ").replace(/[,.]/g, " ").replace(/\s+/g, " ").trim();
+    const STOP = new Set(["con", "de", "del", "la", "las", "los", "el", "para", "sin", "en", "y"]);
+    const words = (s) => normH(s).split(" ").filter((w) => w.length >= 3 && !STOP.has(w));
+    const sameWord = (a, b) => a === b || a === b + "s" || a === b + "es" || b === a + "s" || b === a + "es";
+    const has = (ingName, item) => { const iw = words(ingName), tw = words(item); return tw.length > 0 && tw.every((t) => iw.some((w) => sameWord(w, t))); };
+    const ingOf = (r) => r.ing.filter((i) => i.c !== "pantry");
+    const HKEY = "heladera";
+    let hel = (() => { try { return JSON.parse(localStorage.getItem(HKEY) || "[]"); } catch (e) { return []; } })();
+    const saveHel = () => { try { localStorage.setItem(HKEY, JSON.stringify(hel)); } catch (e) {} };
+    const base = Object.values(R).filter((r) => !r.custom);
+    $("#helList").innerHTML = [...new Set(base.flatMap((r) => ingOf(r).map((i) => normH(i.n))))].sort().map((n) => `<option value="${esc(n)}">`).join("");
+    const QUICK = ["huevos", "papa", "cebolla", "arroz", "pollo", "tomate", "zapallito", "zanahoria", "queso", "atún", "lentejas", "carne picada", "espinaca", "fideos"];
+    function renderHel() {
+      $("#helChips").innerHTML = hel.length ? hel.map((h, i) => `<button class="hel-chip" data-hdel="${i}" aria-label="Quitar ${esc(h)}">${esc(h)} <span aria-hidden="true">×</span></button>`).join("") + `<button class="mini-btn" data-hclear>Vaciar</button>` : "";
+      $("#helQuick").innerHTML = `<small class="muted">Rápido:</small>` + QUICK.filter((q) => !hel.some((h) => normH(h) === normH(q))).slice(0, 10).map((q) => `<button class="hel-q" data-hadd="${esc(q)}">+ ${esc(q)}</button>`).join("");
+      if (!hel.length) { $("#helRes").innerHTML = ""; return; }
+      const scored = Object.values(R).map((r) => { const ings = ingOf(r); const ok = ings.filter((i) => hel.some((h) => has(i.n, h))); return { r, ok, miss: ings.filter((i) => !ok.includes(i)), cov: ings.length ? ok.length / ings.length : 0 }; })
+        .filter((x) => x.ok.length).sort((a, b) => b.cov - a.cov || b.ok.length - a.ok.length || a.miss.length - b.miss.length).slice(0, 9);
+      $("#helRes").innerHTML = scored.length ? `<p class="small hel-sum">${scored.length === 9 ? "Las 9 recetas" : scored.length === 1 ? "La receta" : `Las ${scored.length} recetas`} que más aprovechan lo que tenés:</p><div class="hel-grid">${scored.map((x) => `<button class="hel-card" data-rec="${x.r.id}"><img src="${x.r.img}"${srcs(x.r)} alt="" loading="lazy"><div><b>${esc(x.r.name)}</b>
+          <div class="hel-bar" aria-label="${Math.round(x.cov * 100)} % de los ingredientes"><i style="width:${Math.round(x.cov * 100)}%"></i></div>
+          <small class="ok">Usás: ${esc(x.ok.map((i) => i.n.replace(/\s*\(.*?\)/g, "")).join(", "))}</small>
+          ${x.miss.length ? `<small class="miss">Te falta: ${esc(x.miss.slice(0, 4).map((i) => i.n.replace(/\s*\(.*?\)/g, "")).join(", "))}${x.miss.length > 4 ? ` y ${x.miss.length - 4} más` : ""}</small>` : `<small class="ok"><b>¡Tenés todo!</b></small>`}</div></button>`).join("")}</div>`
+        : `<p class="muted small">Ninguna receta usa eso todavía. Probá con otro nombre (por ejemplo «zapallito» en vez de «calabacín»).</p>`;
+    }
+    const addHel = (v) => { v = String(v || "").trim(); if (!v || hel.some((h) => normH(h) === normH(v))) return; hel.push(v); saveHel(); renderHel(); };
+    $("#helForm").addEventListener("submit", (e) => { e.preventDefault(); String($("#helQ").value).split(/[,;]/).forEach(addHel); $("#helQ").value = ""; });
+    $("#heladera").addEventListener("click", (e) => {
+      const a = e.target.closest("[data-hadd]"), d = e.target.closest("[data-hdel]"), c = e.target.closest("[data-hclear]");
+      if (a) addHel(a.dataset.hadd); if (d) { hel.splice(+d.dataset.hdel, 1); saveHel(); renderHel(); } if (c) { hel = []; saveHel(); renderHel(); }
+    });
+    renderHel();
     $("#recSections").innerHTML = CATS.map((c) => `<section class="cat" id="${c.id}"><div class="cat-head"><h2>${esc(c.t)}</h2><p class="muted">${esc(c.d)}</p></div><div class="grid">${c.ids.map((id) => card(R[id])).join("")}</div></section>`).join("");
   }
 
@@ -237,11 +312,11 @@
   function renderShopping() {
     if (!$("#shopGrid")) return;
     renderWeekTabs("#shopTabs", renderShopping);
-    const w = D.weeks[state.week - 1], list = D.shopping[state.week];
+    const w = D.weeks.find((x) => x.start === state.week) || D.weeks[0], list = shoppingFor(w);
     const n = list.reduce((a, c) => a + c.items.length, 0);
-    const key = (c, nm) => `shop:${state.week}:${c}:${nm}`;
+    const key = (c, nm) => `shop:${w.start}:${c}:${nm}`;
     const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0);
-    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
+    $("#shopSummary").innerHTML = `<div class="card ss"><div><b>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</b><span class="muted"> · ${n} productos en ${list.length} góndolas · ${done} tildados</span></div><div class="ss-actions"><a class="mini-btn" href="plan.html?semana=${w.start}">${ic("calendar")} ver esa semana</a><a class="mini-btn" href="supermercados.html">${ic("super")} dónde pedir</a><button class="mini-btn" id="copyList">${ic("copy")} Copiar lista</button><button class="mini-btn" id="dlList">${ic("external")} Bajar con enlaces</button>${navigator.share ? `<button class="mini-btn" id="shareList">${ic("external")} Compartir</button>` : ""}<button class="mini-btn" id="clearWeek">${ic("refresh")} destildar todo</button></div></div>`;
     $("#clearWeek").addEventListener("click", () => { list.forEach((c) => c.items.forEach((i) => localStorage.removeItem(key(c.cat, i.n)))); renderShopping(); });
     // texto plano de la lista (solo lo que falta comprar; si no hay nada tildado, todo) para pegar en Notas o WhatsApp
     const listText = () => {
@@ -254,7 +329,7 @@
         items.forEach((i) => lines.push("- " + i.n + " · " + i.q));
         lines.push("");
       });
-      lines.push("Plan de comidas Buenos Aires · " + location.origin + location.pathname.replace(/[^/]*$/, "compras.html#semana-" + state.week));
+      lines.push("Plan de comidas Buenos Aires · " + location.origin + location.pathname.replace(/[^/]*$/, "compras.html#semana-" + w.start));
       return { text: lines.join("\n"), partial: anyDone };
     };
     const toast = (msg) => { let t = $("#toast"); if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); };
@@ -262,7 +337,7 @@
       try { await navigator.clipboard.writeText(text); return true; }
       catch (e) { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (err) {} ta.remove(); return ok; }
     };
-    $("#dlList").addEventListener("click", () => window.downloadListHtml("Lista de compras · " + w.label, list, `lista-compras-semana-${state.week}.html`));
+    $("#dlList").addEventListener("click", () => window.downloadListHtml("Lista de compras · " + w.label, list, `lista-compras-${w.start}.html`));
     $("#copyList").addEventListener("click", async () => {
       const { text, partial } = listText();
       const ok = await copyText(text);
@@ -277,13 +352,15 @@
     $("#pantryList").innerHTML = D.pantry.map((p) => `<li>${esc(p)}</li>`).join("");
   }
   if (page === "compras") {
-    const h = location.hash.match(/semana-(\d)/); const cur = D.weeks.find((w) => todayISO >= w.start && todayISO <= w.end);
-    state.week = h ? +h[1] : cur ? cur.n : 1;
+    const h = location.hash.match(/semana-(\d{4}-\d{2}-\d{2})/); const base = mondayOf(todayISO);
+    state.week = h ? mondayOf(h[1]) : base;
+    D.weeks = [-1, 0, 1, 2, 3].map((i) => weekAt(addDays(base, i * 7)));
+    if (!D.weeks.some((w) => w.start === state.week)) { D.weeks.push(weekAt(state.week)); D.weeks.sort((a, b) => a.start.localeCompare(b.start)); }
     renderShopping();
     $("#shopGrid").addEventListener("change", (e) => {
       const cb = e.target; if (cb.type !== "checkbox") return;
       localStorage.setItem(cb.dataset.k, cb.checked ? "1" : "0"); cb.closest("label").classList.toggle("done", cb.checked);
-      const s = $("#shopSummary .muted"); if (s) { const list = D.shopping[state.week]; const key = (c, nm) => `shop:${state.week}:${c}:${nm}`; const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0); s.textContent = s.textContent.replace(/\d+ tildados/, done + " tildados"); }
+      const s = $("#shopSummary .muted"); if (s) { const w = D.weeks.find((x) => x.start === state.week); const list = shoppingFor(w); const key = (c, nm) => `shop:${w.start}:${c}:${nm}`; const done = list.reduce((a, c) => a + c.items.filter((i) => localStorage.getItem(key(c.cat, i.n)) === "1").length, 0); s.textContent = s.textContent.replace(/\d+ tildados/, done + " tildados"); }
     });
   }
 
@@ -345,6 +422,7 @@
   // notify(): manda un evento al Apps Script (si está configurado) que reenvía todo por correo al admin
   window.notifyAdmin = async (payload) => {
     if (!CFG.notifyUrl) return false;
+    if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) { console.info("[aviso no enviado en local]", payload.type); return true; }  // pruebas locales: no mandar correos
     try { await fetch(CFG.notifyUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ at: new Date().toISOString(), page: location.href }, payload)) }); return true; }
     catch (e) { return false; }
   };
@@ -409,10 +487,12 @@
         const qn = normS(q).split(/\s+/).map((w) => w.replace(/[,.]/g, "")).filter((w) => w.length > 2 && !/^\d+$/.test(w));
         // cada palabra de la búsqueda tiene que estar en el nombre del producto (saca "barra proteica" cuando buscás "aceite de girasol")
         const rows = (j.results || []).filter((r) => { const n = normS(r.name); return qn.every((w) => n.includes(w) || n.includes(w.replace(/s$/, ""))); }).sort((a, b) => a.price - b.price);
+        window.__lastRows = rows; window.__lastQ = q; const tracked = new Set(getAlerts().map((a) => a.link));
         const byStore = {}; rows.forEach((r) => { (byStore[r.store] = byStore[r.store] || []).push(r); });
+        const bsItem = (r) => `<div class="bs-item"><a class="bs-row" href="${r.link}" target="_blank" rel="noopener">${r.img ? `<img src="${r.img}" alt="" loading="lazy">` : ""}<span>${esc(r.name)}</span><b data-ars="${r.price}"></b>${r.unit === "kg" ? "<small>/kg</small>" : ""}</a><button class="bell${tracked.has(r.link) ? " on" : ""}" type="button" data-track="${rows.indexOf(r)}" aria-label="Avisarme si baja" title="Avisarme si baja">${ic("bell")}</button></div>`;
         const best = rows[0];
         res.innerHTML = rows.length ? `<p class="small">${rows.length} resultados · el más barato: <b>${esc(best.name)}</b> en <b>${esc(best.store)}</b> a <b data-ars="${best.price}"></b>${best.unit === "kg" ? " por kg" : ""} · <a href="${best.link}" target="_blank" rel="noopener">comprar ↗</a></p>
-          <div class="buscar-grid">${Object.entries(byStore).sort((a, b) => a[1][0].price - b[1][0].price).map(([s, list]) => `<div class="card bs"><h4>${esc(s)} <small>${list.length}</small></h4>${list.slice(0, 5).map((r) => `<a class="bs-row" href="${r.link}" target="_blank" rel="noopener">${r.img ? `<img src="${r.img}" alt="" loading="lazy">` : ""}<span>${esc(r.name)}</span><b data-ars="${r.price}"></b>${r.unit === "kg" ? "<small>/kg</small>" : ""}</a>`).join("")}</div>`).join("")}</div>
+          <div class="buscar-grid">${Object.entries(byStore).sort((a, b) => a[1][0].price - b[1][0].price).map(([s, list]) => `<div class="card bs"><h4>${esc(s)} <small>${list.length}</small></h4>${list.slice(0, 3).map(bsItem).join("")}${list.length > 3 ? `<details class="bs-more"><summary>ver ${Math.min(list.length, 8) - 3} más</summary>${list.slice(3, 8).map(bsItem).join("")}</details>` : ""}</div>`).join("")}</div>
           <p class="muted small">Precios leídos recién de los catálogos online (${new Date(j.at).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}). Las cadenas que no aparecen no tienen ese producto o no respondieron.</p>` : `<p class="muted">Nada con ese nombre en ninguna cadena. Probá con menos palabras (ej. «yerba» en vez de «yerba mate con palo 1 kg»).</p>`;
         renderMoney();
       } catch (err) { res.innerHTML = `<p class="muted">No se pudo consultar el proxy de precios. Abrí la búsqueda en cada cadena: ${Object.keys(STORE_SEARCH).map((s) => `<a href="${STORE_SEARCH[s](q)}" target="_blank" rel="noopener">${esc(s)}</a>`).join(" · ")}.</p>`; }
@@ -438,9 +518,125 @@
     $("#meses").innerHTML = order.map((m) => { const pl = matches(m); return `<details class="card mes" id="mes-${m.m}" ${m.m === nowM ? "open" : ""}><summary><h2>${m.n}</h2>${m.m === nowM ? '<span class="now">este mes</span>' : ""}<span class="cnt">${m.f.length} frutas · ${m.v.length} verduras</span></summary>
       <div class="cols"><div><h4>Frutas</h4>${m.f.map((p) => `<span class="prod f">${esc(p)}</span>`).join("")}</div><div><h4>Verduras</h4>${m.v.map((p) => `<span class="prod v">${esc(p)}</span>`).join("")}</div></div>
       <div class="tip">${ic("leaf")} ${esc(m.tip)}</div>
-      ${pl.length ? `<div class="platos"><h4>Platos del plan que los aprovechan</h4><div class="grid mini">${pl.map((r) => `<button class="rc" data-rec="${r.id}"><img src="${r.img}" alt="" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4></div></button>`).join("")}</div></div>` : ""}
+      ${pl.length ? `<div class="platos"><h4>Platos del plan que los aprovechan</h4><div class="grid mini">${pl.map((r) => `<button class="rc" data-rec="${r.id}"><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4></div></button>`).join("")}</div></div>` : ""}
     </details>`; }).join("");
   }
+
+
+  // ---------- app instalable (PWA), sin conexión y recordatorio diario ----------
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let installEvt = null;
+  const showInstall = (on) => $$(".install-btn").forEach((b) => { b.hidden = !on; });
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; showInstall(true); });
+  window.addEventListener("appinstalled", () => { installEvt = null; showInstall(false); toastG("¡Listo! La app quedó en tu pantalla de inicio."); });
+  if (!standalone && isIOS) showInstall(true);
+  document.addEventListener("click", async (e) => {
+    if (!e.target.closest(".install-btn")) return;
+    $("#moreMenu") && ($("#moreMenu").hidden = true);
+    if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; showInstall(r?.outcome !== "accepted"); }
+    else if (isIOS) toastG("En iPhone: tocá Compartir (el cuadrado con la flecha) en Safari y después «Agregar a inicio».");
+    else toastG("Abrí el menú del navegador (⋮) y elegí «Instalar app» o «Agregar a la pantalla de inicio».");
+  });
+  const net = () => {
+    let p = $("#netPill"); if (navigator.onLine) { if (p) { p.classList.add("back"); setTimeout(() => p.remove(), 1200); } return; }
+    if (!p) { p = document.createElement("div"); p.id = "netPill"; p.className = "net-pill"; p.setAttribute("role", "status"); p.innerHTML = `${ic("refresh")} Sin conexión: ves lo último guardado`; document.body.appendChild(p); }
+  };
+  window.addEventListener("online", net); window.addEventListener("offline", net); net();
+
+  const REM = "recordatorio";
+  const remGet = () => { try { return JSON.parse(localStorage.getItem(REM) || "null"); } catch (e) { return null; } };
+  function downloadIcs(hora) {
+    const [h, m] = hora.split(":"); const d = todayISO.replace(/-/g, ""); const url = location.origin + location.pathname.replace(/[^/]*$/, "mi-plan.html");
+    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Plan de comidas Buenos Aires//ES", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+      "BEGIN:VTIMEZONE", "TZID:America/Argentina/Buenos_Aires", "BEGIN:STANDARD", "DTSTART:19700101T000000", "TZOFFSETFROM:-0300", "TZOFFSETTO:-0300", "TZNAME:-03", "END:STANDARD", "END:VTIMEZONE",
+      "BEGIN:VEVENT", "UID:recordatorio-diario@plan-comidas-bsas", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g, "").slice(0, 15) + "Z",
+      `DTSTART;TZID=America/Argentina/Buenos_Aires:${d}T${h}${m}00`, "DURATION:PT10M", "RRULE:FREQ=DAILY",
+      "SUMMARY:Marcá tu día · Plan de comidas", `DESCRIPTION:¿Comiste lo que planeaste? Marcalo y sumá XP sin cortar la racha: ${url}`, `URL:${url}`,
+      "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:Marcá tu día en Plan de comidas", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" })); a.download = "recordatorio-plan-comidas.ics"; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toastG("Abrí el archivo descargado: tu calendario lo agrega como evento diario con alarma.");
+  }
+  if ($("#remHora")) {
+    const r = remGet(); if (r) { $("#remHora").value = r.hora || "21:00"; $("#remApp").checked = !!r.app; }
+    const save = () => localStorage.setItem(REM, JSON.stringify({ hora: $("#remHora").value || "21:00", app: $("#remApp").checked }));
+    $("#remHora").addEventListener("change", save);
+    $("#remApp").addEventListener("change", () => { save(); toastG($("#remApp").checked ? "Listo: si abrís el sitio después de esa hora sin haber marcado el día, te aviso." : "Aviso en el sitio desactivado."); });
+    $("#remIcs").addEventListener("click", () => { save(); downloadIcs($("#remHora").value || "21:00"); });
+  }
+  (() => {  // aviso al abrir el sitio, una vez por día, si ya pasó la hora y el día no está marcado
+    const r = remGet(); if (!r?.app) return; const [h, m] = (r.hora || "21:00").split(":").map(Number); const now = new Date();
+    if (now.getHours() * 60 + now.getMinutes() < h * 60 + m) return;
+    if (localStorage.getItem("diaMarcado") === todayISO || localStorage.getItem("avisoHoy") === todayISO) return;
+    localStorage.setItem("avisoHoy", todayISO);
+    setTimeout(() => {
+      const n = document.createElement("div"); n.className = "nudge"; n.setAttribute("role", "status");
+      n.innerHTML = `<span>${ic("clock")} ¿Cumpliste el plan de hoy? Marcalo antes de dormir y la racha sigue.</span><a class="mini-btn" href="mi-plan.html#hoy">Marcar mi día</a><button class="nudge-x" aria-label="Cerrar">×</button>`;
+      n.querySelector(".nudge-x").addEventListener("click", () => n.remove()); document.body.appendChild(n);
+    }, 1400);
+  })();
+
+  // ---------- alertas de precio (en este dispositivo; se revisan al abrir Supermercados, como mucho cada 6 h) ----------
+  const AKEY = "alertasPrecio";
+  const getAlerts = () => { try { return JSON.parse(localStorage.getItem(AKEY) || "[]"); } catch (e) { return []; } };
+  const setAlerts = (l) => { try { localStorage.setItem(AKEY, JSON.stringify(l)); } catch (e) {} };
+  const normA = (s) => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const matchQ = (q, rows) => { const qn = normA(q).split(/\s+/).map((w) => w.replace(/[,.]/g, "")).filter((w) => w.length > 2 && !/^\d+$/.test(w)); return rows.filter((r) => { const n = normA(r.name); return qn.every((w) => n.includes(w) || n.includes(w.replace(/s$/, ""))); }).sort((a, b) => a.price - b.price); };
+  function renderAlerts() {
+    const box = $("#alertasBox"); if (!box) return; const list = getAlerts();
+    if (!list.length) { box.innerHTML = ""; return; }
+    box.innerHTML = `<div class="card alertas"><div class="al-head"><h3>${ic("bell")} Mis alertas de precio <small>${list.length}</small></h3><button class="mini-btn" id="alCheck">${ic("refresh")} Revisar ahora</button></div>
+      <p class="muted small">Se revisan solas cuando abrís esta página (como mucho cada 6 horas) y quedan guardadas en este dispositivo. Si bajan más de 3 %, te avisamos.</p>
+      ${list.map((a, i) => { const cur = a.cur ?? a.price; const d = Math.round((cur / a.price - 1) * 100); const st = d <= -3 ? "down" : d >= 3 ? "up" : "eq";
+        return `<div class="al-row ${st}">${a.img ? `<img src="${a.img}" alt="" loading="lazy">` : `<span class="al-ph">${ic("tag")}</span>`}<div class="al-txt"><b>${esc(a.name)}</b><small>${esc(a.store)} · seguido desde el ${esc(a.at.split("-").reverse().join("/"))} a <span data-ars="${a.price}"></span>${a.miss ? " · hoy no apareció en la búsqueda" : ""}</small>${a.best ? `<small class="al-alt">Más barato ahora: ${esc(a.best.store)} a <a href="${a.best.link}" target="_blank" rel="noopener" data-ars="${a.best.price}"></a></small>` : ""}</div>
+          <div class="al-price"><b data-ars="${cur}"></b>${st === "eq" ? `<em>sin cambios</em>` : `<em>${d > 0 ? "▲" : "▼"} ${Math.abs(d)} %</em>`}</div><div class="al-act"><a class="mini-btn" href="${a.link}" target="_blank" rel="noopener">Ver</a><button class="mini-btn" data-unalert="${i}" aria-label="Dejar de seguir">${ic("x")}</button></div></div>`; }).join("")}</div>`;
+    renderMoney();
+  }
+  async function checkAlerts(force) {
+    const list = getAlerts(); if (!list.length || !CFG.priceApi) return;
+    const last = +localStorage.getItem("alertasCheck") || 0; if (!force && Date.now() - last < 6 * 36e5) return;
+    localStorage.setItem("alertasCheck", String(Date.now())); $("#alCheck") && ($("#alCheck").disabled = true);
+    const bajas = [];
+    for (const q of [...new Set(list.map((a) => a.q))].slice(0, 8)) {
+      try {
+        const rs = (await (await fetch(`${CFG.priceApi.replace(/\/$/, "")}/search?q=${encodeURIComponent(q)}`)).json()).results || [];
+        list.filter((a) => a.q === q).forEach((a) => {
+          const same = rs.find((r) => r.link === a.link) || rs.find((r) => r.store === a.store && normA(r.name) === normA(a.name));
+          a.miss = !same; if (same) { if (same.price < (a.cur ?? a.price) * 0.97 && same.price < a.price * 0.97) bajas.push(a); a.cur = same.price; a.curAt = new Date().toISOString(); }
+          const alt = matchQ(q, rs).find((r) => r.link !== a.link); a.best = alt && alt.price < (a.cur ?? a.price) * 0.97 ? { store: alt.store, price: alt.price, link: alt.link, name: alt.name } : null;
+        });
+      } catch (e) {}
+    }
+    setAlerts(list); renderAlerts();
+    if (bajas.length) {
+      const txt = `${bajas[0].name} (${bajas[0].store})${bajas.length > 1 ? ` y ${bajas.length - 1} más` : ""}`;
+      toastG("Bajó el precio de " + txt + ".");
+      try { if ("Notification" in window && Notification.permission === "granted") new Notification("Bajó un precio que seguís", { body: txt, icon: "img/icons/icon-192.png", tag: "precios" }); } catch (e) {}
+    }
+  }
+  if (page === "supermercados" && $("#alertasBox")) {
+    renderAlerts(); checkAlerts(false);
+    $("#alertasBox").addEventListener("click", (e) => {
+      if (e.target.closest("#alCheck")) { checkAlerts(true); return; }
+      const u = e.target.closest("[data-unalert]"); if (u) { const l = getAlerts(); l.splice(+u.dataset.unalert, 1); setAlerts(l); renderAlerts(); }
+    });
+    $("#buscarRes").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-track]"); if (!b || !window.__lastRows) return; e.preventDefault();
+      const r = window.__lastRows[+b.dataset.track]; const l = getAlerts();
+      if (l.some((a) => a.link === r.link)) { toastG("Ya seguís ese producto: está en «Mis alertas de precio»."); return; }
+      l.unshift({ q: window.__lastQ, name: r.name, store: r.store, price: r.price, unit: r.unit, link: r.link, img: r.img || null, at: todayISO }); setAlerts(l.slice(0, 20)); renderAlerts();
+      b.classList.add("on"); b.setAttribute("aria-pressed", "true");
+      toastG(`Listo: te avisamos si ${r.name.length > 40 ? "ese producto" : "«" + r.name + "»"} baja en ${r.store}.`);
+      try { if ("Notification" in window && Notification.permission === "default" && standalone) Notification.requestPermission(); } catch (er) {}
+    });
+  }
+
+  // ---------- volver arriba (páginas largas) ----------
+  const top = document.createElement("button"); top.className = "to-top"; top.type = "button"; top.setAttribute("aria-label", "Volver arriba"); top.innerHTML = ic("arrowup"); top.hidden = true; document.body.appendChild(top);
+  top.addEventListener("click", () => window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+  window.addEventListener("scroll", () => { const on = window.scrollY > 1400; if (top.hidden === on) top.hidden = !on; }, { passive: true });
 
   renderMoney(); liveRates(); animateIn();
   new MutationObserver(() => { clearTimeout(window.__ai); window.__ai = setTimeout(animateIn, 30); }).observe(document.body, { childList: true, subtree: true });

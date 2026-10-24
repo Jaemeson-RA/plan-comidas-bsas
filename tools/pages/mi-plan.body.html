@@ -43,6 +43,7 @@
 
   <!-- ===== Calendario ===== -->
   <section id="tabCal" class="mp-tab">
+    <div class="card inbox" id="inboxBox" hidden></div>
     <div class="plan-tools"><div class="tabs" id="myWeekTabs"></div></div>
     <div class="week-actions">
       <button class="mini-btn" id="fillHouse"><svg class="ic"><use href="#i-calendar"/></svg> Copiar el plan de la casa en esta semana</button>
@@ -73,6 +74,7 @@
 
   <!-- ===== Ranking ===== -->
   <section id="tabRank" class="mp-tab" hidden>
+    <div class="card reto" id="retoCard"></div>
     <div class="two">
       <div class="card score rank-me" id="rankMe"></div>
       <div class="card verdict"><h3>Cómo se suman los puntos</h3>
@@ -100,12 +102,13 @@
       <div class="card verdict"><h3>Cómo se gana XP</h3>
         <ul class="v-list">
           <li><b>Día cumplido</b>: 50 XP; con racha de 3 días, 75; de 7 o más, 100.</li>
-          <li><b>Semana perfecta</b>: +200 XP.</li>
+          <li><b>Desafío de la semana</b>: 5 días cumplidos de lunes a domingo, +100 XP. <b>Semana perfecta</b> (7 de 7): +200 XP más.</li>
           <li><b>Receta creada</b>: 80 XP · <b>ingrediente cargado</b>: 40 XP.</li>
           <li><b>Tomé agua</b>: 10 XP por vaso (3 vasos de 500 ml por día) y 20 XP extra al completar el día.</li>
           <li>Cada nivel pide un poco más que el anterior. Las insignias se destraban solas y se pueden compartir.</li>
         </ul></div>
     </div>
+    <div class="card recap" id="recapCard"></div>
     <h2 class="sub"><span class="squig">Insignias</span></h2>
     <div class="badges" id="badgesGrid"></div>
     <h2 class="sub"><span class="squig">Ajustes</span></h2>
@@ -139,6 +142,13 @@
         </form>
       </div>
     </div>
+    <div class="card editor set-card rem-card" id="remCard">
+      <h3><svg class="ic"><use href="#i-clock"/></svg> Recordatorio diario</h3>
+      <p class="muted small">Un aviso a la noche para marcar tu día y no cortar la racha. Lo más confiable es sumarlo al calendario del teléfono: suena aunque el sitio esté cerrado.</p>
+      <div class="rem-row"><label for="remHora">Hora</label><input id="remHora" type="time" value="21:00"><button class="btn small-btn" id="remIcs" type="button"><svg class="ic"><use href="#i-calendar"/></svg> Agregar al calendario del teléfono</button></div>
+      <label class="snd"><input type="checkbox" id="remApp"> Avisarme también cuando abro el sitio después de esa hora</label>
+      <p class="muted small install-line"><button class="mini-btn install-btn" type="button" hidden><svg class="ic"><use href="#i-arrow"/></svg> Instalar la app</button> Instalada, se abre a pantalla completa y el plan, las recetas y las listas funcionan sin conexión.</p>
+    </div>
   </section>
 
 <section id="adminBox" hidden class="sec">
@@ -154,6 +164,7 @@
     <button class="modal-x" data-pclose aria-label="Cerrar">×</button>
     <div class="rm">
       <h2 id="pickerTitle">Elegí un plato</h2>
+      <div class="prop-row" id="propRow" hidden><label>Para el <input type="date" id="propDate"></label><label>en la comida <select id="propSlot"><option value="desayuno">desayuno</option><option value="almuerzo">almuerzo</option><option value="cena" selected>cena</option></select></label></div>
       <input class="picker-search" id="pickerSearch" placeholder="Buscar… (pollo, rápido, horno, mi receta)">
       <div class="picker-grid" id="pickerGrid"></div>
       <div class="sug-actions"><button class="mini-btn" id="pickerClear"><svg class="ic"><use href="#i-refresh"/></svg> Dejar vacío</button></div>

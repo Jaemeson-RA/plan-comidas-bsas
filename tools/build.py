@@ -416,8 +416,15 @@ sources = [
  {"t":"iProfesional — cuál es el supermercado más barato de Argentina en 2026","u":"https://www.iprofesional.com/actualidad/445916-cual-es-el-supermercado-mas-barato-de-argentina-en-2026"},
  {"t":"Fotos de las recetas: Wikimedia Commons, licencias Creative Commons indicadas en cada receta.","u":"https://commons.wikimedia.org/"},
 ]
-data = {"period":{"start":start.isoformat(),"end":(start+datetime.timedelta(days=34)).isoformat(),"label":"27 de octubre → 30 de noviembre de 2026"},
-        "weeks":weeks,"recipes":R,"shopping":shopping,"pantry":pantry,"stores":stores,"apps":apps,"basket":basket,"rates":rates,"sources":sources,
+# fotos: WebP en dos tamaños si existen (tools/build_webp.py); el JPG queda de respaldo
+for r in R.values():
+    base = os.path.splitext(os.path.basename(r["img"]))[0]
+    if os.path.exists(os.path.join("..", "img", "w", f"{base}-900.webp")):
+        r["jpg"] = r["img"]; r["img"] = f"img/w/{base}-900.webp"; r["srcset"] = f"img/w/{base}-480.webp 480w, img/w/{base}-900.webp 900w"
+# el plan se genera en el navegador a partir de estas rotaciones (desde `epoch`, un lunes), así no se termina nunca
+rot = {"epoch": start.isoformat(), "break": BREAK, "lunch": LUNCH, "dinner": DINNER, "sat": [list(x) for x in SAT], "sun": [list(x) for x in SUN], "merienda": MERIENDA}
+data = {"period":{"start":start.isoformat(),"label":"plan continuo · se arma solo cada semana"},
+        "rot":rot,"recipes":R,"pantry":pantry,"stores":stores,"apps":apps,"basket":basket,"rates":rates,"sources":sources,
         "temporada":TEMPORADA,"meriendaNut":dict(zip(["kcal","prot","carb","fat","fib","sal"],MERIENDA_NUT)),
         "ingredientes":[{"id":x["id"],"n":x["n"],"cat":x["cat"],"por100":x["por100"],"u":x["u"],"alias":x["alias"],"source":"base"} for x in ING_DB]}
 for r in R.values():

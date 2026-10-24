@@ -1,10 +1,11 @@
 <main data-page="plan">
 <section class="page-head">
-  <p class="kicker">Calendario · <span id="periodLabel"></span></p>
+  <p class="kicker">Calendario · plan continuo, mes por mes</p>
   <h1>Qué se come <mark>cada día</mark></h1>
-  <p class="lead">Tocá un plato y se abre la receta completa, con foto, video y costo. Cada semana tiene su botón hacia la lista de compras. De lunes a viernes van los platos rápidos; el fin de semana, los que llevan más tiempo.</p>
+  <p class="lead">El plan se arma solo, semana a semana, y podés mirar cualquier mes. Tocá un plato para ver la receta con foto, video y costo. De lunes a viernes van los platos rápidos; el fin de semana, los que llevan más tiempo.</p>
 </section>
 <div class="plan-tools">
+  <div class="month-nav"><button class="mini-btn" id="mPrev" aria-label="Mes anterior">‹</button><b id="monthLabel"></b><button class="mini-btn" id="mNext" aria-label="Mes siguiente">›</button><button class="mini-btn hoy" id="mHoy">Hoy</button></div>
   <div class="seg" id="viewSeg"><button data-view="cal" class="on">Calendario del mes</button><button data-view="week">Una semana</button></div>
   <div class="legend"><span><svg class="ic"><use href="#i-desayuno"/></svg>desayuno</span><span><svg class="ic"><use href="#i-almuerzo"/></svg>almuerzo</span><span><svg class="ic"><use href="#i-merienda"/></svg>merienda</span><span><svg class="ic"><use href="#i-cena"/></svg>cena</span><span class="lg-wk"><i></i>fin de semana</span></div>
 </div>

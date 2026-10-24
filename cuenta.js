@@ -14,7 +14,7 @@ const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "o
 const DOW = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 const SLOTS = ["desayuno", "almuerzo", "cena"];
 const NUTK = ["kcal", "prot", "carb", "sug", "fat", "sat", "fib", "sal"];
-const todayISO = new Date().toISOString().slice(0, 10);
+const todayISO = (() => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); })();  // hora local, no UTC
 const iso = (d) => d.toISOString().slice(0, 10);
 const addDays = (s, n) => { const d = new Date(s + "T12:00:00"); d.setDate(d.getDate() + n); return iso(d); };
 const mondayOf = (s) => { const d = new Date(s + "T12:00:00"); const k = (d.getDay() + 6) % 7; d.setDate(d.getDate() - k); return iso(d); };
@@ -22,14 +22,15 @@ const label = (s) => { const [y, m, d] = s.split("-").map(Number); return `${d} 
 const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 const PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect width='400' height='300' fill='#F4ECDC'/><g fill='none' stroke='#17302B' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'><path d='M90 150h220'/><path d='M110 150v70a50 50 0 0 0 50 50h80a50 50 0 0 0 50-50v-70'/><path d='M200 95v55M165 95h70'/><path d='M165 55c0-18 18-18 18-36M217 55c0-18 18-18 18-36'/></g></svg>`);
 const toast = (msg) => { let t = $("#toast"); if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3000); };
-const houseDays = Object.fromEntries(D.weeks.flatMap((w) => w.days).map((d) => [d.date, d]));
+const houseDay = (dt) => window.PLAN.houseDay(dt);
+const srcs = (r) => (r && r.srcset ? ` srcset="${r.srcset}" sizes="(max-width:720px) 46vw, 320px"` : "");
 const copyText = (text) => navigator.clipboard.writeText(text).then(() => true).catch(() => { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e) {} ta.remove(); return ok; });
 
 // ---------- Firebase ----------
 const app = initializeApp(CFG.firebase);
 const auth = getAuth(app);
 const db = getDatabase(app);
-let user = null, cal = null, unsubCal = null;
+let user = null, cal = null, unsubCal = null, inbox = {}, unsubInbox = null;
 let community = {}, ingDB = {};   // recetas e ingredientes compartidos (RTDB)
 const ERR = {
   "auth/email-already-in-use": "Ya hay una cuenta con ese correo. Probá ingresar.", "auth/invalid-credential": "Correo o contraseña incorrectos.",
@@ -111,9 +112,11 @@ if (authBox) {
 $("#logout")?.addEventListener("click", () => signOut(auth));
 onAuthStateChanged(auth, (u) => {
   user = u; if (unsubCal) { unsubCal(); unsubCal = null; }
+  if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
     unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
 });
@@ -126,7 +129,7 @@ function weekList() {
 }
 function dayPlan(dateISO, src) {
   if (src === "mio") { const d = cal?.days?.[dateISO]; return d && SLOTS.some((s) => d[s] && R[d[s]]) ? d : null; }
-  const h = houseDays[dateISO]; return h ? { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena } : null;
+  const h = houseDay(dateISO); return { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena };
 }
 function aggregateShopping(days) {
   const agg = new Map();
@@ -138,7 +141,7 @@ function aggregateShopping(days) {
   out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
   return out.filter((c) => c.items.length);
 }
-function render() { if (page === "miplan") { renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); renderWho(); renderPerfil(); renderFriends(); } if (page === "nutricion") renderNut(); }
+function render() { if (page === "miplan") { renderMiPlan(); renderMyRecipes(); renderIngredients(); renderRank(); renderWho(); renderPerfil(); renderFriends(); renderReto(); renderRecap(); renderInbox(); } if (page === "nutricion") renderNut(); }
 
 // =====================================================================
 // MI PLAN · calendario
@@ -153,7 +156,7 @@ function renderMiPlan() {
   $("#myWeekTabs").innerHTML = weeks.map((w) => `<button data-w="${w.start}" class="${w.start === myWeek ? "on" : ""}">${esc(w.label)}</button>`).join("");
   const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i));
   $("#myCal").innerHTML = days.map((dt, i) => { const d = cal?.days?.[dt] || {}; return `<article class="my-day${dt === todayISO ? " today" : ""}"><h4>${DOW[i]} <span>${label(dt)}</span></h4>
-      ${SLOTS.map((s) => { const r = R[d[s]]; return `<button class="slot${r ? "" : " empty"}" data-date="${dt}" data-slot="${s}">${ic(s)}${r ? `<img src="${r.img}" alt=""><span>${esc(r.name)}${r.custom ? " <small>· receta de " + esc(r.ownerName) + "</small>" : ""}</span>` : `<span>+ elegir ${s}</span>`}</button>`; }).join("")}
+      ${SLOTS.map((s) => { const r = R[d[s]]; return `<button class="slot${r ? "" : " empty"}" data-date="${dt}" data-slot="${s}">${ic(s)}${r ? `<img src="${r.img}"${srcs(r)} alt=""><span>${esc(r.name)}${r.custom ? " <small>· receta de " + esc(r.ownerName) + "</small>" : ""}</span>` : `<span>+ elegir ${s}</span>`}</button>`; }).join("")}
       ${dt <= todayISO ? (cal?.libre?.[dt] ? `<span class="done-btn libre">${ic("star")} Día libre (combo a salvo)</span>` : `<span class="done-row"><button class="done-btn${cal?.done?.[dt] ? " on" : ""}" data-done="${dt}">${ic("check")} ${cal?.done?.[dt] ? "Día cumplido" : "Marcar cumplido"}</button>${!cal?.done?.[dt] && fichasDisponibles() > 0 ? `<button class="done-btn ficha" data-libre="${dt}" title="Usar una ficha: el día no suma puntos pero no corta la racha">${ic("coin")} Día libre</button>` : ""}</span>`) : `<span class="done-btn future">${ic("clock")} todavía no</span>`}
     </article>`; }).join("");
   const list = aggregateShopping(days.map((dt) => cal?.days?.[dt]));
@@ -162,14 +165,14 @@ function renderMiPlan() {
     : `<p class="muted">Todavía no elegiste platos para esta semana. Tocá «+ elegir» en un día, o copiá el plan de la casa.</p>`;
   $("#myShare").hidden = !navigator.share;
   window.dispatchEvent(new Event("scroll"));
+  if (location.hash === "#hoy" && !window.__hoy) { const t = $(".my-day.today"); if (t) { window.__hoy = 1; setTimeout(() => t.scrollIntoView({ block: "center", behavior: "smooth" }), 350); } }
 }
 $("#myWeekTabs")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { myWeek = b.dataset.w; renderMiPlan(); } });
 $("#myCal")?.addEventListener("click", (e) => { const b = e.target.closest(".slot"); if (b) openPicker(b.dataset.date, b.dataset.slot); });
 $("#myShop")?.addEventListener("change", (e) => { const cb = e.target; if (cb.type === "checkbox") { localStorage.setItem(cb.dataset.k, cb.checked ? "1" : "0"); cb.closest("label").classList.toggle("done", cb.checked); } });
 $("#fillHouse")?.addEventListener("click", async () => {
   const upd = {}; let n = 0;
-  Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)).forEach((dt) => { const h = houseDays[dt]; if (h) { upd[dt] = { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena }; n++; } });
-  if (!n) { toast("Esta semana no está en el plan de la casa (27 oct → 30 nov). Elegí los platos a mano."); return; }
+  Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)).forEach((dt) => { const h = houseDay(dt); upd[dt] = { desayuno: h.desayuno, almuerzo: h.almuerzo, cena: h.cena }; n++; });
   try { await update(ref(db, `calendars/${user.uid}/days`), upd); touched("Copié el plan de la casa: " + n + " días."); } catch (e) { toast(errMsg(e)); }
 });
 $("#clearMyWeek")?.addEventListener("click", async () => { const upd = {}; Array.from({ length: 7 }, (_, i) => addDays(myWeek, i)).forEach((dt) => { upd[dt] = null; }); try { await update(ref(db, `calendars/${user.uid}/days`), upd); touched("Semana vaciada."); } catch (e) { toast(errMsg(e)); } });
@@ -190,7 +193,7 @@ function touched(msg) {
 }
 // selector de platos (sitio + comunidad)
 function openPicker(date, slot) {
-  pickCtx = { date, slot };
+  pickCtx = { date, slot }; if ($("#propRow")) $("#propRow").hidden = true; $("#pickerClear").hidden = false;
   $("#pickerTitle").textContent = `${slot[0].toUpperCase() + slot.slice(1)} · ${DOW[(new Date(date + "T12:00:00").getDay() + 6) % 7]} ${label(date)}`;
   $("#pickerSearch").value = ""; fillPicker(""); $("#picker").hidden = false; document.body.style.overflow = "hidden"; setTimeout(() => $("#pickerSearch").focus(), 50);
 }
@@ -198,12 +201,13 @@ function fillPicker(q) {
   q = norm(q);
   const rank = (r) => (r.custom && r.owner === user?.uid ? 0 : r.tipo === (pickCtx.slot === "desayuno" ? "desayuno" : "plato") ? 1 : 2);
   const list = Object.values(R).filter((r) => !q || norm(r.name + " " + r.tags.join(" ") + " " + r.ing.map((i) => i.n).join(" ") + (r.custom ? " mi receta comunidad " + r.ownerName : "")).includes(q)).sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
-  $("#pickerGrid").innerHTML = list.map((r) => `<button class="pick" data-pick="${r.id}"><img src="${r.img}" alt="" loading="lazy"><span><b>${esc(r.name)}</b><small>${r.tiempo} min · ${r.kcal} kcal${r.porciones > 1 ? " · rinde " + r.porciones : ""}${r.tipo === "desayuno" ? " · desayuno" : ""}${r.custom ? " · de " + esc(r.ownerName) : ""}</small></span></button>`).join("") || `<p class="muted">Nada con ese nombre.</p>`;
+  $("#pickerGrid").innerHTML = list.map((r) => `<button class="pick" data-pick="${r.id}"><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><span><b>${esc(r.name)}</b><small>${r.tiempo} min · ${r.kcal} kcal${r.porciones > 1 ? " · rinde " + r.porciones : ""}${r.tipo === "desayuno" ? " · desayuno" : ""}${r.custom ? " · de " + esc(r.ownerName) : ""}</small></span></button>`).join("") || `<p class="muted">Nada con ese nombre.</p>`;
 }
 $("#pickerSearch")?.addEventListener("input", (e) => fillPicker(e.target.value));
 $("#picker")?.addEventListener("click", async (e) => {
   if (e.target.closest("[data-pclose]")) { closePicker(); return; }
   const p = e.target.closest("[data-pick]");
+  if (p && pickCtx?.propose) { await sendProposal(p.dataset.pick); return; }
   if (p && pickCtx) { try { await update(ref(db, `calendars/${user.uid}/days/${pickCtx.date}`), { [pickCtx.slot]: p.dataset.pick }); closePicker(); touched(); } catch (ex) { toast(errMsg(ex)); } }
 });
 $("#pickerClear")?.addEventListener("click", async () => { if (pickCtx) { await update(ref(db, `calendars/${user.uid}/days/${pickCtx.date}`), { [pickCtx.slot]: null }).catch(() => {}); closePicker(); touched(); } });
@@ -214,7 +218,7 @@ function closePicker() { $("#picker").hidden = true; document.body.style.overflo
 // =====================================================================
 let edRows = [], edKey = null;
 function recipeCard(r, mine) {
-  return `<div class="rc-wrap"><button class="rc" data-rec="${r.id}"><img src="${r.img}" alt="" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4><div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("flame")}<b>${r.kcal}</b> kcal</span><span>${ic("users")}<b>${r.porciones}</b> porc.</span></div><div><span class="tag">${mine ? "mi receta" : "de " + esc(r.ownerName)}</span>${(r.tags || []).slice(0, 2).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div></div></button>${mine ? `<button class="mini-btn edit" data-edit="${r.key}">${ic("copy")} Editar</button>` : ""}</div>`;
+  return `<div class="rc-wrap"><button class="rc" data-rec="${r.id}"><img src="${r.img}"${srcs(r)} alt="" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4><div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("flame")}<b>${r.kcal}</b> kcal</span><span>${ic("users")}<b>${r.porciones}</b> porc.</span></div><div><span class="tag">${mine ? "mi receta" : "de " + esc(r.ownerName)}</span>${(r.tags || []).slice(0, 2).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div></div></button>${mine ? `<button class="mini-btn edit" data-edit="${r.key}">${ic("copy")} Editar</button>` : ""}</div>`;
 }
 function renderMyRecipes() {
   if (!$("#myRecipes") || !user) return;
@@ -375,17 +379,17 @@ async function loadAdmin() {
 // MI PLAN · días cumplidos, combos y ladder
 // =====================================================================
 let ladder = {};
-onValue(ref(db, "ladder"), (s) => { ladder = s.val() || {}; renderRank(); }, () => {});
+onValue(ref(db, "ladder"), (s) => { ladder = s.val() || {}; renderRank(); renderRecap(); }, () => {});
 $("#myCal")?.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-done]"); if (!b) return;
-  const dt = b.dataset.done; const on = !cal?.done?.[dt]; const snap = myXP();
+  const dt = b.dataset.done; const on = !cal?.done?.[dt]; const snap = myXP(); const stBefore = computeStats(cal?.done || {});
   try {
     await update(ref(db, `calendars/${user.uid}/done`), { [dt]: on ? true : null });
     const done = Object.assign({}, cal?.done || {}); if (on) done[dt] = true; else delete done[dt];
     const st = computeStats(done);
     await set(ref(db, `ladder/${user.uid}`), { name: myName(), points: st.points, streak: st.streak, best: st.best, days: st.days, weeks: st.weeks, updatedAt: new Date().toISOString() });
     toast(on ? (st.streak >= 7 ? `¡Día cumplido! Combo ×2: racha de ${st.streak} días.` : st.streak >= 3 ? `¡Día cumplido! Combo ×1,5: racha de ${st.streak} días.` : "¡Día cumplido! +10 puntos.") : "Día desmarcado.");
-    if (on) gainXP(xpDay(st.streak), "día cumplido", snap);
+    if (on) { const reto = st.retos > stBefore.retos; gainXP(xpDay(st.streak) + (reto ? 100 : 0), reto ? "día cumplido · ¡desafío de la semana!" : "día cumplido", snap); }
     touched(); syncPublic();
   } catch (ex) { toast(errMsg(ex)); }
 });
@@ -400,7 +404,8 @@ function computeStats(done, libre) {
   const mondays = new Set(dates.map((d) => mondayOf(d))); let weeks = 0;
   mondays.forEach((m) => { if (Array.from({ length: 7 }, (_, i) => addDays(m, i)).every((d) => done[d])) weeks++; });
   points += weeks * 50;
-  return { points: Math.round(points), streak, best, days: dates.length, weeks };
+  let retos = 0; mondays.forEach((m) => { if (Array.from({ length: 7 }, (_, i) => addDays(m, i)).filter((d) => done[d]).length >= 5) retos++; });
+  return { points: Math.round(points), streak, best, days: dates.length, weeks, retos };
 }
 function renderRank() {
   if (!$("#rankMe") || !user) return;
@@ -432,11 +437,11 @@ function daysForPeriod() {
   const src = nut.src;
   if (nut.per === "mes") {
     let dates;
-    if (src === "casa") dates = Object.keys(houseDays);
+    if (src === "casa") { const m = todayISO.slice(0, 7); const n = new Date(+m.slice(0, 4), +m.slice(5, 7), 0).getDate(); dates = Array.from({ length: n }, (_, i) => `${m}-${String(i + 1).padStart(2, "0")}`); nut.monthLabel = m; }
     else { const keys = Object.keys(cal?.days || {}).sort(); const m = keys.length ? keys[keys.length - 1].slice(0, 7) : todayISO.slice(0, 7); dates = keys.filter((d) => d.startsWith(m)); nut.monthLabel = m; }
     return dates.map((d) => dayPlan(d, src)).filter(Boolean);
   }
-  const weeks = nut.src === "casa" ? D.weeks.map((w) => ({ start: w.start })) : weekList();
+  const weeks = weekList();
   if (!nut.week || !weeks.some((w) => w.start === nut.week)) nut.week = weeks[0].start;
   return Array.from({ length: 7 }, (_, i) => dayPlan(addDays(nut.week, i), src)).filter(Boolean);
 }
@@ -490,8 +495,8 @@ function renderNut() {
   const hasMine = !!(user && cal?.days && Object.values(cal.days).some((d) => SLOTS.some((s) => d[s])));
   if (!hasMine) nut.src = "casa";
   $$("#srcSeg button").forEach((b) => { b.classList.toggle("on", b.dataset.src === nut.src); b.classList.toggle("off", b.dataset.src === "mio" && !hasMine); b.title = b.dataset.src === "mio" && !hasMine ? (user ? "Tu calendario todavía no tiene platos" : "Ingresá en Mi plan para usar tu calendario") : ""; });
-  $("#srcNote").innerHTML = !user ? `Para analizar <b>tu</b> calendario tenés que <a href="mi-plan.html">ingresar en Mi plan</a> (mismo correo y contraseña). Mientras tanto se analiza el plan de la casa.` : !hasMine ? `Tu calendario todavía no tiene platos: <a href="mi-plan.html">armá tu semana en Mi plan</a> y volvé. Mientras tanto se analiza el plan de la casa.` : nut.src === "mio" ? "Se analizan los platos que elegiste en tu calendario." : "Se analiza el plan de la casa (27 oct → 30 nov).";
-  const weeks = nut.src === "casa" ? D.weeks.map((w) => ({ start: w.start, label: w.label })) : weekList();
+  $("#srcNote").innerHTML = !user ? `Para analizar <b>tu</b> calendario tenés que <a href="mi-plan.html">ingresar en Mi plan</a> (mismo correo y contraseña). Mientras tanto se analiza el plan de la casa.` : !hasMine ? `Tu calendario todavía no tiene platos: <a href="mi-plan.html">armá tu semana en Mi plan</a> y volvé. Mientras tanto se analiza el plan de la casa.` : nut.src === "mio" ? "Se analizan los platos que elegiste en tu calendario." : "Se analiza el plan de la casa de la semana elegida (se renueva solo, semana a semana).";
+  const weeks = weekList();
   if (!nut.week || !weeks.some((w) => w.start === nut.week)) nut.week = weeks[0].start;
   $("#nutWeekTabs").hidden = nut.per !== "semana";
   $("#nutWeekTabs").innerHTML = weeks.map((w) => `<button data-w="${w.start}" class="${w.start === nut.week ? "on" : ""}">${esc(w.label)}</button>`).join("");
@@ -540,7 +545,7 @@ if (page === "nutricion") {
 // GAMIFICACIÓN · XP, niveles, fichas, agua, insignias, perfil, amigos
 // =====================================================================
 let pub = {}, ladderMode = "todos", myEmailHash = null, lastXP = null;
-onValue(ref(db, "public"), (s) => { pub = s.val() || {}; renderRank(); renderFriends(); renderWho(); }, () => {});
+onValue(ref(db, "public"), (s) => { pub = s.val() || {}; renderRank(); renderFriends(); renderWho(); renderReto(); }, () => {});
 
 // ---- sonido (sintetizado, sin archivos) ----
 const SND_KEY = "sonidos";
@@ -566,10 +571,13 @@ const xpDay = (streak) => (streak >= 7 ? 100 : streak >= 3 ? 75 : 50);
 const needFor = (k) => 100 + 60 * (k - 1) + 10 * (k - 1) * (k - 1);
 const xpForLevel = (L) => { let t = 0; for (let k = 1; k < L; k++) t += needFor(k); return t; };
 const levelOf = (xp) => { let L = 1; while (xp >= xpForLevel(L + 1) && L < 99) L++; return L; };
-function myCounts() {
-  const recipes = Object.values(community).filter((c) => c.owner === user?.uid).length;
-  const ings = Object.values(ingDB).filter((c) => c.owner === user?.uid).length;
-  const agua = cal?.agua || {}; const aguaDays = Object.keys(agua).sort();
+const cutObj = (o, cut) => (cut ? Object.fromEntries(Object.entries(o || {}).filter(([k]) => k <= cut)) : o || {});
+const mineUpTo = (o, cut) => Object.values(o).filter((c) => c.owner === user?.uid && (!cut || (c.createdAt || "").slice(0, 10) <= cut)).length;
+const weekDone = (done, monday) => Array.from({ length: 7 }, (_, i) => addDays(monday, i)).filter((d) => done?.[d]).length;
+function myCounts(cut) {
+  const recipes = mineUpTo(community, cut);
+  const ings = mineUpTo(ingDB, cut);
+  const agua = cutObj(cal?.agua, cut); const aguaDays = Object.keys(agua).sort();
   const vasos = aguaDays.reduce((a, d) => a + Math.min(3, agua[d] || 0), 0), full = aguaDays.filter((d) => (agua[d] || 0) >= 3);
   let aguaStreak = 0, best = 0, prev = null, run = 0;
   full.forEach((d) => { run = prev && addDays(prev, 1) === d ? run + 1 : 1; prev = d; best = Math.max(best, run); });
@@ -578,14 +586,15 @@ function myCounts() {
   const planDays = Object.values(cal?.days || {}).filter((d) => d && SLOTS.some((s) => d[s])).length;
   return { recipes, ings, vasos, aguaFull: full.length, aguaStreak, aguaBest: best, friends, planDays };
 }
-function myXP() {
-  const st = computeStats(cal?.done || {}); const c = myCounts();
+function myXP(cut) {
+  const done = cutObj(cal?.done, cut); const libre = cutObj(cal?.libre, cut);
+  const st = computeStats(done, libre); const c = myCounts(cut);
   // XP por día cumplido con el combo del momento
-  const done = cal?.done || {}; const libre = cal?.libre || {}; const dates = Object.keys(done).filter((d) => done[d]).sort();
+  const dates = Object.keys(done).filter((d) => done[d]).sort();
   let xp = 0, run = 0, prev = null;
   const bridged = (a, b) => { let d = addDays(a, 1); while (d < b) { if (!libre[d]) return false; d = addDays(d, 1); } return true; };
   dates.forEach((d) => { run = prev && (addDays(prev, 1) === d || bridged(prev, d)) ? run + 1 : 1; prev = d; xp += xpDay(run); });
-  xp += st.weeks * 200 + c.recipes * 80 + c.ings * 40 + c.vasos * 10 + c.aguaFull * 20;
+  xp += st.weeks * 200 + st.retos * 100 + c.recipes * 80 + c.ings * 40 + c.vasos * 10 + c.aguaFull * 20;
   const level = levelOf(xp);
   return { xp, level, st, c, next: xpForLevel(level + 1), base: xpForLevel(level) };
 }
@@ -647,6 +656,7 @@ function avatarHtml(p, name) { const ini = (name || "?").trim()[0]?.toUpperCase(
 function renderWho() {
   if (page !== "miplan" || !user || !$("#whoLevel")) return;
   const x = myXP(); lastXP = { xp: x.xp, level: x.level };
+  if (cal?.done?.[todayISO] || cal?.libre?.[todayISO]) { try { localStorage.setItem("diaMarcado", todayISO); } catch (e) {} }
   $("#whoLevel").textContent = x.level;
   const pct = Math.min(100, Math.round((x.xp - x.base) / (x.next - x.base) * 100));
   fillBar($("#xpFill").parentElement, pct); $("#xpText").textContent = `${x.xp.toLocaleString("es-AR")} XP · nivel ${x.level} · faltan ${(x.next - x.xp).toLocaleString("es-AR")} para el ${x.level + 1} · ${fichasDisponibles()} ${fichasDisponibles() === 1 ? "ficha" : "fichas"}`;
@@ -712,22 +722,33 @@ function checkBadges() {
   localStorage.setItem("badges:" + (user?.uid || ""), JSON.stringify(now));
 }
 function badgeHtml(b, on, shareable) { return `<div class="badge${on ? " on" : ""}" title="${esc(b.d)}">${medalSvg(b, on)}<b>${esc(b.t)}</b><small>${esc(b.d)}</small><em class="tier t${b.tier || 1}">${TIER[b.tier || 1]}</em>${on && shareable ? `<button class="mini-btn share" data-share="${b.id}">${ic("share")} Compartir</button>` : ""}</div>`; }
-async function shareBadge(id) {
+async function shareBadge(id, fmt = "post") {
   const b = BADGES.find((x) => x.id === id); const url = "https://jaemeson-ra.github.io/plan-comidas-bsas/";
   const text = `Conseguí la insignia «${b.t}» (${b.d}) en Plan de comidas Buenos Aires. ${url}`;
   // tarjeta para compartir (canvas)
-  const cv = document.createElement("canvas"); cv.width = 1080; cv.height = 1080; const g = cv.getContext("2d");
-  g.fillStyle = "#FBF7F0"; g.fillRect(0, 0, 1080, 1080); g.strokeStyle = "rgba(31,45,42,.06)"; for (let i = 0; i < 1080; i += 40) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 1080); g.moveTo(0, i); g.lineTo(1080, i); g.stroke(); }
+  const story = fmt === "story", W = 1080, H = story ? 1920 : 1080, x = myXP();
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H; const g = cv.getContext("2d");
+  try { await document.fonts?.ready; } catch (e) {}
+  g.fillStyle = "#FBF7F0"; g.fillRect(0, 0, W, H); g.strokeStyle = "rgba(31,45,42,.06)"; g.lineWidth = 2;
+  for (let i = 0; i < Math.max(W, H); i += 40) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, H); g.moveTo(0, i); g.lineTo(W, i); g.stroke(); }
   g.textAlign = "center";
+  const L = story ? { kick: 250, mx: 240, my: 330, mw: 600, mh: 750, t: 1210, d: 1290, tier: 1370, who: 1500 } : { kick: 0, mx: 300, my: 90, mw: 480, mh: 600, t: 740, d: 805, tier: 0, who: 900 };
+  if (story) { g.fillStyle = "#23704A"; g.font = "700 44px Outfit, sans-serif"; g.fillText("¡INSIGNIA NUEVA!", W / 2, L.kick); }
   try {
     const svg = await fetch(medalSrc(b)).then((r) => r.text());
     const im = new Image(); await new Promise((res, rej) => { im.onload = res; im.onerror = rej; im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
-    g.drawImage(im, 300, 90, 480, 600);
-  } catch (e) { g.fillStyle = "#2F8F5B"; g.beginPath(); g.arc(540, 400, 170, 0, Math.PI * 2); g.fill(); }
-  g.fillStyle = "#1F2D2A"; g.font = "400 76px 'Young Serif', Georgia, serif"; g.fillText(b.t, 540, 740);
-  g.fillStyle = "#3C4A46"; g.font = "500 40px Outfit, sans-serif"; g.fillText(b.d, 540, 805); g.fillText(`${myName()} · Plan de comidas Buenos Aires`, 540, 900);
-  g.fillStyle = "#2F8F5B"; g.font = "600 34px Outfit, sans-serif"; g.fillText("jaemeson-ra.github.io/plan-comidas-bsas", 540, 980);
-  const blob = await new Promise((r) => cv.toBlob(r, "image/png")); const file = new File([blob], `insignia-${b.id}.png`, { type: "image/png" });
+    g.drawImage(im, L.mx, L.my, L.mw, L.mh);
+  } catch (e) { g.fillStyle = "#2F8F5B"; g.beginPath(); g.arc(W / 2, L.my + L.mh * 0.6, L.mw * 0.36, 0, Math.PI * 2); g.fill(); }
+  g.fillStyle = "#1F2D2A"; g.font = `400 ${story ? 88 : 76}px 'Young Serif', Georgia, serif`; g.fillText(b.t, W / 2, L.t);
+  g.fillStyle = "#3C4A46"; g.font = `500 ${story ? 44 : 40}px Outfit, sans-serif`; g.fillText(b.d, W / 2, L.d);
+  if (story) { g.fillStyle = "#8a6410"; g.font = "700 36px Outfit, sans-serif"; g.fillText("Medalla de " + TIER[b.tier || 1], W / 2, L.tier); }
+  g.fillStyle = "#3C4A46"; g.font = `500 ${story ? 42 : 40}px Outfit, sans-serif`; g.fillText(story ? `${myName()} · nivel ${x.level} · racha ${x.st.streak}` : `${myName()} · Plan de comidas Buenos Aires`, W / 2, L.who);
+  if (story) {
+    g.fillStyle = "#2F8F5B"; g.fillRect(0, 1690, W, 230);
+    g.fillStyle = "#FFFDF9"; g.font = "400 56px 'Young Serif', Georgia, serif"; g.fillText("Plan de comidas Buenos Aires", W / 2, 1790);
+    g.font = "600 36px Outfit, sans-serif"; g.fillText("jaemeson-ra.github.io/plan-comidas-bsas", W / 2, 1855);
+  } else { g.fillStyle = "#2F8F5B"; g.font = "600 34px Outfit, sans-serif"; g.fillText("jaemeson-ra.github.io/plan-comidas-bsas", W / 2, 980); }
+  const blob = await new Promise((r) => cv.toBlob(r, "image/png")); const file = new File([blob], `insignia-${b.id}${fmt === "story" ? "-historia" : ""}.png`, { type: "image/png" });
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ title: b.t, text, files: [file] });
     else if (navigator.share) await navigator.share({ title: b.t, text, url });
@@ -751,7 +772,17 @@ function renderPerfil() {
   if (ph) { img.src = ph; img.hidden = false; ini.hidden = true; } else { img.hidden = true; ini.hidden = false; ini.textContent = (myName() || "?")[0].toUpperCase(); }
   const p = cal?.profile?.nut || loadProfile(); if (p) { $("#bSexo").value = p.sexo; $("#bEdad").value = p.edad; $("#bAltura").value = p.altura; $("#bPeso").value = p.peso; $("#bAct").value = p.act; }
 }
-$("#badgesGrid")?.addEventListener("click", (e) => { const b = e.target.closest("[data-share]"); if (b) shareBadge(b.dataset.share); });
+$("#badgesGrid")?.addEventListener("click", (e) => { const b = e.target.closest("[data-share]"); if (b) openShareSheet(b.dataset.share); });
+function openShareSheet(id) {
+  const b = BADGES.find((x) => x.id === id); let sh = $("#shareSheet");
+  if (!sh) { sh = document.createElement("div"); sh.id = "shareSheet"; sh.className = "share-sheet"; document.body.appendChild(sh); }
+  sh.innerHTML = `<div class="sh-bg" data-shx></div><div class="sh-box" role="dialog" aria-label="Compartir insignia"><h3>Compartir «${esc(b.t)}»</h3>
+    <div class="sh-opts"><button class="sh-opt" data-fmt="story"><span class="sh-prev story"><img src="${medalSrc(b)}" alt=""></span><b>Historia</b><small>9:16 · Instagram, WhatsApp</small></button>
+    <button class="sh-opt" data-fmt="post"><span class="sh-prev post"><img src="${medalSrc(b)}" alt=""></span><b>Post</b><small>1:1 · feed y chats</small></button></div>
+    <button class="mini-btn" data-shx>Cancelar</button></div>`;
+  sh.hidden = false;
+  sh.onclick = (e) => { if (e.target.closest("[data-shx]")) { sh.hidden = true; return; } const o = e.target.closest("[data-fmt]"); if (o) { sh.hidden = true; shareBadge(id, o.dataset.fmt); } };
+}
 $("#setPhotoBtn")?.addEventListener("click", () => $("#setPhoto").click());
 $("#setPhoto")?.addEventListener("change", (e) => {
   const f = e.target.files[0]; if (!f) return;
@@ -784,7 +815,7 @@ async function sha256(s) { const b = new TextEncoder().encode(s.trim().toLowerCa
 function renderFriends() {
   if (page !== "miplan" || !user || !$("#friendsList")) return;
   const ids = Object.keys(cal?.friends || {});
-  $("#friendsList").innerHTML = ids.length ? ids.map((fid) => { const p = pub[fid] || {}; const bs = (p.badges || []).slice(0, 6); return `<div class="friend">${avatarHtml(p, p.name)}<div><b>${esc(p.name || cal.friends[fid]?.name || "amigo/a")}</b><small class="muted">nivel ${p.level || 1} · ${(p.xp || 0).toLocaleString("es-AR")} XP · racha ${p.streak || 0}</small><div class="f-badges">${bs.map((id) => { const b = BADGES.find((x) => x.id === id); return b ? `<span class="f-medal" title="${esc(b.t)} · ${esc(b.d)}">${medalSvg(b, true, 34)}</span>` : ""; }).join("")}${(p.badges || []).length > 6 ? `<span class="chip">+${p.badges.length - 6}</span>` : ""}</div></div><button class="mini-btn" data-unfriend="${fid}" title="Quitar">${ic("x")}</button></div>`; }).join("")
+  $("#friendsList").innerHTML = ids.length ? ids.map((fid) => { const p = pub[fid] || {}; const bs = (p.badges || []).slice(0, 6); return `<div class="friend">${avatarHtml(p, p.name)}<div><b>${esc(p.name || cal.friends[fid]?.name || "amigo/a")}</b><small class="muted">nivel ${p.level || 1} · ${(p.xp || 0).toLocaleString("es-AR")} XP · racha ${p.streak || 0}</small><div class="f-badges">${bs.map((id) => { const b = BADGES.find((x) => x.id === id); return b ? `<span class="f-medal" title="${esc(b.t)} · ${esc(b.d)}">${medalSvg(b, true, 34)}</span>` : ""; }).join("")}${(p.badges || []).length > 6 ? `<span class="chip">+${p.badges.length - 6}</span>` : ""}</div></div><button class="mini-btn prop-btn" data-propose="${fid}">${ic("recetas")} Proponer un plato</button><button class="mini-btn" data-unfriend="${fid}" title="Quitar">${ic("x")}</button></div>`; }).join("")
     : `<p class="muted small">Todavía no tenés amigos agregados.</p>`;
 }
 $("#friendForm")?.addEventListener("submit", async (e) => {
@@ -797,7 +828,7 @@ $("#friendForm")?.addEventListener("submit", async (e) => {
     $("#friendEmail").value = ""; toast(`${hit[1].name || "Amigo/a"} agregado/a.`); setTimeout(checkBadges, 800); syncPublic();
   } catch (ex) { err.textContent = errMsg(ex); err.hidden = false; }
 });
-$("#friendsList")?.addEventListener("click", async (e) => { const b = e.target.closest("[data-unfriend]"); if (b && confirm("¿Quitar de tus amigos?")) { await update(ref(db, `calendars/${user.uid}/friends`), { [b.dataset.unfriend]: null }).catch((ex) => toast(errMsg(ex))); syncPublic(); } });
+$("#friendsList")?.addEventListener("click", async (e) => { const pb = e.target.closest("[data-propose]"); if (pb) { openPropose(pb.dataset.propose); return; } const b = e.target.closest("[data-unfriend]"); if (b && confirm("¿Quitar de tus amigos?")) { await update(ref(db, `calendars/${user.uid}/friends`), { [b.dataset.unfriend]: null }).catch((ex) => toast(errMsg(ex))); syncPublic(); } });
 $("#ladderSeg")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; ladderMode = b.dataset.l; $$("#ladderSeg button").forEach((x) => x.classList.toggle("on", x === b)); renderRank(); });
 
 // ---- perfil público (lo que ven los demás) ----
@@ -808,10 +839,89 @@ function syncPublic() {
     try {
       if (!myEmailHash) myEmailHash = await sha256(user.email);
       const x = myXP(); const badges = earnedBadges();
-      await set(ref(db, `public/${user.uid}`), { name: myName(), photo: cal?.profile?.photo || null, level: x.level, xp: x.xp, streak: x.st.streak, best: x.st.best, days: x.st.days, badges, emailHash: myEmailHash, updatedAt: new Date().toISOString() });
+      await set(ref(db, `public/${user.uid}`), { name: myName(), photo: cal?.profile?.photo || null, level: x.level, xp: x.xp, streak: x.st.streak, best: x.st.best, days: x.st.days, badges, emailHash: myEmailHash, week: { start: mondayOf(todayISO), done: weekDone(cal?.done, mondayOf(todayISO)) }, updatedAt: new Date().toISOString() });
       await update(ref(db, `ladder/${user.uid}`), { name: myName(), level: x.level, xp: x.xp, points: x.st.points, streak: x.st.streak, best: x.st.best, days: x.st.days, weeks: x.st.weeks, updatedAt: new Date().toISOString() });
     } catch (e) { /* reglas sin desplegar */ }
   }, 800);
 }
 // al entrar: publicar el perfil (así los amigos te encuentran) y recordar el XP actual para las animaciones
 onAuthStateChanged(auth, (u) => { if (u) setTimeout(() => { if (cal) { lastXP = null; syncPublic(); checkBadges(); } }, 2500); });
+
+
+// =====================================================================
+// SOCIAL · desafío de la semana, resumen semanal, proponer platos
+// =====================================================================
+const slotName = (sl) => ({ desayuno: "desayuno", almuerzo: "almuerzo", cena: "cena" }[sl] || sl);
+const fechaLarga = (d) => `${DOW[(new Date(d + "T12:00:00").getDay() + 6) % 7].toLowerCase()} ${label(d)}`;
+function renderReto() {
+  const box = $("#retoCard"); if (!box || !user || !cal) return;
+  const mon = mondayOf(todayISO), end = addDays(mon, 6);
+  const me = { name: myName(), photo: cal?.profile?.photo, n: weekDone(cal?.done, mon), me: true };
+  const fr = Object.keys(cal?.friends || {}).map((fid) => { const p = pub[fid] || {}; return { name: p.name || cal.friends[fid]?.name || "amigo/a", photo: p.photo, n: p.week?.start === mon ? p.week.done || 0 : 0 }; });
+  const rows = [me, ...fr].sort((a, b) => b.n - a.n || (b.me ? 1 : 0) - (a.me ? 1 : 0));
+  const left = Math.round((new Date(end + "T12:00:00") - new Date(todayISO + "T12:00:00")) / 864e5) + 1;
+  const all = fr.length && rows.every((r) => r.n >= 5);
+  box.innerHTML = `<div class="reto-head"><div><p class="kicker">Desafío de la semana</p><h3>5 días cumplidos entre el ${label(mon)} y el ${label(end)}</h3>
+      <p class="muted small">Quien llega a 5 suma <b>+100 XP</b> (y la semana perfecta, 7 de 7, otros +200). ${left === 1 ? "Queda hoy." : `Quedan ${left} días.`}${fr.length ? "" : " Agregá amigos más abajo para hacerlo en equipo."}</p></div>
+      ${all ? `<span class="chip hot">${ic("trophy")} ¡Mesa completa!</span>` : ""}</div>
+    <div class="reto-rows">${rows.map((r) => `<div class="reto-row${r.me ? " me" : ""}${r.n >= 5 ? " ok" : ""}">${avatarHtml(r, r.name)}<b>${esc(r.me ? "Vos" : r.name)}</b><div class="reto-bar" aria-label="${r.n} de 5">${[0, 1, 2, 3, 4].map((i) => `<i class="${i < r.n ? "on" : ""}"></i>`).join("")}</div><span class="reto-n">${r.n >= 5 ? ic("check") + " logrado" : r.n + "/5"}</span></div>`).join("")}</div>`;
+}
+function renderRecap() {
+  const box = $("#recapCard"); if (!box || !user || !cal) return;
+  const mon = mondayOf(todayISO), prevMon = addDays(mon, -7), prevSun = addDays(mon, -1), prev2Sun = addDays(mon, -8);
+  const xNow = myXP(), xA = myXP(prevSun).xp, xB = myXP(prev2Sun).xp;
+  const vasos = (m) => Array.from({ length: 7 }, (_, i) => Math.min(3, cal?.agua?.[addDays(m, i)] || 0)).reduce((a, b) => a + b, 0);
+  const cur = { dias: weekDone(cal?.done, mon), xp: Math.max(0, xNow.xp - xA), agua: vasos(mon) };
+  const prev = { dias: weekDone(cal?.done, prevMon), xp: Math.max(0, xA - xB), agua: vasos(prevMon) };
+  const rows = Object.entries(ladder).sort((a, b) => (b[1].points || 0) - (a[1].points || 0)); const pos = rows.findIndex(([uid]) => uid === user.uid) + 1;
+  const cmp = (a, b) => (a > b ? `<em class="up">▲ ${(a - b).toLocaleString("es-AR")}</em>` : a < b ? `<em class="down">▼ ${(b - a).toLocaleString("es-AR")}</em>` : `<em class="eq">igual</em>`);
+  const dayN = Math.min(7, Math.round((new Date(todayISO + "T12:00:00") - new Date(mon + "T12:00:00")) / 864e5) + 1);
+  const tile = (icn, t, v, c, sub) => `<div class="rc-tile">${ic(icn)}<small>${t}</small><b>${v}</b><span>${c} <i>${sub}</i></span></div>`;
+  const falta = 5 - cur.dias;
+  const msg = cur.dias >= 7 ? "Semana perfecta: 7 de 7. Nada que agregar." : cur.dias >= 5 ? "Desafío de la semana logrado. Si completás los 7 días, suma la semana perfecta." : falta > 8 - dayN ? `Esta semana ya no da para el desafío: apuntá a la que viene.` : `Te ${falta === 1 ? "falta 1 día" : `faltan ${falta} días`} para el desafío de la semana (+100 XP).`;
+  box.innerHTML = `<div class="recap-head"><div><p class="kicker">Tu semana</p><h3>${label(mon)} → ${label(addDays(mon, 6))}</h3><p class="muted small">Vas por el día ${dayN} de 7. Se compara con la semana pasada (${label(prevMon)} → ${label(prevSun)}).</p></div></div>
+    <div class="recap-grid">
+      ${tile("check", "Días cumplidos", `${cur.dias}<small>/7</small>`, cmp(cur.dias, prev.dias), `antes: ${prev.dias}`)}
+      ${tile("bolt", "XP ganada", `+${cur.xp.toLocaleString("es-AR")}`, cmp(cur.xp, prev.xp), `antes: +${prev.xp.toLocaleString("es-AR")}`)}
+      ${tile("droplet", "Vasos de agua", `${cur.agua}<small>/21</small>`, cmp(cur.agua, prev.agua), `antes: ${prev.agua}`)}
+      ${tile("trophy", "Puesto en la ladder", pos ? `#${pos}` : "—", "", pos ? `de ${rows.length} · racha ${xNow.st.streak}` : "marcá un día para entrar")}
+    </div><p class="recap-msg">${ic("bulb")} ${msg}</p>`;
+}
+function openPropose(fid) {
+  const name = pub[fid]?.name || cal?.friends?.[fid]?.name || "tu amigo/a";
+  pickCtx = { propose: fid, name, date: addDays(todayISO, 1), slot: "cena" };
+  $("#pickerTitle").textContent = `Proponerle un plato a ${name}`;
+  $("#propRow").hidden = false; $("#propDate").value = pickCtx.date; $("#propDate").min = todayISO; $("#propSlot").value = "cena"; $("#pickerClear").hidden = true;
+  $("#pickerSearch").value = ""; fillPicker(""); $("#picker").hidden = false; document.body.style.overflow = "hidden";
+}
+$("#propSlot")?.addEventListener("change", (e) => { if (pickCtx) { pickCtx.slot = e.target.value; fillPicker($("#pickerSearch").value); } });
+const denied = (ex) => /permission|denied/i.test(String(ex?.code || ex?.message || ex));
+async function sendProposal(rec) {
+  const c = pickCtx; const date = $("#propDate").value || c.date, slot = $("#propSlot").value || c.slot;
+  try {
+    await push(ref(db, `inbox/${c.propose}`), { type: "prop", from: user.uid, fromName: myName(), rec, date, slot, at: new Date().toISOString() });
+    closePicker(); toast(`Propuesta enviada a ${c.name}: ${R[rec]?.name || "plato"} para la ${slot === "cena" ? "cena" : slotName(slot)} del ${fechaLarga(date)}.`);
+  } catch (ex) { toast(denied(ex) ? "No se pudo enviar: esa persona tiene que estar en tus amigos (y la base tiene que tener las reglas nuevas publicadas)." : errMsg(ex)); }
+}
+function renderInbox() {
+  const box = $("#inboxBox"); if (!box || !user) return;
+  const items = Object.entries(inbox || {}).sort((a, b) => (b[1].at || "").localeCompare(a[1].at || ""));
+  box.hidden = !items.length; if (!items.length) { box.innerHTML = ""; return; }
+  const props = items.filter(([, x]) => x.type !== "resp").length;
+  box.innerHTML = `<h3>${ic("mail")} ${props ? (props === 1 ? "Te propusieron un plato" : `Te propusieron ${props} platos`) : "Respuestas a tus propuestas"}</h3>` + items.map(([k, x]) => {
+    const r = R[x.rec]; const cuando = `${x.slot === "cena" ? "la cena" : "el " + slotName(x.slot)} del ${fechaLarga(x.date)}`;
+    if (x.type === "resp") return `<div class="inb resp">${ic(x.ok ? "check" : "x")}<span><b>${esc(x.fromName || "Tu amigo/a")}</b> ${x.ok ? "aceptó" : "no aceptó"} tu propuesta: ${esc(r?.name || "un plato")} para ${cuando}.</span><button class="mini-btn" data-inb-ok="${k}">Entendido</button></div>`;
+    return `<div class="inb">${r ? `<img src="${r.img}"${srcs(r)} alt="" loading="lazy">` : ""}<span><b>${esc(x.fromName || "Un amigo/a")}</b> te propone <b>${esc(r?.name || "un plato")}</b> para ${cuando}.</span>
+      <div class="inb-act"><button class="btn small-btn" data-inb-yes="${k}">Aceptar</button><button class="mini-btn" data-inb-no="${k}">No, gracias</button>${r ? `<button class="mini-btn" data-rec="${x.rec}">Ver receta</button>` : ""}</div></div>`;
+  }).join("");
+}
+$("#inboxBox")?.addEventListener("click", async (e) => {
+  const y = e.target.closest("[data-inb-yes]"), n = e.target.closest("[data-inb-no]"), ok = e.target.closest("[data-inb-ok]");
+  const k = y?.dataset.inbYes || n?.dataset.inbNo || ok?.dataset.inbOk; if (!k || !inbox[k]) return; const x = inbox[k];
+  try {
+    if (y) { await update(ref(db, `calendars/${user.uid}/days/${x.date}`), { [x.slot]: x.rec }); touched(`Listo: ${R[x.rec]?.name || "el plato"} quedó en tu calendario (${fechaLarga(x.date)}).`); }
+    if (y || n) push(ref(db, `inbox/${x.from}`), { type: "resp", from: user.uid, fromName: myName(), rec: x.rec, date: x.date, slot: x.slot, ok: !!y, at: new Date().toISOString() }).catch(() => {});
+    await remove(ref(db, `inbox/${user.uid}/${k}`));
+    if (n) toast("Propuesta rechazada.");
+  } catch (ex) { toast(errMsg(ex)); }
+});

@@ -4,6 +4,14 @@
   <h1>18 recetas, <mark>cinco categorías</mark></h1>
   <p class="lead">Cantidades para una persona, con productos que se consiguen en cualquier súper de Buenos Aires. Tocá una tarjeta para ver ingredientes, pasos y video. El costo por porción se calcula con los precios actuales del supermercado más barato.</p>
 </section>
+<section class="card heladera" id="heladera">
+  <div class="hel-head"><span class="hel-ico"><svg class="ic"><use href="#i-fridge"/></svg></span><div><p class="kicker">¿Qué hay en tu heladera?</p><h2>Cociná con lo que tenés</h2>
+  <p class="muted small">Sumá lo que te quedó y te mostramos las recetas que más lo aprovechan, con lo que te falta comprar.</p></div></div>
+  <form class="hel-form" id="helForm"><input id="helQ" list="helList" placeholder="Ej.: zapallito, huevos, arroz" autocomplete="off" aria-label="Ingrediente que tenés"><button class="btn small-btn" type="submit">Agregar</button><datalist id="helList"></datalist></form>
+  <div class="hel-chips" id="helChips"></div>
+  <div class="hel-quick" id="helQuick"></div>
+  <div id="helRes"></div>
+</section>
 <nav class="chips" id="catNav"></nav>
 <div id="recSections"></div>
 </main>
