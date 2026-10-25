@@ -225,7 +225,7 @@ function aggregateShopping(days) {
   days.forEach((d) => SLOTS.forEach((s) => { const r = R[d?.[s]]; if (!r) return; r.ing.forEach((i) => { if (i.c === "pantry") return; const k = `${i.c}|${i.n}|${i.u}`; agg.set(k, (agg.get(k) || 0) + i.q * (+d.x || 1) * (window.HOG?.() || 1)); }); }));
   days.forEach((d) => { if (d?.colacion) { [["alm|frutos secos (mix)|g", 30], ["verd|fruta de estación (manzana, naranja, banana)|u", 1]].forEach(([k, q]) => agg.set(k, (agg.get(k) || 0) + q)); } });
   const CATS = { verd: "Verdulería", carne: "Carnicería y pescadería", lact: "Lácteos y huevos", alm: "Almacén", pan: "Panadería" };
-  const fmtq = (q, u) => { q = Math.round(q * 10) / 10; if ((u === "g" || u === "ml") && q >= 1000) return `${q / 1000} ${u === "g" ? "kg" : "L"}`; return u === "u" ? `${q} u` : `${q} ${u}`; };
+  const fmtq = (q, u) => { const dec = (x) => String(x).replace(".", ","); if (u === "u") return `${Math.max(1, Math.ceil(q - 0.05))} u`; q = Math.round(q * 10) / 10; if ((u === "g" || u === "ml") && q >= 1000) return `${dec(Math.round(q / 100) / 10)} ${u === "g" ? "kg" : "L"}`; return `${dec(q)} ${u}`; };
   const out = Object.keys(CATS).map((c) => ({ c, cat: CATS[c], items: [] }));
   [...agg.entries()].forEach(([k, q]) => { const [c, n, u] = k.split("|"); (out.find((x) => x.cat === CATS[c]) || out[3]).items.push({ n, q: fmtq(q, u), raw: Math.round(q * 10) / 10, u }); });
   out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
@@ -245,7 +245,7 @@ function renderMiPlan() {
   const weeks = weekList(); if (!myWeek || !weeks.some((w) => w.start === myWeek)) myWeek = weeks[0].start;
   $("#myWeekTabs").innerHTML = weeks.map((w) => `<button data-w="${w.start}" class="${w.start === myWeek ? "on" : ""}">${esc(w.label)}</button>`).join("");
   const days = Array.from({ length: 7 }, (_, i) => addDays(myWeek, i));
-  $("#myCal").innerHTML = days.map((dt, i) => { const d = cal?.days?.[dt] || {}; return `<article class="my-day${dt === todayISO ? " today" : ""}"><h4>${DOW[i]} <span>${label(dt)}</span>${d.x && Math.abs(d.x - 1) > 0.05 ? ` <em class="porc-x" title="Porciones del día (las ajustó «Tu mes a medida»)">×${(+d.x).toLocaleString("es-AR")}</em>` : ""}${d.colacion ? ` <em class="porc-x snack" title="Colación: frutos secos (30 g) y una fruta">+ colación</em>` : ""}</h4>
+  $("#myCal").innerHTML = days.map((dt, i) => { const d = cal?.days?.[dt] || {}; return `<article class="my-day${dt === todayISO ? " is-today" : ""}"><h4>${DOW[i]} <span>${label(dt)}</span>${d.x && Math.abs(d.x - 1) > 0.05 ? ` <em class="porc-x" title="Porciones del día (las ajustó «Tu mes a medida»)">×${(+d.x).toLocaleString("es-AR")}</em>` : ""}${d.colacion ? ` <em class="porc-x snack" title="Colación: frutos secos (30 g) y una fruta">+ colación</em>` : ""}</h4>
       ${SLOTS.map((s) => { const r = R[d[s]]; return `<button class="slot${r ? "" : " empty"}" data-date="${dt}" data-slot="${s}">${ic(s)}${r ? `<img src="${r.img}"${srcs(r)} alt=""><span>${esc(r.name)}${r.custom ? " <small>· receta de " + esc(r.ownerName) + "</small>" : ""}</span>` : `<span>+ elegir ${s}</span>`}</button>`; }).join("")}
       ${dt <= todayISO ? (cal?.libre?.[dt] ? `<span class="done-btn libre">${ic("star")} Día libre (combo a salvo)</span>` : `<span class="done-row"><button class="done-btn${cal?.done?.[dt] ? " on" : ""}" data-done="${dt}">${ic("check")} ${cal?.done?.[dt] ? "Día cumplido" : "Marcar cumplido"}</button>${!cal?.done?.[dt] && fichasDisponibles() > 0 ? `<button class="done-btn ficha" data-libre="${dt}" title="Usar una ficha: el día no suma puntos pero no corta la racha">${ic("coin")} Día libre</button>` : ""}</span>`) : `<span class="done-btn future">${ic("clock")} todavía no</span>`}
     </article>`; }).join("");
@@ -1383,7 +1383,7 @@ function renderMedida() {
   const first = days[0].date, lead = (new Date(first + "T12:00:00").getDay() + 6) % 7;
   const MES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   const title = st.per === "next" ? `${MES[+first.slice(5, 7) - 1]} ${first.slice(0, 4)}` : `${label(first)} → ${label(days[days.length - 1].date)}`;
-  const cell = (d) => { const dd = new Date(d.date + "T12:00:00"); return `<div class="md-day${d.date === todayISO ? " today" : ""}${dd.getDay() % 6 === 0 ? " wk" : ""}">
+  const cell = (d) => { const dd = new Date(d.date + "T12:00:00"); return `<div class="md-day${d.date === todayISO ? " is-today" : ""}${dd.getDay() % 6 === 0 ? " wk" : ""}">
       <div class="md-d"><b>${dd.getDate()}</b><small>${["dom", "lun", "mar", "mié", "jue", "vie", "sáb"][dd.getDay()]}</small>${fmtX(d.x) ? `<em title="Porciones de ese día">${fmtX(d.x)}</em>` : ""}</div>
       ${SLOTS.map((s) => { const r = R[d[s]]; return r ? `<button class="md-m" data-rec="${r.id}" title="${esc(r.name)}">${ic(s)}<span>${esc(r.name)}</span></button>` : ""; }).join("")}
       ${d.snack ? `<span class="md-snack" title="Un puñado de frutos secos (30 g) y una fruta">${ic("leaf")}<span>+ colación</span></span>` : ""}

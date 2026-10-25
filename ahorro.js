@@ -14,7 +14,7 @@
   const money = () => window.renderMoney && window.renderMoney();
   const toast = (m) => (window.toastG ? window.toastG(m) : alert(m));
   const ls = { get: (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
-  const pesos = (n) => "$ " + Math.round(n).toLocaleString("es-AR");
+  const pesos = (n) => "$ " + Math.round(n).toLocaleString("es-AR");
 
   // =====================================================================
   // Qué buscar en el súper para cada ingrediente de las recetas (y alternativas si no aparece)
@@ -157,7 +157,7 @@
       if (!avail.length) { $("#cmpRes").innerHTML = `<p class="muted">No encontramos precios para esta lista${only ? " en las cadenas que tenés cerca" : ""}. Probá de nuevo en un rato.</p>`; return; }
       const P = [1, 2, 3].filter((k) => k <= avail.length).map((k) => plan(last.res, avail, k));
       const singles = avail.map((s) => { const p = plan(last.res, [s], 1); return { s, total: p.total, found: p.assign.length }; }).sort((a, b) => a.total - b.total);
-      // recomendación: sumar un súper solo si ahorra al menos 8 % y $ 3.000
+      // recomendación: sumar un súper solo si ahorra al menos 8 % y $ 3.000
       let rec = 0; for (let k = 1; k < P.length; k++) { const save = P[rec].total - P[k].total; if (save >= Math.max(3000, P[rec].total * 0.08)) rec = k; }
       if (showK === null) showK = rec;
       const sel = P[showK]; const base = P[0].total; const n = last.res.length;

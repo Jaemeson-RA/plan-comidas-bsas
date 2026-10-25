@@ -45,7 +45,7 @@
   }
   function fmt(ars) {
     const v = ars / rate();
-    if (state.cur === "ARS") return "$ " + Math.round(v).toLocaleString("es-AR");
+    if (state.cur === "ARS") return "$ " + Math.round(v).toLocaleString("es-AR");
     const sym = state.cur === "USD" ? "US$ " : "€ ";
     const dec = v < 20 ? 2 : v < 200 ? 1 : 0;
     return sym + v.toLocaleString("es-AR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
@@ -58,8 +58,8 @@
   }
   function renderMoney() {
     $$("[data-ars]").forEach((el) => { if (el.dataset.count !== undefined && !el.dataset.counted) countUp(el); else el.textContent = fmt(+el.dataset.ars); });
-    if ($("#rUsd")) $("#rUsd").textContent = "$ " + (state.mode === "blue" ? rates.usd_blue : rates.usd_oficial).toLocaleString("es-AR");
-    if ($("#rEur")) $("#rEur").textContent = "$ " + (state.mode === "blue" ? rates.eur_blue : rates.eur_oficial).toLocaleString("es-AR");
+    if ($("#rUsd")) $("#rUsd").textContent = "$ " + (state.mode === "blue" ? rates.usd_blue : rates.usd_oficial).toLocaleString("es-AR");
+    if ($("#rEur")) $("#rEur").textContent = "$ " + (state.mode === "blue" ? rates.eur_blue : rates.eur_oficial).toLocaleString("es-AR");
   }
   $("#curSeg")?.addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
@@ -220,7 +220,8 @@
   function openRecipe(id) {
     const r = R[id]; if (!r) return;
     const n = r.nut || {};
-    const nutLine = n.kcal ? `<div class="nut-line">${ic("flame")} <b>${Math.round(n.kcal)} kcal</b> · ${n.prot} g proteínas · ${n.carb} g carbohidratos${n.sug != null ? ` (${n.sug} g azúcar)` : ""} · ${n.fat} g grasas${n.sat != null ? ` (${n.sat} g sat.)` : ""} · ${n.fib} g fibra · ${n.sal} g sal <small>por porción${n.source === "ingredientes" ? ", calculado con los ingredientes" : ", estimado"}</small></div>` : "";
+    const dc = (x) => String(x).replace(".", ",");  // decimales con coma
+    const nutLine = n.kcal ? `<div class="nut-line">${ic("flame")} <b>${Math.round(n.kcal)} kcal</b> · ${dc(n.prot)} g proteínas · ${dc(n.carb)} g carbohidratos${n.sug != null ? ` (${dc(n.sug)} g azúcar)` : ""} · ${dc(n.fat)} g grasas${n.sat != null ? ` (${dc(n.sat)} g sat.)` : ""} · ${dc(n.fib)} g fibra · ${dc(n.sal)} g sal <small>por porción${n.source === "ingredientes" ? ", calculado con los ingredientes" : ", estimado"}</small></div>` : "";
     $("#modalContent").innerHTML = `
       <img class="rm-img" src="${r.img}"${r.srcset ? ` srcset="${r.srcset}" sizes="(max-width:720px) 100vw, 640px"` : ""} alt="${esc(r.name)}">
       <div class="rm">
@@ -427,7 +428,7 @@
     const N = HOG();
     week.days.forEach((d) => ["desayuno", "almuerzo", "cena"].forEach((s) => (R[d[s]]?.ing || []).forEach((i) => { if (i.c === "pantry") return; const k = `${i.c}|${i.n}|${i.u}`; agg.set(k, (agg.get(k) || 0) + i.q * N); })));
     [["lact|yogur natural (pote)|u", 2], ["verd|fruta de estación (manzana, naranja, banana)|u", 4], ["pan|pan integral (rodajas)|u", 4]].forEach(([k, q]) => agg.set(k, (agg.get(k) || 0) + q * N));  // meriendas
-    const fmtq = (q, u) => { q = Math.round(q * 10) / 10; if ((u === "g" || u === "ml") && q >= 1000) return `${q / 1000} ${u === "g" ? "kg" : "L"}`; return u === "u" ? `${q} u` : `${q} ${u}`; };
+    const fmtq = (q, u) => { const dec = (x) => String(x).replace(".", ","); if (u === "u") return `${Math.max(1, Math.ceil(q - 0.05))} u`; q = Math.round(q * 10) / 10; if ((u === "g" || u === "ml") && q >= 1000) return `${dec(Math.round(q / 100) / 10)} ${u === "g" ? "kg" : "L"}`; return `${dec(q)} ${u}`; };
     const out = Object.keys(SHOP_CATS).map((c) => ({ c, cat: SHOP_CATS[c], items: [] }));
     [...agg.entries()].forEach(([k, q]) => { const [c, n, u] = k.split("|"); (out.find((x) => x.c === c) || out[3]).items.push({ n, q: fmtq(q, u), raw: q, u }); });
     out.forEach((c) => c.items.sort((a, b) => a.n.localeCompare(b.n)));
@@ -451,12 +452,18 @@
   }
 
   // ---------- plan: calendario + semana ----------
+  // la pestaña elegida queda centrada en su fila (sin mover la página); si la fila todavía está oculta, espera a que aparezca
+  const centerOn = (c) => {
+    const go = () => { const on = c.querySelector(".on"); if (!on || c.scrollWidth <= c.clientWidth) return; const a = c.getBoundingClientRect(), r = on.getBoundingClientRect(); c.scrollLeft += r.left - a.left - (a.width - r.width) / 2; };
+    if (c.clientWidth) requestAnimationFrame(go); else if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (c.clientWidth) { ro.disconnect(); go(); } }); ro.observe(c); }
+  };
   function renderWeekTabs(containerId, onPick) {
     const c = $(containerId); if (!c) return; c.innerHTML = "";
     D.weeks.forEach((w) => {
       const b = document.createElement("button"); const t = weekTag(w); b.innerHTML = (t ? `<small>${t} · </small>` : "") + esc(w.label); b.classList.toggle("on", w.start === state.week);
-      b.addEventListener("click", () => { state.week = w.start; vt(onPick); b.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }); c.appendChild(b);
+      b.addEventListener("click", () => { state.week = w.start; vt(onPick); }); c.appendChild(b);
     });
+    centerOn(c);
   }
   function renderCalendar() {
     const c = $("#calendar"); if (!c) return;
@@ -465,7 +472,7 @@
       html += `<div class="cal-week-label"><span>${weekTag(w) ? weekTag(w) + " · " : ""}${esc(w.label)}</span><a class="mini-btn" href="compras.html#semana-${w.start}">${ic("compras")} Lista de compras de esta semana</a></div>`;
       html += `<div class="cal-row">` + w.days.map((d) => {
         const n = +d.date.slice(8), m = +d.date.slice(5, 7); const out = d.date.slice(0, 7) !== state.ym;
-        return `<div class="cal-cell${d.date === todayISO ? " today" : ""}${d.dow === "Sábado" || d.dow === "Domingo" ? " wk" : ""}${out ? " out" : ""}">
+        return `<div class="cal-cell${d.date === todayISO ? " is-today" : ""}${d.dow === "Sábado" || d.dow === "Domingo" ? " wk" : ""}${out ? " out" : ""}">
           <div class="cal-date"><b>${n}</b>${n === 1 || out ? `<span>${MESES[m - 1].slice(0, 3)}</span>` : ""}${d.date === todayISO ? `<span class="hoy">hoy</span>` : ""}</div>
           ${["desayuno", "almuerzo", "cena"].map((k) => `<button class="cm" data-rec="${d[k]}" title="${esc(R[d[k]].name)}"><i>${ICON[k]}</i><img src="${R[d[k]].img}"${srcs(R[d[k]])} alt="" loading="lazy"><span>${esc(R[d[k]].name)}</span></button>`).join("")}
           <div class="cm mer"><i>${ICON.merienda}</i><span>${esc(d.merienda)}</span></div>
@@ -478,10 +485,10 @@
     renderWeekTabs("#weekTabs", renderWeek);
     const w = D.weeks.find((x) => x.start === state.week) || D.weeks[0];
     $("#planTable tbody").innerHTML = w.days.map((d) => `
-      <tr><td class="day${d.date === todayISO ? " today" : ""}">${d.dow}<span>${lab(d.date)}</span></td>
+      <tr><td class="day${d.date === todayISO ? " is-today" : ""}">${d.dow}<span>${lab(d.date)}</span></td>
         <td><div class="td-sw">${mealBtn(d.desayuno)}${swapBtn(d.date, "desayuno", d.sw?.desayuno)}</div></td><td><div class="td-sw">${mealBtn(d.almuerzo)}${swapBtn(d.date, "almuerzo", d.sw?.almuerzo)}</div></td><td class="muted">${esc(d.merienda)}</td><td><div class="td-sw">${mealBtn(d.cena)}${swapBtn(d.date, "cena", d.sw?.cena)}</div></td></tr>`).join("");
     $("#planCards").innerHTML = w.days.map((d) => `
-      <article class="dc${d.date === todayISO ? " today" : ""}"><h4>${esc(d.label)}${d.date === todayISO ? ' <span class="hoy">hoy</span>' : ""}</h4>
+      <article class="dc${d.date === todayISO ? " is-today" : ""}"><h4>${esc(d.label)}${d.date === todayISO ? ' <span class="hoy">hoy</span>' : ""}</h4>
         <div class="row"><small>Desayuno</small>${mealBtn(d.desayuno)}${swapBtn(d.date, "desayuno", d.sw?.desayuno)}</div><div class="row"><small>Almuerzo</small>${mealBtn(d.almuerzo)}${swapBtn(d.date, "almuerzo", d.sw?.almuerzo)}</div>
         <div class="row"><small>Merienda</small><span class="muted">${esc(d.merienda)}</span></div><div class="row"><small>Cena</small>${mealBtn(d.cena)}${swapBtn(d.date, "cena", d.sw?.cena)}</div></article>`).join("");
     renderBatch();
@@ -498,7 +505,7 @@
     // el sábado y el domingo se adelanta la semana que viene (no la que termina)
     const dowNow = new Date().getDay(); if (w.start === mondayOf(todayISO) && (dowNow === 0 || dowNow === 6)) w = weekAt(addDays(w.start, 7));
     const nzb =(s) => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const lab2 = (iso) => { const d = new Date(iso + "T12:00"); return ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"][d.getDay()]; };
+    const lab2 = (iso) => { const d = new Date(iso + "T12:00"); return ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"][d.getDay()]; };
     const uses = new Map();
     w.days.slice(0, 5).forEach((d) => ["almuerzo", "cena"].forEach((s) => { const r = R[d[s]]; if (!r) return; const u = uses.get(r.id) || { r, days: [] }; u.days.push(d.date); uses.set(r.id, u); }));
     const good = (r) => r.porciones >= 2 || r.tags.some((t) => /batch|rinde|olla|horno/.test(nzb(t))) || r.tiempo >= 35;
@@ -511,7 +518,7 @@
     // bases que aparecen en dos o más platos de lunes a viernes
     const weekR = [...uses.values()].map((u) => u.r);
     const bases = BASES.map((B) => { const m = new Map(); weekR.forEach((r) => r.ing.forEach((i) => { const n = nzb(i.n); const hit = n.match(B.re); if (hit) { const key = i.n.replace(/\s*\(.*?\)/g, "").split(/[,/]/)[0].trim(); const e = m.get(key) || new Set(); e.add(r.name); m.set(key, e); } })); return { B, items: [...m.entries()].filter(([, s]) => s.size >= 2) }; }).filter((x) => x.items.length);
-    const dayList = (u) => u.days.map(lab2).join(" y ");
+    const dayList = (u) => { const l = u.days.map(lab2); return l.length > 1 ? l.slice(0, -1).join(", el ") + " y el " + l[l.length - 1] : l[0]; };
     const steps = [
       oven.length && `Prendé el horno a 200 °C y meté ${oven.map((u) => `<b>${esc(u.r.name.toLowerCase())}</b>`).join(" y ")}${bases.some((b) => b.B.k === "horno") ? ", y en otra placa las verduras para asar" : ""}.`,
       stove.length && `En las hornallas: ${stove.map((u) => `<b>${esc(u.r.name.toLowerCase())}</b>`).join(", ")}. Si tenés dos, van a la vez.`,
@@ -860,9 +867,9 @@
     $("#verdict").innerHTML = `<h3>En pocas palabras</h3>
       <ul class="v-list">
         <li><b>Compra grande del mes:</b> ${esc(cheapest)}. Es la más barata del changuito y, como el envío se paga una sola vez, conviene concentrar ahí lo pesado (aceite, arroz, yerba, carne para congelar).</li>
-        <li><b>Reposición de la semana:</b> Día (mínimo bajo, $ 12.000, y marca propia barata) o el Disco / Coto que tengas a dos cuadras, para frescos y verdura.</li>
-        <li><b>Si pedís seguido en Jumbo o Disco:</b> Jumbo Prime ($ 5.500/mes) se paga solo con dos pedidos de más de $ 60.000, porque cada envío sale $ 3.999.</li>
-        <li><b>Coto</b> pide $ 30.000 de mínimo para enviar: sirve para la compra grande, no para reponer. ${esc(second)} es la segunda opción en precio.</li>
+        <li><b>Reposición de la semana:</b> Día (mínimo bajo, $ 12.000, y marca propia barata) o el Disco / Coto que tengas a dos cuadras, para frescos y verdura.</li>
+        <li><b>Si pedís seguido en Jumbo o Disco:</b> Jumbo Prime ($ 5.500/mes) se paga solo con dos pedidos de más de $ 60.000, porque cada envío sale $ 3.999.</li>
+        <li><b>Coto</b> pide $ 30.000 de mínimo para enviar: sirve para la compra grande, no para reponer. ${esc(second)} es la segunda opción en precio.</li>
         <li><b>Frescos:</b> verdura, fruta y carne salen más baratos y mejores en la verdulería y la carnicería del barrio que en cualquier súper online.</li>
       </ul>`;
     const pos = Object.fromEntries(totals.map((x, i) => [x.s, i + 1]));
@@ -1222,7 +1229,7 @@
     const tb = $(".tabbar a[data-nav='inicio']"); if (tb) tb.lastChild.textContent = "Hoy";
     // todas las funciones, por categoría
     const CATS_APP = [
-      ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "bolt", "Mes a medida"], ["temporada.html", "leaf", "Estación"], ["plan.html#batch", "pot", "Batch del domingo"]]],
+      ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "settings", "Mes a medida"], ["temporada.html", "leaf", "Estación"], ["plan.html#batch", "pot", "Batch del domingo"]]],
       ["Comprar", "c2", [["compras.html", "compras", "Lista"], ["compras.html#comparar", "coin", "Comparar precios"], ["promos.html", "tag", "Promos"], ["supermercados.html#mapa", "pin", "Sucursales"]]],
       ["Vos", "c3", [["mi-plan.html", "users", "Mi plan"], ["mi-plan.html#prog", "chart", "Progreso"], ["nutricion.html", "flame", "Nutrición"], ["mi-plan.html#rank", "trophy", "Ranking"], ["pasos.html", "bolt", "Pasos"], ["mi-plan.html#rank", "target", "Desafíos"]]],
     ];

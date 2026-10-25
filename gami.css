@@ -188,7 +188,7 @@ span.av.ini{display:inline-flex;align-items:center;justify-content:center;backgr
 .md-head div { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; padding: 0 .3rem .2rem; }
 .md-day { background: var(--crema); border: 1.5px solid var(--border); border-radius: 10px; padding: .45rem .45rem .4rem; display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
 .md-day.wk { background: #FDF8EA; }
-.md-day.today { outline: 2.5px solid var(--verde); outline-offset: 1px; }
+.md-day.is-today { outline: 2.5px solid var(--verde); outline-offset: 1px; }
 .md-d { display: flex; align-items: baseline; gap: .3rem; }
 .md-d b { font-family: var(--display); font-weight: 400; font-size: 1.1rem; }
 .md-d small { color: var(--muted); font-size: .7rem; }

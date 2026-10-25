@@ -140,7 +140,7 @@ main{max-width:1180px;margin:0 auto;padding:0 1rem}
 .cal-row{display:grid;grid-template-columns:repeat(7,1fr);gap:.55rem}
 .cal-cell{background:var(--crema);border:1.5px solid var(--border);border-radius:8px;padding:.6rem .55rem .5rem;min-height:196px;display:flex;flex-direction:column;gap:.3rem;box-shadow:var(--hard-sm)}
 .cal-cell.wk{background:#FDF8EA}
-.cal-cell.today{outline:2.5px solid var(--verde);outline-offset:2px}
+.cal-cell.is-today{outline:2.5px solid var(--verde);outline-offset:2px}
 .cal-date{display:flex;align-items:baseline;gap:.35rem;margin-bottom:.15rem}
 .cal-date b{font-family:var(--display);font-weight:900;font-size:1.25rem}
 .cal-date span{font-size:.72rem;color:var(--muted);font-weight:700}
@@ -168,7 +168,7 @@ table.plan td{padding:.7rem .9rem;border-bottom:1px dashed var(--line);vertical-
 table.plan tr:last-child td{border-bottom:0}
 table.plan td.day{font-family:var(--display);font-weight:700;white-space:nowrap}
 table.plan td.day span{display:block;font-family:var(--body);font-weight:500;color:var(--muted);font-size:.8rem}
-table.plan td.today{background:var(--rojo2)}
+table.plan td.is-today{background:var(--rojo2)}
 .meal{background:none;border:0;padding:0;font:inherit;font-weight:700;text-align:left;color:var(--ink);cursor:pointer;display:flex;gap:.55rem;align-items:center}
 .meal img{width:46px;height:46px;border-radius:7px;object-fit:cover;flex:none;border:1.5px solid var(--border)}
 .meal:hover span{color:var(--rojo);text-decoration:underline}
@@ -360,7 +360,7 @@ table.basket tfoot td.best{background:var(--ok);color:#fff}
   .plan-wrap{display:none}
   .plan-cards{display:grid;gap:.8rem}
   .dc{background:var(--crema);border:1.5px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;box-shadow:var(--hard-sm)}
-  .dc.today{outline:3px solid var(--rojo);outline-offset:2px}
+  .dc.is-today{outline:3px solid var(--rojo);outline-offset:2px}
   .dc h4{font-family:var(--display);font-size:1.1rem;margin-bottom:.5rem}
   .dc .row{display:grid;grid-template-columns:78px 1fr;gap:.6rem;padding:.4rem 0;border-top:1px dashed var(--line);align-items:center}
   .dc .row small{color:var(--rojo);text-transform:uppercase;letter-spacing:.06em;font-size:.68rem;font-weight:700}
@@ -403,7 +403,7 @@ table.basket tfoot td.best{background:var(--ok);color:#fff}
 /* ---------- mi calendario ---------- */
 .my-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.55rem}
 .my-day{background:var(--crema);border:1.5px solid var(--border);border-radius:8px;padding:.6rem .55rem;box-shadow:var(--hard-sm);display:flex;flex-direction:column;gap:.35rem}
-.my-day.today{outline:2.5px solid var(--verde);outline-offset:2px}
+.my-day.is-today{outline:2.5px solid var(--verde);outline-offset:2px}
 .my-day h4{font-family:var(--display);font-size:1rem}
 .my-day h4 span{font-family:var(--body);font-weight:700;color:var(--muted);font-size:.78rem}
 .slot{display:flex;align-items:center;gap:.4rem;width:100%;text-align:left;border:1.5px dashed var(--line);background:var(--paper);border-radius:6px;padding:.35rem .45rem;font:inherit;font-size:.8rem;font-weight:700;color:var(--ink);cursor:pointer;line-height:1.2}
@@ -1337,3 +1337,19 @@ main{min-height:100vh}
 .sh-live{display:inline-flex;align-items:center;gap:.25rem;font-size:.76rem;font-weight:700;color:var(--verde);background:var(--ok2);border-radius:999px;padding:.2rem .55rem}
 .sh-live .ic{width:14px;height:14px}
 .shop-src .seg .ic{width:14px;height:14px;vertical-align:-2px}
+
+/* ===== auditoría móvil (360 px) ===== */
+button,input,select,textarea{font-family:inherit}
+.shop-cat{background-image:none}
+.shop-cat .q{padding:0}
+.shop-cat .sh-row + .sh-row{border-top:1px solid rgba(23,48,43,.07)}
+.ap-quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+.map > p{text-align:center;padding:1rem 1.2rem;margin:0}
+.hero-cta .btn{white-space:nowrap;padding-left:1rem;padding-right:1rem}
+.mes summary{align-items:center}.mes summary h2{margin:0}
+.nt-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.25rem;flex:1 1 100%}.nt-days .pchip{min-width:0;width:100%;padding:.4rem 0;font-size:.8rem;justify-content:center;text-align:center}
+.mes summary::after{content:"+";margin-left:auto;align-self:center;font-weight:700;font-size:1.3rem;line-height:1;color:var(--rojo)}
+.mes[open] summary::after{content:"–"}
+@media (max-width:520px){
+  .dc .row small{flex:none;width:64px;font-size:.64rem;letter-spacing:.04em}
+}
