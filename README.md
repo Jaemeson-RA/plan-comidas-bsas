@@ -1,6 +1,6 @@
 # Menuario · plan de comidas en Buenos Aires
 
-Sitio estático (HTML + CSS + JS, sin build ni dependencias en el navegador) con un plan de comidas continuo para Buenos Aires: 30 recetas con foto y video que rotan solas semana a semana, lista de compras, comparativa de supermercados con envío a domicilio (ARS / USD / EUR) y alertas de precio, productos de estación, análisis nutricional y un espacio con cuenta para armar el propio calendario, crear recetas, cargar ingredientes (escaneando el código de barras), competir con amigos y proponerles platos. Se instala como app en el teléfono y funciona sin conexión.
+Sitio estático (HTML + CSS + JS, sin build ni dependencias en el navegador) con un plan de comidas continuo para Buenos Aires (Menuario): 54 recetas con foto y video que rotan solas semana a semana, lista de compras, comparativa de supermercados con envío a domicilio (ARS / USD / EUR) y alertas de precio, productos de estación, análisis nutricional y un espacio con cuenta para armar el propio calendario, crear recetas, cargar ingredientes (escaneando el código de barras), competir con amigos y proponerles platos. Se instala como app en el teléfono y funciona sin conexión.
 
 **Sitio:** https://jaemeson-ra.github.io/plan-comidas-bsas/
 

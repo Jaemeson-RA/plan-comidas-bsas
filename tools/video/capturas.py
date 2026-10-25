@@ -13,11 +13,11 @@ SCENES = [
  ("inicio", "Tu plan", "Un mes de comidas, listo", "Desayunos, almuerzos y cenas para vos, con productos de acá."),
  ("calendario", "Calendario", "Todo el mes de un vistazo", "Tocá un plato y se abre la receta."),
  ("receta", "Recetas", "Con foto, video y costo", "Ingredientes para una porción, pasos claros y precio."),
- ("compras", "Compras", "La lista se arma sola", "Por góndola. Copiala a las notas del teléfono."),
+ ("compras", "Compras", "La lista se arma sola", "Por góndola, sin lo que ya tenés en la heladera."),
  ("super", "Supermercados", "Siete cadenas comparadas", "Precios en pesos, dólares o euros, y dónde conviene pedir."),
  ("editor", "Tus recetas", "Creá las tuyas", "La nutrición se calcula sola con cada ingrediente."),
  ("ingrediente", "Ingredientes", "Escaneá el paquete", "Valores reales por 100 g, disponibles para todos."),
- ("ranking", "Ranking", "Días cumplidos y combos", "Marcá tu día, sumá puntos y subí en la ladder."),
+ ("ranking", "Ranking", "Días cumplidos y combos", "Marcá tu día, sumá XP y competí con tus amigos."),
  ("nutricion", "Nutrición", "Tu semana, con nota", "Calorías, proteínas, fibra y sal frente a lo recomendado."),
  ("temporada", "Estación", "Lo que está en temporada", "Frutas y verduras de cada mes, y los platos que las usan."),
 ]
@@ -56,11 +56,11 @@ def capture(page, mobile):
     tag = "m" if mobile else "d"; out = {}
     def shot(name): page.wait_for_timeout(600); f = os.path.join(OUT, f"raw_{tag}_{name}.png"); page.screenshot(path=f, full_page=False); out[name] = f; print("shot", tag, name)
     page.goto(BASE + "/index.html"); page.wait_for_selector(".today .meal img"); page.wait_for_timeout(1200); shot("inicio")
-    page.goto(BASE + "/plan.html"); page.wait_for_selector(".cal-cell, .dc")
+    page.goto(BASE + "/plan.html"); page.wait_for_selector(".cal-cell:not(.out), .dc", state="attached"); page.wait_for_timeout(500)
     if mobile: page.click("#viewSeg [data-view=week]"); page.wait_for_timeout(500); page.evaluate("window.scrollTo(0, document.querySelector('#weekTabs').getBoundingClientRect().top + scrollY - 70)")
     else: page.click("#viewSeg [data-view=cal]"); page.wait_for_timeout(500); page.evaluate("window.scrollTo(0, document.querySelector('#calendar').getBoundingClientRect().top + scrollY - 80)")
     page.wait_for_timeout(600); shot("calendario")
-    page.click(".cm[data-rec], .dc .meal"); page.wait_for_selector("#modal:not([hidden]) .rm h2"); page.wait_for_timeout(900)
+    page.locator(".cm[data-rec]:visible, .dc .meal:visible").first.click(); page.wait_for_selector("#modal:not([hidden]) .rm h2"); page.wait_for_timeout(900)
     if mobile: page.evaluate("document.querySelector('.modal-box').scrollTop = 0")
     shot("receta"); page.keyboard.press("Escape")
     page.goto(BASE + "/compras.html#semana-2"); page.wait_for_selector("#shopGrid input")
@@ -78,15 +78,17 @@ def capture(page, mobile):
     page.goto(BASE + "/temporada.html"); page.wait_for_selector(".mes[open]"); page.evaluate("window.scrollTo(0, document.querySelector('.mes[open]').getBoundingClientRect().top + scrollY - 70)"); page.wait_for_timeout(1000); shot("temporada")
     return out
 
+# lo que aparece al hacer scroll (.reveal) se muestra de entrada: la captura no hace scroll
+SHOW = "document.addEventListener('DOMContentLoaded',()=>{const s=document.createElement('style');s.textContent='.reveal{opacity:1!important;transform:none!important;visibility:visible!important}#toast,.sug-fab,.upd-bar{display:none!important}';document.head.appendChild(s)});"
 with sync_playwright() as p:
     browser = p.chromium.launch(channel="msedge", headless=True)
     # 1) capturas crudas
     dctx = browser.new_context(viewport={"width": 1440, "height": 900}, device_scale_factor=1.5, locale="es-AR", reduced_motion="reduce")
-    dctx.add_init_script("try{localStorage.setItem('cur','ARS');localStorage.setItem('planView_d','cal')}catch(e){}")
-    draw = capture(dctx.new_page(), False); dctx.close()
+    dctx.add_init_script("try{localStorage.setItem('cur','ARS');localStorage.setItem('planView_d','cal');localStorage.setItem('tutorialHecho','1');localStorage.setItem('tutorialLuego','2099-01-01')}catch(e){}")
+    dctx.add_init_script(SHOW); draw = capture(dctx.new_page(), False); dctx.close()
     mctx = browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="es-AR", reduced_motion="reduce")
-    mctx.add_init_script("try{localStorage.setItem('cur','ARS');localStorage.setItem('planView_m','week')}catch(e){}")
-    mraw = capture(mctx.new_page(), True); mctx.close()
+    mctx.add_init_script("try{localStorage.setItem('cur','ARS');localStorage.setItem('planView_m','week');localStorage.setItem('tutorialHecho','1');localStorage.setItem('tutorialLuego','2099-01-01')}catch(e){}")
+    mctx.add_init_script(SHOW); mraw = capture(mctx.new_page(), True); mctx.close()
     # 2) cuadros compuestos (16:9 con captura de escritorio, 9:16 con captura móvil)
     for o, (w, h), raw in (("h", (1920, 1080), draw), ("v", (1080, 1920), mraw)):
         ctx = browser.new_context(viewport={"width": w, "height": h}, device_scale_factor=1)

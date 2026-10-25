@@ -56,7 +56,7 @@ body::after{display:none}
 .sticker.r{background:var(--rojo);color:#fff;transform:rotate(4deg)}
 </style></head><body>
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-<symbol id="i-pot" viewBox="0 0 24 24"><path d="M4.5 10.5h15"/><path d="M5.5 10.5v5a3.5 3.5 0 0 0 3.5 3.5h6a3.5 3.5 0 0 0 3.5-3.5v-5"/><path d="M2.5 12.5h3M18.5 12.5h3"/><path d="M12 7.5v3M10 7.5h4"/><path d="M9.5 4.5c0-1 1-1 1-2M13.5 4.5c0-1 1-1 1-2"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /> <path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" /> <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /> <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /> <path d="M16 3.13a4 4 0 0 1 0 7.75" /> <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></symbol><symbol id="i-snow" viewBox="0 0 24 24"><path d="M10 4l2 1l2 -1" /> <path d="M12 2v6.5l3 1.72" /> <path d="M17.928 6.268l.134 2.232l1.866 1.232" /> <path d="M20.66 7l-5.629 3.25l.01 3.458" /> <path d="M19.928 14.268l-1.866 1.232l-.134 2.232" /> <path d="M20.66 17l-5.629 -3.25l-2.99 1.738" /> <path d="M14 20l-2 -1l-2 1" /> <path d="M12 22v-6.5l-3 -1.72" /> <path d="M6.072 17.732l-.134 -2.232l-1.866 -1.232" /> <path d="M3.34 17l5.629 -3.25l-.01 -3.458" /> <path d="M4.072 9.732l1.866 -1.232l.134 -2.232" /> <path d="M3.34 7l5.629 3.25l2.99 -1.738" /></symbol><symbol id="i-phone" viewBox="0 0 24 24"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14" /> <path d="M11 4h2" /> <path d="M12 17v.01" /></symbol><symbol id="i-pot" viewBox="0 0 24 24"><path d="M4.5 10.5h15"/><path d="M5.5 10.5v5a3.5 3.5 0 0 0 3.5 3.5h6a3.5 3.5 0 0 0 3.5-3.5v-5"/><path d="M2.5 12.5h3M18.5 12.5h3"/><path d="M12 7.5v3M10 7.5h4"/><path d="M9.5 4.5c0-1 1-1 1-2M13.5 4.5c0-1 1-1 1-2"/></symbol>
 <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12"/><path d="M16 3l0 4"/><path d="M8 3l0 4"/><path d="M4 11l16 0"/><path d="M8 15h2v2h-2l0 -2"/></symbol>
 <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/></symbol>
 <symbol id="i-tag" viewBox="0 0 24 24"><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3z"/></symbol>
@@ -65,7 +65,7 @@ body::after{display:none}
 <div id="root"></div>
 <script>
 const $ = (s) => document.querySelector(s);
-const logo = `<div class="logo"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Plan de comidas <em>Buenos Aires</em></div>`;
+const logo = `<div class="logo"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span><span>Menu<em>ario</em></span></div>`;
 // window.render(spec): spec = {kind:'scene'|'intro'|'cuenta'|'cierre', o:'h'|'v', step, title, sub, img}
 window.render = (s) => {
   const o = s.o;
@@ -75,17 +75,17 @@ window.render = (s) => {
     $('#root').innerHTML = `<div class="frame ${o}"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div>
       <div class="cap"><div class="step"><i>${s.step}</i>${s.kicker || ''}</div><h2>${s.title}</h2><p>${s.sub}</p></div>${shot}${o === 'h' ? logo : ''}</div>`;
   } else if (s.kind === 'intro') {
-    $('#root').innerHTML = `<div class="frame title ${o}"><div class="blob a"></div><div class="blob b"></div><div class="big"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Plan de comidas <em>Buenos Aires</em></div>
+    $('#root').innerHTML = `<div class="frame title ${o}"><div class="blob a"></div><div class="blob b"></div><div class="big"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span><span>Menu<em>ario</em></span></div>
       <h1>Armá tu plan de comidas y compará <mark>precios</mark> en tu zona.</h1><p>Recetas fáciles, lista de compras automática y análisis nutricional. Gratis.</p>
-      <div class="sticker" style="left:${o === 'h' ? 150 : 90}px;top:${o === 'h' ? 150 : 250}px">30 recetas</div><div class="sticker r" style="right:${o === 'h' ? 150 : 90}px;bottom:${o === 'h' ? 150 : 300}px">con video</div></div>`;
+      <div class="sticker" style="left:${o === 'h' ? 150 : 90}px;top:${o === 'h' ? 150 : 250}px">54 recetas</div><div class="sticker r" style="right:${o === 'h' ? 150 : 90}px;bottom:${o === 'h' ? 150 : 300}px">con video</div></div>`;
   } else if (s.kind === 'cuenta') {
     $('#root').innerHTML = `<div class="frame title ${o}"><div class="blob a"></div><div class="blob c"></div><div class="big"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Con tu <em>cuenta</em></div>
       <h1>Armá tu semana, creá recetas, sumá ingredientes.</h1>
-      <div class="feats"><span><svg class="ic"><use href="#i-calendar"/></svg>Tu calendario</span><span><svg class="ic"><use href="#i-tag"/></svg>Escaneá el paquete</span><span><svg class="ic"><use href="#i-bolt"/></svg>Ranking</span><span><svg class="ic"><use href="#i-flame"/></svg>Nutrición</span><span><svg class="ic"><use href="#i-compras"/></svg>Lista lista</span></div></div>`;
+      <div class="feats"><span><svg class="ic"><use href="#i-calendar"/></svg>Tu calendario</span><span><svg class="ic"><use href="#i-target"/></svg>Desafíos del mes</span><span><svg class="ic"><use href="#i-bolt"/></svg>Pasos</span><span><svg class="ic"><use href="#i-snow"/></svg>Tu heladera</span><span><svg class="ic"><use href="#i-users"/></svg>Lista compartida</span><span><svg class="ic"><use href="#i-flame"/></svg>Nutrición</span></div></div>`;
   } else {
-    $('#root').innerHTML = `<div class="frame title ${o}"><div class="blob a"></div><div class="blob b"></div><div class="big"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span>Plan de comidas <em>Buenos Aires</em></div>
+    $('#root').innerHTML = `<div class="frame title ${o}"><div class="blob a"></div><div class="blob b"></div><div class="big"><span class="brand-ico"><svg class="ic"><use href="#i-pot"/></svg></span><span>Menu<em>ario</em></span></div>
       <h1>Entrá y armá tu <mark>semana</mark>.</h1><span class="url">jaemeson-ra.github.io/plan-comidas-bsas</span>
-      <div class="sticker" style="left:${o === 'h' ? 160 : 90}px;bottom:${o === 'h' ? 150 : 260}px">gratis</div><div class="sticker r" style="right:${o === 'h' ? 160 : 90}px;top:${o === 'h' ? 150 : 240}px">productos de estación</div></div>`;
+      <div class="sticker" style="left:${o === 'h' ? 160 : 90}px;bottom:${o === 'h' ? 150 : 260}px">gratis</div><div class="sticker r" style="right:${o === 'h' ? 160 : 90}px;top:${o === 'h' ? 150 : 240}px">también como app</div></div>`;
   }
   return new Promise((res) => { const imgs = [...document.images]; if (!imgs.length) return setTimeout(res, 150); let n = 0; imgs.forEach((im) => { const done = () => { if (++n >= imgs.length) setTimeout(res, 150); }; im.complete ? done() : (im.onload = done, im.onerror = done); }); });
 };

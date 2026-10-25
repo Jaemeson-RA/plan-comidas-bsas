@@ -443,7 +443,7 @@
   // ---------- inicio ----------
   if ((page === "inicio" || page === "404") && $("#today")) {
     const vid = $("#introVideo");
-    if (vid && !document.documentElement.classList.contains("is-app")) { const v = window.matchMedia("(max-width: 720px)").matches; vid.poster = v ? "media/intro-vertical-poster.jpg" : "media/intro-poster.jpg"; if (v) { vid.querySelector("source").src = "media/intro-vertical.mp4"; vid.classList.add("vertical"); vid.load(); } }
+    if (vid && !document.documentElement.classList.contains("is-app")) { const v = window.matchMedia("(max-width: 720px)").matches; vid.poster = v ? "media/intro-vertical-poster.jpg?v=3" : "media/intro-poster.jpg?v=3"; if (v) { vid.querySelector("source").src = "media/intro-vertical.mp4?v=3"; vid.classList.add("vertical"); vid.load(); } }
     const d = houseDay(todayISO);
     $("#today").innerHTML = `<div class="t-head"><p class="kicker">Menú de hoy</p><h3>${"Hoy, " + longDate(d.date)}</h3></div>
       ${["desayuno", "almuerzo", "cena"].map((m) => `<div class="t-row"><small>${ICON[m]} ${m}</small>${mealBtn(d[m])}</div>`).join("")}
