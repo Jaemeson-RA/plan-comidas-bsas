@@ -1277,7 +1277,8 @@ main{min-height:100vh}
 .ap-use{background:#FFF6EE;border:1.5px solid #F5D2B8;border-radius:18px;padding:.8rem .85rem}
 .ap-use-items{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.6rem}
 .ap-use-recs{display:grid;gap:.4rem}
-@media (max-width:520px){.fr-d{flex:1 1 130px}.fr-d input{width:100%}}
+.fr-form #frQ{flex:1 1 220px}
+@media (max-width:520px){.fr-form #frQ{flex-basis:100%}.fr-d{flex:1 1 130px}.fr-d input{width:100%}}
 
 /* ===== primeros pasos ===== */
 .tuto .sh-box{max-height:92vh;overflow:auto}
