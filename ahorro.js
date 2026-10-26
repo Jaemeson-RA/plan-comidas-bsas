@@ -8,8 +8,10 @@
   const ic = (n) => `<svg class="ic"><use href="#i-${n}"/></svg>`;
   const page = $("main")?.dataset.page;
   const API = String(CFG.priceApi || "").replace(/\/$/, "");
-  const STORES = ["Carrefour", "Día", "Coto", "Jumbo", "Disco", "Vea", "ChangoMás"];
-  const COLOR = { Carrefour: "#2A6FB8", "Día": "#D93A2B", Coto: "#8E2C48", Jumbo: "#3E9B4F", Disco: "#E58A1F", Vea: "#C99A1E", "ChangoMás": "#5B6BBF" };
+  const STORES = ["Carrefour", "Día", "Coto", "Jumbo", "Disco", "Vea", "ChangoMás"];  // nacionales (las que tienen promos y changuito)
+  const COLOR = { Carrefour: "#2A6FB8", "Día": "#D93A2B", Coto: "#8E2C48", Jumbo: "#3E9B4F", Disco: "#E58A1F", Vea: "#C99A1E", "ChangoMás": "#5B6BBF", Toledo: "#14808A", Cordiez: "#C2410C" };
+  const zs = () => (window.ZONA ? window.ZONA.chains() : STORES);  // cadenas de la zona elegida (app.js)
+  const zq = () => (window.ZONA ? window.ZONA.q() : "");
   const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const money = () => window.renderMoney && window.renderMoney();
   const toast = (m) => (window.toastG ? window.toastG(m) : alert(m));
@@ -80,9 +82,9 @@
     return { cost: packs * c.price, how: packs > 1 ? `${packs} × ${pesos(c.price)}` : "1 envase" };
   }
   async function searchQuery(q) {  // filas filtradas por cadena (las 6 más baratas), con caché de 6 h en el dispositivo
-    const key = "px6:" + norm(q), hit = ls.get(key, null);
+    const key = "px7:" + (window.ZONA?.get() || "") + ":" + norm(q), hit = ls.get(key, null);
     if (hit && Date.now() - hit.at < 6 * 36e5) return hit.rows;
-    const j = await (await fetch(`${API}/search?q=${encodeURIComponent(q)}`)).json();
+    const j = await (await fetch(`${API}/search?q=${encodeURIComponent(q)}${zq()}`)).json();
     const rows = {}; matchRows(q, j.results || []).forEach((r) => { (rows[r.store] = rows[r.store] || []).push({ name: r.name, price: r.price, unit: r.unit, mult: r.mult, link: r.link, img: r.img || null }); });
     Object.keys(rows).forEach((s) => { rows[s] = rows[s].sort((a, b) => a.price - b.price).slice(0, 6); });
     ls.set(key, { at: Date.now(), rows }); return rows;
@@ -131,6 +133,8 @@
     }
     function renderHead() {
       const m = mine(), nr = near();
+      let zb = $("#cmpZona"); if (!zb && $("#cmpNearWrap")) { zb = document.createElement("div"); zb.id = "cmpZona"; $("#cmpNearWrap").before(zb); }
+      if (zb && window.zonaBar) zb.innerHTML = window.zonaBar("Comparamos los súper de");
       // el origen se elige arriba de la lista (Plan de la casa / Mi calendario): acá solo se muestra
       const L = currentList(); $("#cmpSrc").innerHTML = `<span class="pill-src">${window.__shop?.src === "mi" ? "Mi calendario" : "Plan de la casa"}</span>`;
       $("#cmpWhat").textContent = `${L.items.length} productos · ${L.label.replace(/^(Lista de compras|Mi calendario) · /, "")}${fGetCount() ? " · sin lo que hay en la heladera" : ""}`;
@@ -139,6 +143,7 @@
     $("#cmpSrc").addEventListener("click", (e) => { const b = e.target.closest("[data-src]"); if (!b) return; src = b.dataset.src; last = null; $("#cmpRes").innerHTML = ""; renderHead(); });
     $("#cmpNearWrap").addEventListener("change", (e) => { if (e.target.id === "cmpNear") { ls.set("cmpNearOn", e.target.checked); if (last) render(); } });
     window.addEventListener("shoplist", () => { last = null; $("#cmpRes").innerHTML = ""; renderHead(); });
+    window.addEventListener("zona", () => { last = null; showK = null; $("#cmpRes").innerHTML = ""; renderHead(); });
     renderHead();
     $("#cmpGo").addEventListener("click", async () => {
       if (!API) { toast("Falta configurar el proxy de precios."); return; }
@@ -153,7 +158,7 @@
     });
     function render() {
       const nr = near(), only = nr && $("#cmpNear")?.checked ? nr.chains : null;
-      const avail = STORES.filter((s) => last.res.some((r) => r.per[s]) && (!only || only.includes(s)));
+      const avail = zs().filter((s) => last.res.some((r) => r.per[s]) && (!only || only.includes(s)));
       if (!avail.length) { $("#cmpRes").innerHTML = `<p class="muted">No encontramos precios para esta lista${only ? " en las cadenas que tenés cerca" : ""}. Probá de nuevo en un rato.</p>`; return; }
       const P = [1, 2, 3].filter((k) => k <= avail.length).map((k) => plan(last.res, avail, k));
       const singles = avail.map((s) => { const p = plan(last.res, [s], 1); return { s, total: p.total, found: p.assign.length }; }).sort((a, b) => a.total - b.total);
@@ -202,13 +207,19 @@
         <span class="pstore">${esc(x.store)}</span><b class="pname">${esc(x.name)}</b>
         ${x.promo ? `<span class="ptag">${esc(promoTxt(x.promo))}${x.caja ? " · en la caja" : ""}</span>` : ""}
         <span class="pprice"><b data-ars="${x.price}"></b>${x.list ? `<s data-ars="${x.list}"></s>` : ""}${x.unit === "kg" ? (x.mult && Math.abs(x.mult - 1) > 0.01 ? `<small>${Math.round(x.mult * 1000)} g</small>` : "<small>/kg</small>") : ""}</span></a>`;
+    const zItems = () => { const z = zs(); return data.items.filter((x) => z.includes(x.store)); };  // solo las cadenas de la zona
+    const pStores = () => zs().filter((s) => STORES.includes(s));
     function filtered() {
       const qn = norm(st.q).split(/\s+/).filter((w) => w.length > 1);
-      return data.items.filter((x) => st.stores.has(x.store) && (st.rubro === "todos" || x.rubro === st.rubro) && (!qn.length || qn.every((w) => norm(x.name).includes(w))))
+      return zItems().filter((x) => st.stores.has(x.store) && (st.rubro === "todos" || x.rubro === st.rubro) && (!qn.length || qn.every((w) => norm(x.name).includes(w))))
         .sort((a, b) => (st.sort === "price" ? a.price - b.price : (b.pct || 0) - (a.pct || 0)));
     }
     function render() {
-      $("#prStores").innerHTML = STORES.map((s) => `<button class="pchip${st.stores.has(s) ? " on" : ""}" data-store="${esc(s)}" style="--c:${COLOR[s]}">${esc(s)} <small>${data.byStore?.[s] || 0}</small></button>`).join("");
+      let zb = $("#prZona"); if (!zb) { zb = document.createElement("div"); zb.id = "prZona"; $("#prStores").before(zb); }
+      const reg = zs().filter((s) => !STORES.includes(s));
+      zb.innerHTML = (window.zonaBar ? window.zonaBar("Promos de") : "") + (reg.length ? `<p class="muted small">${esc(reg.join(" y "))}: sus ofertas están en su sitio; acá mostramos las de las cadenas nacionales que hay en tu zona.</p>` : "");
+      if (![...st.stores].some((s) => pStores().includes(s))) pStores().forEach((s) => st.stores.add(s));
+      $("#prStores").innerHTML = pStores().map((s) => `<button class="pchip${st.stores.has(s) ? " on" : ""}" data-store="${esc(s)}" style="--c:${COLOR[s]}">${esc(s)} <small>${data.byStore?.[s] || 0}</small></button>`).join("");
       $("#prRubros").innerHTML = `<button class="pchip${st.rubro === "todos" ? " on" : ""}" data-rubro="todos">Todo</button>` + Object.entries(RUBRO).map(([k, v]) => `<button class="pchip${st.rubro === k ? " on" : ""}" data-rubro="${k}">${v}</button>`).join("");
       const list = filtered();
       $("#prMeta").textContent = `${list.length.toLocaleString("es-AR")} promos · actualizadas ${new Date(data.at).toLocaleString("es-AR", { weekday: "long", hour: "2-digit", minute: "2-digit" })} · se renuevan cada 3 horas. Confirmá el precio final en el sitio de la cadena.`;
@@ -220,7 +231,7 @@
       const week = P.weekAt(P.mondayOf(new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10)));
       const items = P.shoppingFor(week).flatMap((c) => c.items.map((i) => Object.assign({ c: c.c }, i))); const hits = [];
       items.forEach((it) => {
-        const q = queriesFor(it.n)[0]; let m = matchRows(q, data.items);
+        const q = queriesFor(it.n)[0]; let m = matchRows(q, zItems());
         if (it.c === "verd") { const w = m.filter((x) => x.unit === "kg" || WEIGHTED.test(norm(x.name))); m = w.length ? w : m.filter((x) => { const s = sizeOf(x.name); return !s || s.d !== "g" || s.q >= 250; }); }  // verdura suelta, no condimentos
         m.sort((a, b) => (b.pct || 0) - (a.pct || 0)); if (m.length) hits.push({ it, x: m[0], n: m.length });
       });
@@ -234,8 +245,9 @@
     $("#prSort").addEventListener("click", (e) => { const b = e.target.closest("[data-s]"); if (!b) return; st.sort = b.dataset.s; $$("#prSort button").forEach((x) => x.classList.toggle("on", x === b)); render(); });
     let tq = null; $("#prQ").addEventListener("input", (e) => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value; st.shown = 48; render(); }, 180); });
     $("#prMore").addEventListener("click", () => { st.shown += 48; render(); });
+    window.addEventListener("zona", () => { if (!data) return; st.stores = new Set(pStores()); st.shown = 48; render(); forPlan(); });
     (async () => {
-      $("#prMeta").textContent = "Cargando las promos de las siete cadenas…";
+      $("#prMeta").textContent = "Cargando las promos de las cadenas…";
       $("#prGrid").innerHTML = Array.from({ length: 12 }, () => `<div class="promo skel-box"><span class="skel" style="height:110px"></span><span class="skel" style="width:40%;height:10px"></span><span class="skel" style="height:13px"></span><span class="skel" style="width:70%;height:13px"></span><span class="skel" style="width:35%;height:16px;margin-top:auto"></span></div>`).join("");
       try { data = await (await fetch(`${API}/promos`)).json(); render(); forPlan(); }
       catch (e) { $("#prMeta").textContent = navigator.onLine ? "No se pudieron cargar las promos. Probá de nuevo en un rato." : "Sin conexión: las promos necesitan internet."; }
@@ -247,17 +259,18 @@
   // =====================================================================
   const BRAND = [["Coto", /\bcoto\b/i], ["Carrefour", /carrefour/i], ["Día", /\bd[ií]a\b|supermercados? dia|dia%/i], ["Jumbo", /\bjumbo\b/i], ["Disco", /\bdisco\b/i], ["Vea", /\bvea\b/i], ["ChangoMás", /chango ?m[aá]s|walmart/i]];
   if (page === "supermercados" && $("#mapBox")) {
-    const st = { chains: new Set(STORES), radius: ls.get("mapRadius", 1500), center: null, shops: [], map: null, layer: null, me: null };
+    const st = { chains: new Set(zs()), radius: ls.get("mapRadius", 1500), center: null, shops: [], map: null, layer: null, me: null };
+    const zc = () => window.ZONA?.info()?.c || [-34.6037, -58.3816];  // centro de la zona (o el Obelisco)
     const loadLeaflet = () => window.L ? Promise.resolve() : new Promise((res, rej) => {
       const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; css.integrity = "sha384-c6Rcwz4e4CITMbu/NBmnNS8yN2sC3cUElMEMfP3vqqKFp7GOYaaBBCqmaWBjmkjb"; css.crossOrigin = "anonymous"; document.head.appendChild(css);
       const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"; s.integrity = "sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO"; s.crossOrigin = "anonymous"; s.onload = res; s.onerror = rej; document.head.appendChild(s);
     });
     const km = (a, b) => { const r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r; const h = Math.sin(dLa / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); };
-    function chips() { $("#mapChains").innerHTML = STORES.map((s) => `<button class="pchip${st.chains.has(s) ? " on" : ""}" data-chain="${esc(s)}" style="--c:${COLOR[s]}">${esc(s)}</button>`).join(""); }
+    function chips() { $("#mapChains").innerHTML = zs().map((s) => `<button class="pchip${st.chains.has(s) ? " on" : ""}" data-chain="${esc(s)}" style="--c:${COLOR[s]}">${esc(s)}</button>`).join(""); }
     async function ensureMap() {
       if (st.map) return; await loadLeaflet();
       $("#map").classList.add("on");
-      st.map = L.map("map", { zoomControl: true, scrollWheelZoom: false }).setView([-34.6037, -58.3816], 14);
+      st.map = L.map("map", { zoomControl: true, scrollWheelZoom: false }).setView(zc(), 13);
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(st.map);
       st.layer = L.layerGroup().addTo(st.map);
     }
@@ -274,12 +287,12 @@
         .map((x) => ({ chain, name: x.name || chain, lat: +x.lat, lon: +x.lon, addr: String(x.display_name || "").split(",").slice(1, 3).join(",").trim(), hours: "" }));
     }
     async function search(c, label) {
-      st.center = c; await ensureMap(); $("#mapStatus").textContent = "Buscando sucursales…";
+      st.center = c; st.label = label; await ensureMap(); $("#mapStatus").textContent = "Buscando sucursales…";
       const all = [];
       const [stat, live] = await Promise.all([loadStatic(), API ? fetch(`${API}/sucursales?lat=${c[0]}&lon=${c[1]}`, { signal: tmo(12000) }).then((r) => r.json()).then((j) => j.items || []).catch(() => []) : Promise.resolve([])]);
       all.push(...stat.filter((s) => km(c, [s.lat, s.lon]) * 1000 <= st.radius * 1.05), ...live);
-      const covered = new Set(stat.map((s) => s.chain).concat(live.length ? ["Carrefour", "Día", "ChangoMás"] : []));
-      const missing = STORES.filter((s) => !covered.has(s));
+      const covered = new Set(stat.map((s) => s.chain).concat(live.map((s) => s.chain)));
+      const missing = zs().filter((s) => !covered.has(s));
       for (const ch of missing) { try { all.push(...await nominatimChain(ch, c, st.radius)); } catch (e) {} await new Promise((r) => setTimeout(r, 1100)); }
       const shops = [];
       all.forEach((s) => { s.d = km(c, [s.lat, s.lon]); if (s.d * 1000 > st.radius * 1.05) return; if (shops.some((x) => x.chain === s.chain && km([x.lat, x.lon], [s.lat, s.lon]) < 0.08)) return; shops.push(s); });
@@ -305,6 +318,7 @@
       $("#mapList").innerHTML = list.slice(0, 30).map((s) => `<div class="msh" style="--c:${COLOR[s.chain]}"><span class="dot"></span><div><b>${esc(s.name)}</b><small>${esc(s.addr || "")}${s.hours ? " · " + esc(s.hours) : ""}</small></div><span class="d">${s.d < 1 ? Math.round(s.d * 1000) + " m" : s.d.toFixed(1) + " km"}</span><a class="mini-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}&travelmode=walking" target="_blank" rel="noopener">Cómo llegar</a></div>`).join("");
     }
     chips(); $("#mapRadius").value = String(st.radius);
+    window.addEventListener("zona", () => { st.chains = new Set(zs()); chips(); if (st.center) search(st.center, st.label); });
     $("#mapChains").addEventListener("click", (e) => { const b = e.target.closest("[data-chain]"); if (!b) return; const s = b.dataset.chain; if (st.chains.has(s) && st.chains.size > 1) st.chains.delete(s); else st.chains.add(s); chips(); if (st.center) draw(); });
     $("#mapRadius").addEventListener("change", (e) => { st.radius = +e.target.value; ls.set("mapRadius", st.radius); if (st.center) search(st.center); });
     $("#mapLocate").addEventListener("click", () => {
@@ -313,15 +327,60 @@
       navigator.geolocation.getCurrentPosition((p) => search([p.coords.latitude, p.coords.longitude], "tu ubicación"),
         (err) => { $("#mapStatus").textContent = err.code === 1 ? "No diste permiso de ubicación. Escribí tu dirección arriba." : "No pudimos obtener tu ubicación. Escribí tu dirección arriba."; }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 6e4 });
     });
+    const addr = $("#mapAddr"), sug = document.createElement("ul"); sug.id = "mapSug"; sug.className = "addr-sug"; sug.setAttribute("role", "listbox"); sug.hidden = true;
+    addr.setAttribute("role", "combobox"); addr.setAttribute("aria-autocomplete", "list"); addr.setAttribute("aria-controls", "mapSug"); addr.setAttribute("aria-expanded", "false"); addr.autocomplete = "off";
+    $("#mapForm").style.position = "relative"; $("#mapForm").appendChild(sug);
+    let opts = [], act = -1, sugT = null, sugAb = null;
+    const labelOf = (pr) => { const calle = [pr.street || (pr.type === "street" ? pr.name : ""), pr.housenumber].filter(Boolean).join(" ");
+      const main = calle || pr.name || ""; const lugar = [pr.district || pr.locality, pr.city || pr.county, pr.state].filter((x, i, a) => x && x !== main && a.indexOf(x) === i);
+      return { main, sub: lugar.join(", ") }; };
+    const closeSug = () => { sug.hidden = true; act = -1; addr.setAttribute("aria-expanded", "false"); };
+    const drawSug = () => {
+      if (!opts.length) { closeSug(); return; }
+      sug.innerHTML = opts.map((o, i) => `<li role="option" id="ms${i}" data-i="${i}" aria-selected="${i === act}">${ic("pin")}<span><b>${esc(o.main)}</b>${o.sub ? `<small>${esc(o.sub)}</small>` : ""}</span></li>`).join("");
+      sug.hidden = false; addr.setAttribute("aria-expanded", "true"); if (act >= 0) addr.setAttribute("aria-activedescendant", "ms" + act); };
+    const pick = (o) => { addr.value = o.main + (o.sub ? ", " + o.sub : ""); closeSug(); search([o.lat, o.lon], o.main || o.sub); };
+    addr.addEventListener("input", () => {
+      clearTimeout(sugT); const q = addr.value.trim(); if (q.length < 3) { opts = []; closeSug(); return; }
+      sugT = setTimeout(async () => {
+        try {
+          sugAb?.abort(); sugAb = new AbortController(); const c = zc(), sig = sugAb.signal, prov = window.ZONA?.info()?.prov;
+          const dist = (o) => (o.lat - c[0]) ** 2 + ((o.lon - c[1]) * Math.cos(c[0] * Math.PI / 180)) ** 2;
+          const title = (t) => String(t || "").toLowerCase().replace(/(^|[\s.(])([a-záéíóúñü])/g, (m, a, b) => a + b.toUpperCase());
+          // calle y altura: Georef (normalizador de direcciones del Estado, interpola la altura en todo el país); lugares y calles: Photon
+          const geo = /\d/.test(q) ? fetch(`https://apis.datos.gob.ar/georef/api/direcciones?direccion=${encodeURIComponent(q)}${prov ? "&provincia=" + prov : ""}&max=40&aplanar=true&campos=calle.nombre,altura.valor,localidad_censal.nombre,provincia.nombre,ubicacion`, { signal: sig })
+            .then((r) => r.json()).then((j) => (j.direcciones || []).filter((d) => d.ubicacion_lat).map((d) => ({ main: `${title(d.calle_nombre)} ${d.altura_valor || ""}`.trim(), sub: [d.localidad_censal_nombre, d.provincia_nombre].filter(Boolean).join(", "), lat: d.ubicacion_lat, lon: d.ubicacion_lon }))).catch(() => []) : Promise.resolve([]);
+          const pho = fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=7&lat=${c[0]}&lon=${c[1]}&bbox=-73.6,-55.2,-53.5,-21.7`, { signal: sig })
+            .then((r) => r.json()).then((j) => (j.features || []).filter((f) => (f.properties.countrycode || "").toUpperCase() === "AR")
+              .map((f) => ({ ...labelOf(f.properties), lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] })).filter((o) => o.main || o.sub)).catch(() => []);
+          const [g, ph] = await Promise.all([geo, pho]); if (sig.aborted) return;
+          g.sort((a, b) => dist(a) - dist(b));
+          const seen = new Set(); opts = [...g.slice(0, 4), ...ph].filter((o) => { const k = (o.main + o.sub).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 6);
+          act = -1; drawSug();
+        } catch (er) { if (er.name !== "AbortError") { opts = []; closeSug(); } }
+      }, 280);
+    });
+    addr.addEventListener("keydown", (e) => {
+      if (sug.hidden || !opts.length) return;
+      if (e.key === "ArrowDown") { e.preventDefault(); act = (act + 1) % opts.length; drawSug(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); act = (act - 1 + opts.length) % opts.length; drawSug(); }
+      else if (e.key === "Escape") closeSug();
+      else if (e.key === "Enter" && act >= 0) { e.preventDefault(); pick(opts[act]); }
+    });
+    sug.addEventListener("mousedown", (e) => e.preventDefault());  // que el input no pierda el foco antes del clic
+    sug.addEventListener("click", (e) => { const li = e.target.closest("[data-i]"); if (li) pick(opts[+li.dataset.i]); });
+    addr.addEventListener("blur", () => setTimeout(closeSug, 150));
     $("#mapForm").addEventListener("submit", async (e) => {
-      e.preventDefault(); const q = $("#mapAddr").value.trim(); if (q.length < 3) return;
-      $("#mapStatus").textContent = "Buscando la dirección…";
+      e.preventDefault(); const q = addr.value.trim(); if (q.length < 3) return;
+      if (opts.length && !sug.hidden) { pick(opts[Math.max(0, act)]); return; }
+      closeSug(); $("#mapStatus").textContent = "Buscando la dirección…";
       try {
-        const u = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&countrycodes=ar&accept-language=es&viewbox=-58.75,-34.40,-58.20,-34.85&q=${encodeURIComponent(q + (/(caba|buenos aires|capital)/i.test(q) ? "" : ", Buenos Aires"))}`;
+        const c = zc(), z = window.ZONA?.info();
+        const u = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&countrycodes=ar&accept-language=es&viewbox=${c[1] - 1.5},${c[0] + 1.5},${c[1] + 1.5},${c[0] - 1.5}&q=${encodeURIComponent(q + (z && !/,/.test(q) ? ", " + z.name.replace(/ y .*$/, "") : ""))}`;
         const j = await (await fetch(u, { headers: { Accept: "application/json" } })).json();
-        if (!j.length) { $("#mapStatus").textContent = "No encontramos esa dirección. Probá con calle y altura, por ejemplo «Av. Corrientes 1500»."; return; }
+        if (!j.length) { $("#mapStatus").textContent = "No encontramos esa dirección. Probá con calle, altura y ciudad (por ejemplo «Córdoba 1500, Rosario») o elegí una de las sugerencias."; return; }
         const ad = j[0].address || {}; const calle = [ad.road, ad.house_number].filter(Boolean).join(" ");
-        const found = calle ? [calle, ad.suburb || ad.city_district || ad.neighbourhood || ad.city].filter(Boolean).join(", ") : q;  // la dirección que encontró, para poder corregirla
+        const found = calle ? [calle, ad.suburb || ad.city_district || ad.neighbourhood || ad.city || ad.town].filter(Boolean).join(", ") : q;  // la dirección que encontró, para poder corregirla
         search([+j[0].lat, +j[0].lon], found);
       } catch (er) { $("#mapStatus").textContent = "No pudimos buscar la dirección ahora. Probá de nuevo."; }
     });

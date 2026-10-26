@@ -38,7 +38,37 @@ YT = {  # video elegido por receta
  "chiliporotos":"s6NO4wKYn8k",
  "woktofu":"JcXWU7QysIc",
  "empanadaslentejas":"2aowdIomktw",
- "falafel":"W55JW5xTAxs"}
+ "falafel":"W55JW5xTAxs",
+ "risotto":"9Wi6jY6LmHQ",
+ "pastapesto":"_GmvhHHUZAM",
+ "minestrone":"SjDSh7jKkrE",
+ "lasagna":"VuPL4RZ2LOY",
+ "arrabbiata":"RzDQLQL2rXc",
+ "paella":"kVBSO93_Zcs",
+ "gazpacho":"cdQ50R0ZSEk",
+ "ratatouille":"Dpbq9b4bWdI",
+ "quiche":"ICHrXbX-kzI",
+ "crepes":"H_k_QutlKoE",
+ "musaka":"9wA5xHjZtyA",
+ "souvlaki":"_XaxcXzD2hw",
+ "gulash":"xFuzjsbLxWk",
+ "strogonoff":"GPyaY9BzMHg",
+ "bircher":"LmNcAWJqQrc",
+ "shakshuka":"mu3wV0sg1mw",
+ "teriyaki":"mNTVWIeis_o",
+ "oyakodon":"0EbXcYYDuaY",
+ "yakisoba":"hQTGGHT9VB8",
+ "okonomiyaki":"-WPxguSgYWs",
+ "padthai":"ajwDf0q89k4",
+ "arrozfrito":"2axMjM4P0cA",
+ "agridulce":"FT5Q2RFNiDA",
+ "chowmein":"afj8-vLI94g",
+ "dal":"WAGtxmnqel0",
+ "tikka":"DZtHqd-RLiA",
+ "chana":"Fyr2A9fApzk",
+ "bibimbap":"JaBFHCes-AQ",
+ "nasigoreng":"6SZl0S31dBM",
+ "satay":"1FJtwO9hGUY"}
 # valores nutricionales aproximados por porción: kcal, proteínas g, carbohidratos g, grasas g, fibra g, sal g
 NUT = {
  "tostadas":(380,14,40,17,7,1.1),"yogur":(350,14,55,7,6,0.3),"revueltos":(420,24,22,26,3,1.3),"panqueques":(390,14,55,11,6,0.3),
@@ -72,7 +102,37 @@ NUT = {
  "chiliporotos":(598,24,113,7,24,3.1),
  "woktofu":(586,34,75,19,11,2.3),
  "empanadaslentejas":(623,25,104,13,11,2.0),
- "falafel":(559,25,76,21,16,0.9)}
+ "falafel":(559,25,76,21,16,0.9),
+ "risotto":(544,19,75,20,3,2.7),
+ "pastapesto":(632,22,73,29,5,1.8),
+ "minestrone":(566,26,97,10,17,3.1),
+ "lasagna":(830,52,80,35,9,2.4),
+ "arrabbiata":(524,17,91,11,6,2.1),
+ "paella":(731,54,83,19,9,2.0),
+ "gazpacho":(453,17,48,22,10,2.4),
+ "ratatouille":(549,19,86,16,12,2.3),
+ "quiche":(717,35,67,34,4,3.3),
+ "crepes":(554,20,81,17,6,0.4),
+ "musaka":(745,40,42,46,11,1.5),
+ "souvlaki":(600,56,48,20,4,1.8),
+ "gulash":(720,47,60,32,10,1.2),
+ "strogonoff":(820,44,75,38,4,1.3),
+ "bircher":(470,14,85,10,10,0.2),
+ "shakshuka":(490,21,43,25,9,1.9),
+ "teriyaki":(735,51,93,17,4,2.4),
+ "oyakodon":(635,48,78,12,3,2.6),
+ "yakisoba":(765,45,108,18,11,2.8),
+ "okonomiyaki":(695,25,61,39,6,3.0),
+ "padthai":(784,46,83,30,5,2.8),
+ "arrozfrito":(656,25,81,25,6,2.9),
+ "agridulce":(851,40,113,25,5,3.1),
+ "chowmein":(727,44,96,19,9,2.4),
+ "dal":(718,29,126,12,14,1.0),
+ "tikka":(825,49,85,33,8,1.8),
+ "chana":(710,21,114,20,17,2.4),
+ "bibimbap":(799,40,90,32,7,3.0),
+ "nasigoreng":(718,39,88,22,4,2.7),
+ "satay":(818,50,78,34,5,2.8)}
 MERIENDA_NUT = (200,8,28,6,2,0.4)
 
 # ---------- BASE DE INGREDIENTES (por 100 g: kcal, prot, carb, azúcar, grasa, saturada, fibra, sal) ----------
@@ -80,6 +140,26 @@ MERIENDA_NUT = (200,8,28,6,2,0.4)
 def ING(n, cat, kcal, prot, carb, sug, fat, sat, fib, sal, u=None, alias=()):
     return {"n":n,"cat":cat,"por100":{"kcal":kcal,"prot":prot,"carb":carb,"sug":sug,"fat":fat,"sat":sat,"fib":fib,"sal":sal},"u":u,"alias":list(alias)}
 ING_DB = [
+ ING("arroz carnaroli","alm",350,7,78,0.3,0.6,0.2,1.3,0.01),
+ ING("albahaca fresca (atado)","verd",23,3.2,2.7,0.3,0.6,0,1.6,0.01,u=50),
+ ING("nueces","alm",654,15,14,2.6,65,6.1,6.7,0.01),
+ ING("láminas para lasaña","alm",360,12.5,73,2.5,1.5,0.3,3,0.02),
+ ING("tapa para tarta","alm",330,7,48,2,12,5.5,2,1.3,u=200),
+ ING("pan árabe","pan",275,9.1,55.7,1.3,1.2,0.2,2.2,1.3,u=60),
+ ING("crema de leche","lact",340,2.1,2.8,2.9,36,23,0,0.07),
+ ING("mostaza","pantry",66,4.4,5.8,0.9,3.3,0.2,3.3,2.8),
+ ING("repollo","verd",25,1.3,5.8,3.2,0.1,0,2.5,0.05),
+ ING("ketchup","pantry",101,1.2,27,22,0.1,0,0.3,2.3),
+ ING("mayonesa","pantry",680,1,0.6,0.6,75,11.7,0,1.5),
+ ING("fideos de arroz","alm",364,6,82,0.1,0.6,0.2,1.6,0.1),
+ ING("brotes de soja","verd",30,3,5.9,4.1,0.2,0.05,1.8,0.02),
+ ING("maní tostado sin sal","alm",585,24,21,4.2,50,7,8,0.02),
+ ING("azúcar","pantry",400,0,100,100,0,0,0,0),
+ ING("fécula de maíz (maicena)","alm",381,0.3,91,0,0.1,0,0.9,0.02),
+ ING("ananá en almíbar (lata)","alm",60,0.4,15.6,14,0.1,0,0.8,0.01),
+ ING("jengibre fresco","verd",80,1.8,18,1.7,0.8,0.2,2,0.03),
+ ING("cilantro fresco","verd",23,2.1,3.7,0.9,0.5,0,2.8,0.12),
+ ING("semillas de sésamo","alm",573,17.7,23.4,0.3,49.7,7,11.8,0.03),
  ING("pasta de maní","alm",588,25,20,9,50,10,6,0.9),
  ING("semillas de chía","alm",486,17,42,0,31,3.3,34,0.04),
  ING("tofu firme","verd",144,15.8,2.8,0.6,8.7,1.3,2.3,0.03),
@@ -223,7 +303,14 @@ OLD_PORC = {"lentejas":4,"empanadas":4,"pastel":4,"noquis":4,"albondigas":3,"arr
  "locrovegano":2,
  "currylentejas":2,
  "chiliporotos":2,
- "empanadaslentejas":2}
+ "empanadaslentejas":2,
+ "minestrone":2,
+ "lasagna":2,
+ "quiche":2,
+ "musaka":2,
+ "gulash":2,
+ "dal":2,
+ "chana":2}
 PORCIONES = {"lentejas":2,"empanadas":2,"pastel":2,"noquis":2,"albondigas":2,"arrozpollo":2,"tortilla":2,"curry":2,
  "hamblentejas":2,
  "garbanzosespinaca":2,
@@ -232,7 +319,14 @@ PORCIONES = {"lentejas":2,"empanadas":2,"pastel":2,"noquis":2,"albondigas":2,"ar
  "locrovegano":2,
  "currylentejas":2,
  "chiliporotos":2,
- "empanadaslentejas":2}
+ "empanadaslentejas":2,
+ "minestrone":2,
+ "lasagna":2,
+ "quiche":2,
+ "musaka":2,
+ "gulash":2,
+ "dal":2,
+ "chana":2}
 HALVES = {"palta","cebolla","cebolla morada","morrón rojo","limón","tomate","zapallito","berenjena","lechuga","banana","pepino","brócoli o zapallito","puerro","zanahoria","acelga (atado)","espinaca fresca (atado)","garbanzos cocidos (lata)","tomate triturado (lata)","caldo de verduras (cubo)","atún al natural (lata 170 g)"}
 def _scale(id, ing):
     f = PORCIONES.get(id,1) / OLD_PORC.get(id,2)
@@ -246,6 +340,40 @@ def _scale(id, ing):
         elif u in ("cda","cdita"): q = max(0.5, round(q * 2) / 2)
         out.append(dict(i, q=q))
     return out
+# cocina del mundo: id -> [país, región] (las recetas sin entrada son de acá)
+ORIGEN = {
+ "_":None
+,
+ "risotto":["Italia", "europa"],
+ "pastapesto":["Italia", "europa"],
+ "minestrone":["Italia", "europa"],
+ "lasagna":["Italia", "europa"],
+ "arrabbiata":["Italia", "europa"],
+ "paella":["España", "europa"],
+ "gazpacho":["España", "europa"],
+ "ratatouille":["Francia", "europa"],
+ "quiche":["Francia", "europa"],
+ "crepes":["Francia", "europa"],
+ "musaka":["Grecia", "europa"],
+ "souvlaki":["Grecia", "europa"],
+ "gulash":["Hungría", "europa"],
+ "strogonoff":["Rusia", "europa"],
+ "bircher":["Suiza", "europa"],
+ "shakshuka":["Medio Oriente", "otro"],
+ "teriyaki":["Japón", "asia"],
+ "oyakodon":["Japón", "asia"],
+ "yakisoba":["Japón", "asia"],
+ "okonomiyaki":["Japón", "asia"],
+ "padthai":["Tailandia", "asia"],
+ "arrozfrito":["China", "asia"],
+ "agridulce":["China", "asia"],
+ "chowmein":["China", "asia"],
+ "dal":["India", "asia"],
+ "tikka":["India", "asia"],
+ "chana":["India", "asia"],
+ "bibimbap":["Corea", "asia"],
+ "nasigoreng":["Indonesia", "asia"],
+ "satay":["Indonesia", "asia"]}
 def rec(id, name, tipo, tiempo, kcal, cost, tags, ing, pasos, tip):
     ing = _scale(id, ing)
     R[id] = {"id":id,"name":name,"tipo":tipo,"tiempo":tiempo,"kcal":kcal,"cost":cost,"tags":tags,"porciones":PORCIONES.get(id,1),
@@ -253,6 +381,7 @@ def rec(id, name, tipo, tiempo, kcal, cost, tags, ing, pasos, tip):
              "nut":_nut(id, ing, PORCIONES.get(id,1)),
              "img":media[id]["img"]["file"],"credit":{"title":media[id]["img"]["title"].replace("File:",""),
              "page":media[id]["img"]["page"],"license":media[id]["img"]["license"],"artist":media[id]["img"]["artist"]}}
+    if id in ORIGEN: R[id]["origen"] = ORIGEN[id]
 
 # ---------- DESAYUNOS ----------
 rec("tostadas","Tostadas integrales con palta o queso untable","desayuno",10,380,2400,["rápido","sin cocción"],
@@ -349,7 +478,7 @@ rec("empanadas","Empanadas de carne al horno","plato",60,540,2800,["horno","clá
 rec("noquis","Ñoquis de calabaza","plato",45,520,1900,["clásico argentino","vegetariano","29 del mes"],
  [I("zapallo anco / calabaza",600,"g","verd"),I("harina 0000",250,"g","alm"),I("huevos",1,"u","lact"),I("queso rallado",40,"g","lact"),I("manteca",20,"g","lact"),I("nuez moscada o salvia, sal",1,"pizca","pantry")],
  ["Cocinar la calabaza al horno (o al vapor) hasta que esté tierna; pisarla y dejar que se enfríe y pierda agua.","Mezclar con el huevo, el queso y sal; sumar la harina de a poco hasta una masa blanda que apenas no se pegue.","Hacer rollitos, cortar trozos de 2 cm y marcarlos con un tenedor.","Hervir en agua con sal: cuando flotan, 1 minuto más. Saltear en manteca con salvia o servir con salsa de tomate."],
- "El 29 se comen ñoquis con un billete abajo del plato: tradición porteña para que no falte plata. Por eso caen el 29 de octubre y el 29 de noviembre.")
+ "El 29 se comen ñoquis con un billete abajo del plato: tradición argentina para que no falte plata. Por eso caen el 29 de octubre y el 29 de noviembre.")
 rec("tortilla","Tortilla de papas","plato",35,480,1700,["clásico","vegetariano","rinde"],
  [I("papa",600,"g","verd"),I("cebolla",1,"u","verd"),I("huevos",5,"u","lact"),I("aceite",3,"cda","pantry"),I("sal y pimienta",1,"pizca","pantry")],
  ["Cortar las papas en láminas finas y la cebolla en pluma.","Cocinarlas en aceite a fuego medio-bajo 15 min, sin que doren. Escurrir bien.","Mezclar con los huevos batidos y sal; dejar reposar 5 min.","Cuajar en sartén a fuego medio 4 min, dar vuelta con un plato y 3 min más."],
@@ -499,6 +628,128 @@ rec("falafel","Falafel al horno con ensalada y salsa de tahini","plato",45,559,1
  ["Remojá los garbanzos secos en mucha agua toda la noche (no los cocines) y escurrilos muy bien.", "Procesalos con la cebolla, el ajo, el perejil, comino, sal y pimienta hasta una pasta granulosa; sumá la harina de garbanzo.", "Formá bolitas apenas aplastadas, ponelas en una placa aceitada y pincelalas con aceite.", "Horneá a 200 °C unos 25 minutos, dándolas vuelta a mitad, hasta que estén doradas.", "Salsa: tahini con jugo de limón, sal y agua hasta que quede cremosa. Serví con la ensalada de lechuga, tomate y pepino."],
  "Tienen que ser garbanzos remojados crudos: con los de lata la mezcla queda blanda y se desarma.")
 
+# ---------- RECETAS NUEVAS (tools/add_recipes.py) ----------
+rec("risotto","Risotto de hongos","plato",40,544,3400,["vegetariano", "sin gluten", "finde", "cocina del mundo"],
+ [I("arroz carnaroli",160,"g","alm"),I("champiñones",250,"g","verd"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("caldo de verduras (cubo)",1,"u","pantry"),I("manteca",20,"g","lact"),I("queso rallado",40,"g","lact"),I("aceite de oliva",1,"cda","pantry"),I("perejil",1,"pizca","pantry")],
+ ["Disolvé el caldo en 400 ml de agua y mantenelo caliente en una olla chica a fuego mínimo.", "Picá bien chiquitos la cebolla y el ajo, y cortá los champiñones en láminas. Dorá los champiñones 5 minutos con la mitad de la manteca y el aceite, y reservalos.", "En la misma olla rehogá la cebolla y el ajo 4 minutos. Sumá el arroz sin lavar y tostalo 1 minuto revolviendo.", "Agregá el caldo de a un cucharón y revolvé seguido; cuando se absorbe, sumá otro. Seguí así unos 18 minutos, hasta que el grano esté cremoso pero firme al centro.", "Volvé a poner los champiñones, apagá el fuego y mezclá con el resto de la manteca y el queso rallado. Tapá y dejá 2 minutos.", "Serví con perejil picado. No agregues sal: el caldo y el queso ya salan."],
+ "Si no conseguís carnaroli, usá arroz doble carolina; evitá el largo fino o el parboil, que no sueltan almidón y no queda cremoso.")
+rec("pastapesto","Fideos al pesto genovés","plato",20,632,2600,["rápido", "vegetariano", "pasta", "cocina del mundo"],
+ [I("fideos (spaghetti o tallarines)",180,"g","alm"),I("albahaca fresca (atado)",1,"u","verd"),I("nueces",30,"g","alm"),I("queso rallado",30,"g","lact"),I("ajo (dientes)",1,"u","verd"),I("aceite de oliva",3,"cda","pantry"),I("sal",1,"pizca","pantry")],
+ ["Poné a hervir abundante agua con sal para los fideos.", "Lavá y secá bien las hojas de albahaca, sin los tallos gruesos.", "Procesá o mixeá la albahaca con las nueces, el ajo, el queso rallado y el aceite de oliva hasta lograr una pasta. Si queda muy espesa, sumá una cucharada del agua de los fideos.", "Cociná los fideos el tiempo del paquete (8 a 10 minutos) y guardá medio vaso del agua de cocción antes de colarlos.", "Mezclá los fideos con el pesto fuera del fuego, aflojando con un chorrito del agua reservada, y serví enseguida."],
+ "Las nueces reemplazan a los piñones, que son carísimos. El pesto que sobra dura 4 días en la heladera tapado con un hilo de aceite, o meses en cubeteras en el freezer.")
+rec("minestrone","Minestrone","plato",45,566,3000,["olla", "batch", "vegetariano", "rinde", "cocina del mundo"],
+ [I("cebolla",1,"u","verd"),I("zanahoria",1,"u","verd"),I("zapallito",1,"u","verd"),I("papa",200,"g","verd"),I("ajo (dientes)",1,"u","verd"),I("tomate triturado (lata)",0.5,"u","alm"),I("porotos alubia cocidos (lata)",1,"u","alm"),I("acelga (atado)",0.5,"u","verd"),I("fideos secos cortos (mostachol o tirabuzón)",80,"g","alm"),I("caldo de verduras (cubo)",0.5,"u","pantry"),I("aceite de oliva",1,"cda","pantry"),I("queso rallado",20,"g","lact"),I("perejil",1,"pizca","pantry")],
+ ["Cortá la cebolla, la zanahoria, el zapallito y la papa en cubitos de 1 cm; picá el ajo y cortá la acelga en tiras.", "En una olla con el aceite rehogá la cebolla, la zanahoria y el ajo 5 minutos a fuego medio.", "Sumá la papa, el tomate triturado, el caldo y 1,2 litros de agua. Cuando hierva, bajá el fuego y cociná 15 minutos.", "Agregá el zapallito, los porotos enjuagados y los fideos, y cociná 10 minutos más (el tiempo del paquete).", "Sumá la acelga los últimos 3 minutos, probá de sal y apagá.", "Serví con queso rallado y perejil. La segunda porción va a la heladera (3 días) o al freezer."],
+ "Si lo vas a congelar, cociná los fideos aparte y sumalos al recalentar: así no se pasan ni se chupan todo el caldo.")
+rec("lasagna","Lasaña de carne y verduras","plato",80,830,4200,["horno", "batch", "proteico", "finde", "cocina del mundo"],
+ [I("láminas para lasaña",100,"g","alm"),I("carne picada magra",250,"g","carne"),I("cebolla",1,"u","verd"),I("zanahoria",1,"u","verd"),I("zapallito",1,"u","verd"),I("morrón rojo",0.5,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("tomate triturado (lata)",1,"u","alm"),I("leche",200,"ml","lact"),I("harina 0000",20,"g","alm"),I("manteca",10,"g","lact"),I("queso mozzarella",60,"g","lact"),I("queso rallado",20,"g","lact"),I("aceite",1,"cda","pantry"),I("albahaca u orégano",1,"pizca","pantry"),I("nuez moscada, sal, pimienta",1,"pizca","pantry")],
+ ["Rallá la zanahoria y cortá la cebolla, el morrón, el zapallito y el ajo en cubitos chicos.", "En una sartén grande con el aceite rehogá la cebolla, el morrón y el ajo 5 minutos. Sumá la carne y cociná 6 minutos, desgranándola.", "Agregá la zanahoria, el zapallito, el tomate triturado, el orégano y medio vaso de agua. Cociná tapado 15 minutos a fuego bajo.", "Para la salsa blanca, derretí la manteca, sumá la harina y revolvé 1 minuto; agregá la leche de a poco, batiendo, hasta que espese (unos 5 minutos). Condimentá con nuez moscada, sal y pimienta.", "En una fuente chica (20 x 20 cm) armá capas: salsa de carne, láminas, salsa blanca y mozzarella. Repetí y terminá con salsa, mozzarella y queso rallado.", "Horneá a 180 °C durante 30 minutos (si las láminas son secas, tapá con papel aluminio los primeros 20). Dejá reposar 10 minutos antes de cortar."],
+ "Cortá la segunda porción ya fría y congelala en un táper: aguanta 2 meses y se recalienta tapada en el horno o el microondas.")
+rec("arrabbiata","Penne all'arrabbiata","plato",20,524,1400,["rápido", "económico", "vegano", "vegetariano", "sin lactosa", "pasta", "cocina del mundo"],
+ [I("fideos secos cortos (mostachol o tirabuzón)",200,"g","alm"),I("tomate triturado (lata)",1,"u","alm"),I("ajo (dientes)",3,"u","verd"),I("aceite de oliva",2,"cda","pantry"),I("ají molido, sal, pimienta",1,"pizca","pantry"),I("perejil",1,"pizca","pantry")],
+ ["Poné a hervir abundante agua con sal y cociná el mostachol el tiempo del paquete (unos 10 minutos).", "Mientras, laminá el ajo y dorálo apenas en el aceite de oliva a fuego bajo con el ají molido, 1 a 2 minutos, sin que se queme.", "Sumá el tomate triturado, salá y cociná 10 minutos a fuego medio, hasta que espese.", "Colá la pasta y pasala a la sartén con la salsa; mezclá 1 minuto con un chorrito del agua de cocción.", "Serví con perejil picado. Si comés lácteos, un poco de queso rallado le queda bárbaro."],
+ "Regulá el picante con el ají molido: arrancá con poco y sumá al final. Si te pasás, un chorrito de aceite de oliva crudo lo suaviza.")
+rec("paella","Paella de pollo y verduras","plato",50,731,3100,["sin gluten", "sin lactosa", "proteico", "una sartén", "finde", "cocina del mundo"],
+ [I("pata muslo de pollo",2,"u","carne"),I("arroz",140,"g","alm"),I("morrón rojo",1,"u","verd"),I("arvejas (lata o congeladas)",100,"g","alm"),I("tomate",2,"u","verd"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite de oliva",2,"cda","pantry"),I("pimentón, cúrcuma, sal",1,"pizca","pantry"),I("limón",1,"u","verd")],
+ ["Separá el muslo de la pata, sacale la piel y cortá el muslo en dos. Poné a calentar 300 ml de agua.", "En una sartén grande y ancha con el aceite dorá el pollo 10 minutos, dándolo vuelta, hasta que esté bien dorado. Reservalo.", "En la misma sartén rehogá la cebolla, el ajo y el morrón en tiras 5 minutos. Sumá el tomate rallado y cociná 3 minutos más.", "Agregá el arroz, el pimentón y la cúrcuma, y revolvé 1 minuto. Volvé a poner el pollo y cubrí con el agua caliente.", "Cociná 18 minutos a fuego medio-bajo SIN revolver; a los 10 minutos repartí las arvejas por arriba.", "Apagá, tapá con un repasador limpio y dejá reposar 5 minutos. Serví con gajos de limón."],
+ "La cúrcuma reemplaza al azafrán (que sale una fortuna) y da el mismo color; como en la paella valenciana, va con agua: el sabor lo da el pollo bien dorado. Si te gusta el socarrat, subí el fuego el último minuto hasta que se escuche crepitar.")
+rec("gazpacho","Gazpacho con huevo duro y tostadas","plato",20,453,3600,["rápido", "liviano", "vegetariano", "sin lactosa", "cocina del mundo"],
+ [I("tomate",4,"u","verd"),I("pepino",1,"u","verd"),I("morrón rojo",0.5,"u","verd"),I("ajo (dientes)",1,"u","verd"),I("aceite de oliva",3,"cda","pantry"),I("vinagre o limón",2,"cda","pantry"),I("sal",1,"pizca","pantry"),I("huevos",2,"u","lact"),I("pan integral (rodajas)",4,"u","pan")],
+ ["Poné el huevo en agua fría; cuando hierva, contá 10 minutos. Pasalo a agua fría y pelalo.", "Cortá en trozos los tomates bien maduros, el pepino pelado, el morrón y el ajo. Guardá un poquito de pepino y morrón en cubitos para decorar.", "Licuá las verduras con el aceite de oliva, el vinagre, la sal y medio vaso de agua fría durante 2 minutos, hasta que quede liso.", "Probá y ajustá sal y vinagre. Si lo querés más fino, pasalo por un colador.", "Tostá el pan y serví el gazpacho bien frío con el huevo duro picado y los cubitos de verdura por arriba."],
+ "Usá tomates que ya estén en la heladera para que salga frío al toque; tapado en una botella aguanta 2 días en la heladera.")
+rec("ratatouille","Ratatouille con arroz y huevo","plato",45,549,2700,["olla", "vegetariano", "sin gluten", "sin lactosa", "liviano", "cocina del mundo"],
+ [I("berenjena",1,"u","verd"),I("zapallito",1,"u","verd"),I("morrón rojo",1,"u","verd"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("tomate triturado (lata)",1,"u","alm"),I("aceite de oliva",2,"cda","pantry"),I("albahaca u orégano",1,"pizca","pantry"),I("sal y pimienta",1,"pizca","pantry"),I("arroz",120,"g","alm"),I("huevos",2,"u","lact")],
+ ["Cortá la berenjena, el zapallito, el morrón y la cebolla en cubos de 2 cm; picá el ajo.", "En una cacerola con el aceite dorá la berenjena 5 minutos a fuego fuerte; sumá la cebolla, el morrón y el ajo, y cociná 5 minutos más.", "Agregá el zapallito, el tomate triturado, el orégano, sal y pimienta. Tapá y cociná 25 minutos a fuego bajo, revolviendo de vez en cuando.", "Mientras, herví el arroz en agua con sal 15 minutos y colalo.", "Al final, hacé el huevo a la plancha (o hundilo en el ratatouille, tapado, 5 minutos) y serví todo junto."],
+ "Para una versión vegana, salteá el huevo y sumá garbanzos cocidos. El ratatouille es todavía más rico al día siguiente.")
+rec("quiche","Quiche de puerro y queso","plato",60,717,3100,["horno", "batch", "vegetariano", "vianda", "cocina del mundo"],
+ [I("tapa para tarta",1,"u","alm"),I("puerro",2,"u","verd"),I("huevos",3,"u","lact"),I("leche",150,"ml","lact"),I("queso port salut light",80,"g","lact"),I("queso rallado",20,"g","lact"),I("aceite",0.5,"cda","pantry"),I("nuez moscada, sal, pimienta",1,"pizca","pantry")],
+ ["Prendé el horno a 200 °C. Forrá una tartera chica (20-22 cm) con la tapa, pinchala con un tenedor y precociná 8 minutos.", "Lavá bien los puerros (la tierra se esconde entre las capas), cortalos en rodajas finas y rehogalos en el aceite 8 minutos, hasta que estén tiernos.", "Batí los huevos con la leche, el queso rallado, nuez moscada, sal y pimienta.", "Repartí el puerro sobre la masa, sumá el port salut en cubitos y volcá la mezcla de huevos.", "Bajá el horno a 180 °C y cociná 25 a 30 minutos, hasta que el centro esté firme y dorado. Dejá entibiar 10 minutos antes de cortar."],
+ "Se come fría o tibia, así que la segunda porción va directo a la vianda. La otra tapa del paquete se congela sin problema.")
+rec("crepes","Crêpes con fruta y yogur","desayuno",25,554,2500,["vegetariano", "dulce", "cocina del mundo"],
+ [I("harina 0000",80,"g","alm"),I("huevos",2,"u","lact"),I("leche",200,"ml","lact"),I("manteca",10,"g","lact"),I("banana",1,"u","verd"),I("fruta de estación",2,"u","verd"),I("yogur natural (pote)",2,"u","lact"),I("miel",2,"cdita","pantry"),I("canela",1,"pizca","pantry")],
+ ["Licuá o batí la harina, el huevo y la leche hasta que no queden grumos. Dejá reposar la mezcla 10 minutos.", "Calentá una sartén antiadherente a fuego medio y pincelala con un poquito de manteca.", "Volcá un cucharón chico de mezcla y girá la sartén para cubrir el fondo. Cociná 1 minuto, dala vuelta y cociná 30 segundos más.", "Repetí con el resto de la mezcla, apilando las crêpes en un plato.", "Rellenalas con la fruta en rodajas y el yogur, y terminá con un hilo de miel y canela."],
+ "La mezcla aguanta 2 días tapada en la heladera, y las crêpes cocidas se congelan separadas con papel manteca: las calentás 30 segundos en la sartén.")
+rec("musaka","Musaka de berenjena","plato",75,745,2900,["horno", "proteico", "batch", "finde", "cocina del mundo"],
+ [I("berenjena",2,"u","verd"),I("carne picada magra",250,"g","carne"),I("cebolla",1,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("tomate triturado (lata)",0.5,"u","alm"),I("aceite de oliva",2,"cda","pantry"),I("leche",300,"ml","lact"),I("harina 0000",25,"g","alm"),I("manteca",25,"g","lact"),I("queso rallado",30,"g","lact"),I("canela",1,"pizca","pantry"),I("nuez moscada, sal, pimienta",1,"pizca","pantry")],
+ ["Cortá las berenjenas en rodajas de 1 cm, pincelalas con 1 cda de aceite y horneálas 20 minutos a 200 °C, dándolas vuelta a la mitad.", "Mientras, rehogá la cebolla y el ajo picados con el resto del aceite 5 minutos; sumá la carne picada y cociná hasta que pierda el color rosado.", "Agregá el tomate triturado, una pizca de canela, sal y pimienta, y dejá reducir 10 minutos a fuego bajo.", "Para la bechamel, derretí la manteca, sumá la harina y revolvé 1 minuto; incorporá la leche de a poco batiendo hasta que espese (5 minutos). Condimentá con nuez moscada.", "En una fuente armá capas: berenjena, carne, berenjena, y cubrí con la bechamel y el queso rallado.", "Horneá 30 minutos a 190 °C hasta que esté dorada y dejá reposar 10 minutos antes de cortar."],
+ "Se congela entera o en porciones hasta 3 meses; si querés bajar el costo, reemplazá la mitad de la carne por lentejas cocidas.")
+rec("souvlaki","Souvlaki de pollo con tzatziki","plato",35,600,3000,["proteico", "cocina del mundo"],
+ [I("suprema de pollo",400,"g","carne"),I("limón",1.0,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite de oliva",2,"cda","pantry"),I("orégano, sal, pimienta",2,"pizca","pantry"),I("yogur natural (pote)",1.0,"u","lact"),I("pepino",0.5,"u","verd"),I("tomate",2,"u","verd"),I("cebolla morada",0.5,"u","verd"),I("pan árabe",2,"u","pan")],
+ ["Cortá la suprema en cubos de 3 cm y mezclala con el jugo de medio limón, el aceite, el orégano, sal y pimienta. Dejá marinar 15 minutos.", "Para el tzatziki, rallá el pepino, escurrilo bien con la mano y mezclalo con el yogur, el ajo rallado y una pizca de sal.", "Ensartá el pollo en palitos de brochette (si son de madera, remojalos antes en agua).", "Cociná las brochettes en una plancha o sartén bien caliente 10 a 12 minutos, girándolas para que se doren parejo.", "Calentá el pan árabe 1 minuto en la sartén y serví el pollo con tomate, cebolla morada en pluma y el tzatziki por encima."],
+ "Si no tenés palitos, salteá los cubos directo en la sartén: queda igual de rico, y el tzatziki aguanta 2 días en la heladera.")
+rec("gulash","Gulash húngaro con papas","plato",120,720,3350,["olla", "batch", "finde", "proteico", "sin gluten", "sin lactosa", "cocina del mundo"],
+ [I("carne para guiso (paleta o roast beef)",400,"g","carne"),I("cebolla",2,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("morrón rojo",1,"u","verd"),I("tomate triturado (lata)",0.5,"u","alm"),I("papa",450,"g","verd"),I("aceite",2,"cda","pantry"),I("pimentón, comino, laurel, sal",1,"pizca","pantry")],
+ ["Cortá la carne en cubos de 3 cm y doralos en tandas con el aceite en una olla bien caliente, 5 minutos. Retiralos.", "En la misma olla rehogá las cebollas picadas 10 minutos a fuego medio, hasta que estén doradas; sumá el ajo y el morrón en tiras.", "Apagá el fuego, agregá 2 cdas de pimentón dulce y 1 cdita de comino (así no se queman) y revolvé.", "Volvé a poner la carne, sumá el tomate, el laurel, sal y agua hasta cubrir. Tapá y cociná a fuego bajo 1 hora.", "Agregá las papas peladas en cubos grandes y cociná 30 minutos más, hasta que la carne esté tierna y la salsa espese."],
+ "Al día siguiente es todavía más rico; se congela hasta 3 meses (mejor sin las papas, que se suman al recalentar).")
+rec("strogonoff","Strogonoff de carne con arroz","plato",30,820,3700,["proteico", "sin gluten", "cocina del mundo"],
+ [I("nalga / bife magro",300,"g","carne"),I("champiñones",200,"g","verd"),I("cebolla",1.0,"u","verd"),I("aceite",2,"cda","pantry"),I("crema de leche",100,"ml","lact"),I("mostaza",2,"cdita","pantry"),I("pimentón, sal, pimienta",2,"pizca","pantry"),I("arroz",160,"g","alm")],
+ ["Poné a hervir el arroz en agua con sal 15 a 18 minutos y escurrilo.", "Cortá la carne en tiras finas (contra la fibra) y doralas 2 a 3 minutos en la sartén bien caliente con la mitad del aceite. Retiralas.", "En la misma sartén rehogá la cebolla en pluma con el resto del aceite 5 minutos; sumá los champiñones fileteados y cociná 5 minutos más.", "Agregá la crema, la mostaza y el pimentón, y dejá hervir suave 2 minutos.", "Volvé a poner la carne solo para calentarla (1 minuto, así no se endurece), salpimentá y serví sobre el arroz."],
+ "Para ahorrar, usá la mitad de crema y completá con un chorrito de leche; si hay champiñones en oferta, duplicalos y bajá la carne.")
+rec("bircher","Bircher muesli (avena remojada con manzana)","desayuno",10,470,1600,["sin cocción", "vegetariano", "económico", "cocina del mundo"],
+ [I("avena",100,"g","alm"),I("leche",200,"ml","lact"),I("yogur natural (pote)",1.0,"u","lact"),I("manzana",2,"u","verd"),I("pasas de uva",30,"g","alm"),I("miel",2,"cdita","pantry"),I("canela",2,"pizca","pantry")],
+ ["La noche anterior, mezclá en un frasco la avena con la leche, el yogur y la canela.", "Rallá la mitad de la manzana con cáscara y sumala junto con las pasas; revolvé bien.", "Tapá y dejá en la heladera toda la noche (mínimo 6 horas) para que la avena se hidrate.", "A la mañana revolvé, agregá un chorrito de leche si quedó muy espeso y serví con la otra media manzana en cubitos y la miel."],
+ "Unas gotas de limón sobre la manzana rallada evitan que se oscurezca; ya preparado aguanta 2 días en la heladera.")
+rec("shakshuka","Shakshuka (huevos en salsa de tomate y morrón)","plato",25,490,1900,["rápido", "una sartén", "vegetariano", "sin lactosa", "económico", "cocina del mundo"],
+ [I("huevos",4,"u","lact"),I("tomate triturado (lata)",1.0,"u","alm"),I("morrón rojo",1.0,"u","verd"),I("cebolla",1.0,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite de oliva",2,"cda","pantry"),I("comino, pimentón, ají molido, sal",2,"pizca","pantry"),I("perejil",2,"pizca","pantry"),I("pan integral (rodajas)",4,"u","pan")],
+ ["Picá la cebolla y cortá el morrón en tiras finas; rehogalos con el aceite en una sartén mediana 6 a 7 minutos a fuego medio.", "Sumá el ajo picado, el comino, el pimentón y el ají molido, y revolvé 30 segundos.", "Agregá el tomate triturado, salá y cociná 8 minutos hasta que la salsa espese.", "Hacé dos huecos con una cuchara, rompé un huevo en cada uno, tapá y cociná 5 a 6 minutos, hasta que la clara esté firme y la yema blanda.", "Espolvoreá perejil y serví en la misma sartén, con el pan tostado para mojar."],
+ "Para la versión sin gluten, acompañala con arroz o papas en vez de pan; la salsa se puede dejar hecha y congelar.")
+rec("teriyaki","Pollo teriyaki con arroz","plato",30,735,2450,["proteico", "sin lactosa", "cocina del mundo"],
+ [I("suprema de pollo",360,"g","carne"),I("salsa de soja",2,"cda","pantry"),I("miel",2,"cda","pantry"),I("vinagre o limón",2,"cdita","pantry"),I("ajo (dientes)",2,"u","verd"),I("jengibre (opcional)",2,"pizca","pantry"),I("fécula de mandioca",2,"cdita","alm"),I("aceite",2,"cda","pantry"),I("arroz",160,"g","alm"),I("brócoli",200,"g","verd"),I("cebolla de verdeo",2,"u","verd")],
+ ["Cociná el arroz en agua con sal 15 a 18 minutos; en los últimos 4 minutos poné el brócoli en arbolitos arriba para que se haga al vapor.", "Mezclá la salsa de soja, la miel, el vinagre, el ajo rallado, el jengibre, la fécula y 3 cdas de agua.", "Cortá la suprema en bocados y doralos con el aceite en una sartén bien caliente 6 a 7 minutos.", "Bajá el fuego, volcá la salsa y revolvé 1 a 2 minutos hasta que espese y el pollo quede brillante.", "Serví sobre el arroz con el brócoli y la cebolla de verdeo picada por encima."],
+ "Con pata muslo deshuesada sale más jugoso y más barato; la miel reemplaza al mirin y el vinagre le da el toque ácido.")
+rec("oyakodon","Oyakodon (bowl de arroz con pollo y huevo)","plato",30,635,1900,["proteico", "sin lactosa", "económico", "cocina del mundo"],
+ [I("arroz",160,"g","alm"),I("suprema de pollo",240,"g","carne"),I("huevos",4,"u","lact"),I("cebolla",1.0,"u","verd"),I("caldo de verduras (cubo)",0.5,"u","pantry"),I("salsa de soja",1.0,"cda","pantry"),I("miel",2,"cdita","pantry"),I("cebolla de verdeo",2,"u","verd")],
+ ["Cociná el arroz en agua con sal 15 a 18 minutos y dejalo tapado.", "En una sartén chica poné 120 ml de agua con el caldo, la salsa de soja y la miel; cuando hierva sumá la cebolla en pluma y cociná 3 minutos.", "Agregá la suprema en bocados chicos, tapá y cociná 5 a 6 minutos a fuego medio, hasta que esté cocida.", "Batí apenas los huevos (que queden vetas de clara) y volcalos sobre el pollo; tapá y cociná 1 a 2 minutos, hasta que estén cuajados pero cremosos.", "Deslizá todo sobre el arroz en un bowl y terminá con la cebolla de verdeo picada."],
+ "El caldo reemplaza al dashi japonés; si querés menos sal, usá un cuarto de cubo cada dos porciones y sumá más cebolla.")
+rec("yakisoba","Yakisoba de pollo y verduras","plato",25,765,2300,["rápido", "una sartén", "proteico", "sin lactosa", "cocina del mundo"],
+ [I("fideos (spaghetti o tallarines)",200,"g","alm"),I("suprema de pollo",240,"g","carne"),I("repollo",240,"g","verd"),I("zanahoria",1.0,"u","verd"),I("cebolla",1.0,"u","verd"),I("morrón rojo",1.0,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("aceite",2,"cda","pantry"),I("salsa de soja",2,"cda","pantry"),I("ketchup",2,"cda","pantry"),I("miel",2,"cdita","pantry"),I("jengibre (opcional)",2,"pizca","pantry")],
+ ["Herví los fideos 1 minuto menos de lo que indica el paquete, escurrilos y pasalos por agua fría.", "Mezclá la salsa de soja, el ketchup, la miel y 1 cda de agua.", "Cortá el pollo en tiras y salteálo con el aceite en una sartén grande o wok bien caliente 4 a 5 minutos.", "Sumá la cebolla, la zanahoria en bastoncitos, el morrón y el ajo; salteá 3 minutos y agregá el repollo en tiras finas 2 minutos más.", "Incorporá los fideos y la salsa, y salteá todo junto 2 minutos a fuego fuerte, revolviendo sin parar."],
+ "Sirve para usar el repollo y las verduras que quedan en la heladera; con fideos de arroz y salsa de soja sin TACC queda sin gluten.")
+rec("okonomiyaki","Okonomiyaki (tortilla japonesa de repollo)","plato",30,695,1950,["una sartén", "sin lactosa", "económico", "cocina del mundo"],
+ [I("repollo",300,"g","verd"),I("harina 0000",100,"g","alm"),I("huevos",4,"u","lact"),I("panceta ahumada",60,"g","carne"),I("cebolla de verdeo",2,"u","verd"),I("aceite",1.0,"cda","pantry"),I("salsa de soja",1.0,"cda","pantry"),I("ketchup",3.0,"cda","pantry"),I("miel",2,"cdita","pantry"),I("mayonesa",2,"cda","pantry")],
+ ["Cortá el repollo en tiras muy finas y picá la cebolla de verdeo.", "En un bol batí los huevos con la harina y 60 ml de agua fría hasta tener una pasta lisa; sumá el repollo y el verdeo y mezclá bien.", "Calentá el aceite en una sartén antiadherente, volcá la mezcla y emparejala en un disco de 2 cm de alto. Cubrí con las fetas de panceta.", "Cociná tapado 6 a 7 minutos a fuego medio-bajo, dalo vuelta con ayuda de un plato y cociná 6 minutos más del lado de la panceta.", "Mezclá el ketchup, la salsa de soja y la miel, pincelá la superficie y terminá con líneas de mayonesa."],
+ "La mezcla de ketchup y soja reemplaza a la salsa okonomi; sin panceta queda vegetariano y más barato.")
+rec("padthai","Pad thai de pollo","plato",30,784,3300,["proteico", "una sartén", "sin lactosa", "cocina del mundo"],
+ [I("fideos de arroz",150,"g","alm"),I("suprema de pollo",240,"g","carne"),I("huevos",2,"u","lact"),I("brotes de soja",120,"g","verd"),I("cebolla de verdeo",2,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("maní tostado sin sal",30,"g","alm"),I("limón",1.0,"u","verd"),I("azúcar",4,"cdita","pantry"),I("salsa de soja",2,"cda","pantry"),I("aceite",2,"cda","pantry"),I("ají molido, sal, pimienta",2,"pizca","pantry")],
+ ["Remojá los fideos de arroz en agua tibia 10 minutos (o lo que diga el paquete), hasta que estén flexibles pero firmes; escurrilos.", "Mezclá la salsa: el jugo de medio limón, 2 cucharaditas de azúcar, 1 cucharada de salsa de soja, 1 de agua y una pizca de ají molido. Picá el maní grueso.", "En la sartén bien caliente con el aceite, dorá el pollo en tiritas 4-5 minutos con el ajo picado. Correlo a un costado y revolvé ahí el huevo hasta que cuaje.", "Sumá los fideos y la salsa y salteá 2-3 minutos, moviendo con pinza, hasta que absorban todo el líquido.", "Apagá, agregá los brotes de soja y el verdeo en trozos y mezclá 30 segundos. Serví con el maní picado y una rodaja de limón."],
+ "El tamarindo original se reemplaza con limón y azúcar; con salsa de soja «sin TACC» el plato queda apto celíacos.")
+rec("arrozfrito","Arroz frito chino con huevo y verduras","plato",30,656,1300,["económico", "una sartén", "vegetariano", "sin lactosa", "cocina del mundo"],
+ [I("arroz",160,"g","alm"),I("huevos",4,"u","lact"),I("arvejas (lata o congeladas)",120,"g","alm"),I("zanahoria",1.0,"u","verd"),I("cebolla de verdeo",2,"u","verd"),I("ajo (dientes)",2,"u","verd"),I("salsa de soja",2,"cda","pantry"),I("aceite",2,"cda","pantry"),I("sal y pimienta",2,"pizca","pantry")],
+ ["Cociná el arroz y dejalo enfriar destapado en la heladera (ideal, del día anterior): frío y seco es el secreto para que no se apelmace.", "Cortá la zanahoria en cubitos chiquitos y separá lo blanco y lo verde del verdeo.", "En sartén o wok muy caliente con unas gotas de aceite, revolvé los huevos batidos 1 minuto, apenas cuajados, y reservalos.", "Con el resto del aceite salteá 3 minutos la zanahoria, lo blanco del verdeo y el ajo picado; sumá las arvejas.", "Agregá el arroz desgranado y salteá 4-5 minutos a fuego fuerte sin parar. Volvé el huevo, rociá la salsa de soja, mezclá y terminá con lo verde del verdeo."],
+ "Es el plato ideal para usar el arroz que sobró: tapado en la heladera dura 2 días y sale mejor que recién hecho.")
+rec("agridulce","Pollo agridulce con arroz","plato",35,851,2400,["proteico", "sin lactosa", "cocina del mundo"],
+ [I("suprema de pollo",280,"g","carne"),I("fécula de maíz (maicena)",4,"cda","alm"),I("morrón rojo",1.0,"u","verd"),I("cebolla",1.0,"u","verd"),I("ananá en almíbar (lata)",160,"g","alm"),I("ketchup",3.0,"cda","pantry"),I("vinagre o limón",3.0,"cda","pantry"),I("azúcar",4,"cdita","pantry"),I("salsa de soja",2,"cda","pantry"),I("ajo (dientes)",2,"u","verd"),I("aceite",3.0,"cda","pantry"),I("arroz",150,"g","alm"),I("sal",2,"pizca","pantry")],
+ ["Poné a cocinar el arroz. Cortá el pollo en cubos de 2-3 cm, salalo y pasalo por 1½ cucharada de maicena.", "Dorá el pollo en una sartén con 1 cucharada de aceite bien caliente, 6-7 minutos, dándolo vuelta hasta que esté crocante; reservá.", "Mezclá la salsa: ketchup, vinagre, azúcar, salsa de soja, 3 cucharadas del almíbar de la lata, 4 de agua y la media cucharada restante de maicena.", "En la misma sartén con el resto del aceite salteá 3 minutos el morrón y la cebolla en cuadrados con el ajo; sumá el ananá en trozos.", "Volcá la salsa y revolvé 1-2 minutos hasta que espese y brille. Volvé el pollo, mezclá 30 segundos y serví enseguida con el arroz."],
+ "El resto del ananá en almíbar se guarda en un táper en la heladera hasta 5 días: sirve de postre o para repetir la receta.")
+rec("chowmein","Chow mein de pollo (tallarines salteados)","plato",30,727,2400,["proteico", "una sartén", "sin lactosa", "cocina del mundo"],
+ [I("fideos (spaghetti o tallarines)",180,"g","alm"),I("suprema de pollo",240,"g","carne"),I("repollo",160,"g","verd"),I("zanahoria",1.0,"u","verd"),I("cebolla",1.0,"u","verd"),I("cebolla de verdeo",2,"u","verd"),I("brotes de soja",100,"g","verd"),I("ajo (dientes)",2,"u","verd"),I("jengibre fresco",10,"g","verd"),I("salsa de soja",2,"cda","pantry"),I("azúcar",2,"cdita","pantry"),I("fécula de maíz (maicena)",2,"cdita","alm"),I("aceite",2,"cda","pantry")],
+ ["Herví los fideos 1 minuto menos de lo que indica el paquete, escurrilos, pasalos por agua fría y mezclalos con unas gotas de aceite.", "Cortá el pollo en tiras finas y mezclalo con 1 cucharadita de salsa de soja y la maicena. Cortá repollo, zanahoria y cebolla en juliana.", "En wok o sartén grande muy caliente con media cucharada de aceite, dorá el pollo 4 minutos y reservá.", "Con el resto del aceite salteá 3 minutos las verduras con el ajo y el jengibre rallados, a fuego fuerte: tienen que quedar crocantes.", "Sumá los fideos, el pollo, las 2 cucharaditas de soja restantes, el azúcar, los brotes y el verdeo; salteá 2 minutos levantando con pinza hasta que todo brille."],
+ "Si no conseguís fideos chinos al huevo, los tallarines secos comunes funcionan perfecto; el jengibre fresco que sobra se congela entero y se ralla congelado.")
+rec("dal","Dal de lentejas con arroz","plato",45,718,1300,["olla", "batch", "económico", "proteico", "vegano", "vegetariano", "sin gluten", "sin lactosa", "cocina del mundo"],
+ [I("lentejas secas",180,"g","alm"),I("arroz",140,"g","alm"),I("cebolla",1,"u","verd"),I("tomate",1,"u","verd"),I("ajo (dientes)",3,"u","verd"),I("jengibre fresco",10,"g","verd"),I("limón",0.5,"u","verd"),I("cilantro fresco",10,"g","verd"),I("aceite",1.5,"cda","pantry"),I("cúrcuma, sal, pimienta",1,"pizca","pantry"),I("comino, pimentón, ají molido, sal",1,"pizca","pantry")],
+ ["Enjuagá las lentejas y cocinalas en 800 ml de agua con 1 cucharadita de cúrcuma, 25 minutos a fuego bajo, hasta que se deshagan. Mientras, cociná el arroz.", "En una sartén con 1 cucharada de aceite rehogá la cebolla picada 6 minutos; sumá el jengibre rallado, 2 dientes de ajo picados y el tomate en cubos, 5 minutos más.", "Volcá el sofrito a las lentejas, salá y cociná 5 minutos revolviendo: tiene que quedar un guiso cremoso; si se espesa, agregá agua caliente.", "Tadka: en la sartén limpia calentá la media cucharada de aceite restante y tirá 1 cucharadita de comino, el ajo restante en láminas, pimentón y ají molido; 30 segundos, sin que se queme.", "Volcá el aceite chisporroteante sobre el dal, sumá el jugo de limón y el cilantro picado y serví con el arroz."],
+ "Con lentejas rojas (vienen peladas) queda más cremoso y se cocina en 15 minutos; la segunda porción se congela hasta 3 meses.")
+rec("tikka","Pollo tikka masala con arroz","plato",50,825,2800,["proteico", "sin gluten", "cocina del mundo"],
+ [I("suprema de pollo",320,"g","carne"),I("yogur natural (pote)",1.0,"u","lact"),I("tomate triturado (lata)",0.8,"u","alm"),I("cebolla",1.0,"u","verd"),I("ajo (dientes)",4,"u","verd"),I("jengibre fresco",16,"g","verd"),I("curry en polvo",2,"cda","pantry"),I("pimentón, comino, sal, pimienta",2,"pizca","pantry"),I("crema de leche",60,"ml","lact"),I("aceite",2,"cda","pantry"),I("arroz",140,"g","alm"),I("limón",0.5,"u","verd"),I("cilantro fresco",10,"g","verd")],
+ ["Marinada: mezclá el yogur con la mitad del curry, 1 cucharadita de pimentón, el jugo de limón, sal y la mitad del ajo y del jengibre rallados. Sumá el pollo en cubos y dejá 20 minutos (o toda la noche en la heladera).", "Dorá el pollo escurrido en una sartén muy caliente con media cucharada de aceite, 5-6 minutos, hasta que tenga partes tostadas; reservá.", "En la misma sartén con el resto del aceite rehogá la cebolla picada 6 minutos; sumá el ajo y el jengibre restantes, el resto del curry y 1 cucharadita de comino, 1 minuto.", "Agregá el tomate triturado y cociná 10 minutos a fuego bajo. Sumá la crema y el pollo y cociná 5 minutos más, hasta que la salsa quede espesa y anaranjada.", "Serví con el arroz y cilantro picado por arriba."],
+ "El garam masala no se consigue fácil: curry en polvo + comino da un resultado muy parecido. Para versión sin lactosa, cambiá yogur y crema por leche de coco.")
+rec("chana","Chana masala (garbanzos al estilo indio) con arroz","plato",35,710,1500,["olla", "batch", "económico", "vegano", "vegetariano", "sin gluten", "sin lactosa", "cocina del mundo"],
+ [I("garbanzos cocidos (lata)",1.5,"u","alm"),I("tomate triturado (lata)",0.5,"u","alm"),I("cebolla",1,"u","verd"),I("ajo (dientes)",3,"u","verd"),I("jengibre fresco",10,"g","verd"),I("curry en polvo",1,"cda","pantry"),I("comino, pimentón, ají molido, sal",1,"pizca","pantry"),I("limón",0.5,"u","verd"),I("cilantro fresco",10,"g","verd"),I("aceite",2,"cda","pantry"),I("arroz",140,"g","alm")],
+ ["Poné a cocinar el arroz. Escurrí y enjuagá los garbanzos.", "En una olla con el aceite dorá la cebolla bien picada 8 minutos, hasta que tome color: es la base del sabor.", "Sumá el ajo y el jengibre rallados, el curry, 1 cucharadita de comino, 1 de pimentón y una pizca de ají molido; revolvé 1 minuto sin que se queme.", "Agregá el tomate y 200 ml de agua, salá y cociná 5 minutos. Sumá los garbanzos y cociná 15 minutos a fuego bajo, aplastando algunos con la cuchara para espesar.", "Apagá, agregá el jugo de limón y el cilantro picado y serví con el arroz."],
+ "Más barato todavía con garbanzos secos: remojá 150 g la noche anterior y hervilos 1 hora. Se congela perfecto en porciones.")
+rec("bibimbap","Bibimbap (bowl coreano de arroz, verduras y huevo)","plato",40,799,2700,["proteico", "sin lactosa", "cocina del mundo"],
+ [I("arroz",160,"g","alm"),I("carne picada magra",200,"g","carne"),I("huevos",2,"u","lact"),I("zanahoria",1.0,"u","verd"),I("espinaca",0.6,"u","verd"),I("zapallito",1.0,"u","verd"),I("brotes de soja",100,"g","verd"),I("ajo (dientes)",4,"u","verd"),I("salsa de soja",2,"cda","pantry"),I("azúcar",4,"cdita","pantry"),I("semillas de sésamo",2,"cdita","alm"),I("aceite",2,"cda","pantry"),I("pimentón, sal",2,"pizca","pantry"),I("ají molido, sal, pimienta",2,"pizca","pantry")],
+ ["Cociná el arroz. Salsa picante (reemplazo del gochujang): mezclá 1 cucharada de pimentón, ½ cucharadita de ají molido, 1 cucharadita de soja, 1 de azúcar y 1 de agua.", "Salteá la carne picada con un ajo picado, 2 cucharaditas de soja y 1 de azúcar, 5-6 minutos, hasta que se dore.", "Por separado y con unas gotas de aceite, salteá 2 minutos cada verdura: zanahoria y zapallito en bastones finos, la espinaca con el otro ajo, y los brotes de soja.", "Freí el huevo dejando la yema blanda.", "Armá el bowl: arroz caliente abajo, las verduras y la carne en montoncitos alrededor, el huevo en el centro, sésamo y la salsa picante. Mezclá todo antes de comer."],
+ "Usá las verduras que tengas en la heladera: champiñones, pepino o repollo también van. Para versión vegetariana, cambiá la carne por tofu.")
+rec("nasigoreng","Nasi goreng (arroz frito indonesio)","plato",30,718,2000,["proteico", "una sartén", "sin lactosa", "cocina del mundo"],
+ [I("arroz",160,"g","alm"),I("suprema de pollo",200,"g","carne"),I("huevos",2,"u","lact"),I("cebolla morada",1.0,"u","verd"),I("ajo (dientes)",4,"u","verd"),I("salsa de soja",2,"cda","pantry"),I("azúcar",4,"cdita","pantry"),I("ají molido, sal, pimienta",2,"pizca","pantry"),I("tomate",1.0,"u","verd"),I("pepino",0.5,"u","verd"),I("cebolla de verdeo",2,"u","verd"),I("aceite",2,"cda","pantry")],
+ ["Cociná el arroz y dejalo enfriar (mejor del día anterior). Mezclá la salsa de soja con el azúcar hasta disolverla: es el reemplazo del kecap manis, la soja dulce indonesia.", "Picá muy fino (o pisá en mortero) la cebolla morada, el ajo y ½ cucharadita de ají molido hasta hacer una pasta.", "En sartén caliente con dos tercios del aceite rehogá la pasta 2 minutos y sumá el pollo en cubitos; dorá 5 minutos.", "Agregá el arroz y la soja dulce y salteá 4-5 minutos a fuego fuerte, hasta que el arroz quede oscuro y algo tostado. Sumá el verdeo picado.", "Freí el huevo en el resto del aceite y serví el arroz con el huevo arriba y rodajas de tomate y pepino al costado."],
+ "Se diferencia del arroz frito chino por la soja dulce y el picante: si te gusta más intenso, sumá ají molido. Con soja «sin TACC» es apto celíacos.")
+rec("satay","Pollo satay con salsa de maní y arroz","plato",40,818,2600,["proteico", "sin lactosa", "cocina del mundo"],
+ [I("suprema de pollo",320,"g","carne"),I("salsa de soja",2,"cda","pantry"),I("curry en polvo",2,"cdita","pantry"),I("cúrcuma, sal, pimienta",2,"pizca","pantry"),I("ajo (dientes)",2,"u","verd"),I("azúcar",4,"cdita","pantry"),I("aceite",1.0,"cda","pantry"),I("pasta de maní",3.0,"cda","alm"),I("leche de coco",100,"ml","alm"),I("limón",1.0,"u","verd"),I("ají molido, sal, pimienta",2,"pizca","pantry"),I("arroz",140,"g","alm"),I("pepino",0.5,"u","verd")],
+ ["Cortá el pollo en tiras largas y marinalo 15 minutos con la soja, el curry, ½ cucharadita de cúrcuma, el ajo rallado, 1 cucharadita de azúcar y el aceite. Si usás palitos de brochette de madera, remojalos en agua.", "Poné a cocinar el arroz. Ensartá el pollo en los palitos (o dejalo en tiras).", "Cociná en plancha, parrilla o sartén bien caliente 3-4 minutos por lado, hasta que se marque y esté cocido por dentro.", "Salsa: en una ollita a fuego bajo mezclá la pasta de maní, la leche de coco, el jugo de limón, la otra cucharadita de azúcar y una pizca de ají molido, 2-3 minutos, hasta que quede cremosa.", "Serví los pinchos con la salsa, el arroz y rodajas de pepino."],
+ "Salen buenísimos a la parrilla en un asado. La leche de coco que sobra se congela en cubetera para la próxima vez.")
+
 BREAK = ["tostadas","yogur","revueltos","yogur","tostadas","panqueques","revueltos"]
 LUNCH = ["pollohorno","merluza","wok","lentejas","milanesas","curry","arrozpollo","pescadohorno","albondigas","tortilla","noquis"]
 DINNER = ["sopa","tarta","omelette","atun","zapallitos","garbanzos","wrap","gramajo","hamburguesas"]
@@ -553,26 +804,33 @@ pantry = ["Aceite de girasol y aceite de oliva","Sal, pimienta, pimentón, comin
 # ---------- SUPERMERCADOS ----------
 stores = [
  {"id":"carrefour","name":"Carrefour","url":"https://www.carrefour.com.ar/","envio":"Se calcula en el checkout según tu dirección (no está publicado).","minimo":"$ 10.000 según las preguntas frecuentes de la app (dato antiguo, verificar).",
-  "gratis":"No publicado.","plazo":"Envío en el día / 24 h en CABA sujeto a disponibilidad; 48 h hábiles según los términos y condiciones.","cobertura":"CABA y GBA. También Retiro / Drive en sucursal y 'Entrega inmediata' (Bringo) en zonas con Carrefour Market.",
+  "gratis":"No publicado.","plazo":"Envío en el día / 24 h en CABA sujeto a disponibilidad; 48 h hábiles según los términos y condiciones.","cobertura":"Envío a domicilio y retiro en sucursal en casi todo el país; Drive y 'Entrega inmediata' (Bringo) en algunas ciudades. Lo que llega a tu casa se ve al poner tu dirección.",
   "nota":"En los relevamientos de 2026 aparece como la cadena más barata para una compra mensual completa, y en nuestro changuito también quedó primera.","fuente":"https://www.carrefour.com.ar/como-comprar"},
  {"id":"dia","name":"Día","url":"https://diaonline.supermercadosdia.com.ar/","envio":"Se muestra en el carrito antes de pagar (varía por zona).","minimo":"$ 12.000 de compra mínima para envío a domicilio.",
-  "gratis":"No publicado. Retiro gratis en la tienda más cercana.","plazo":"Franjas 9:30–13:30, 13:30–17:30 y 17:30–20:30. Mismo día pidiendo con 5 h de anticipación.","cobertura":"Capital Federal y Gran Buenos Aires (almacén, limpieza, congelados, bebidas).",
+  "gratis":"No publicado. Retiro gratis en la tienda más cercana.","plazo":"Franjas 9:30–13:30, 13:30–17:30 y 17:30–20:30. Mismo día pidiendo con 5 h de anticipación.","cobertura":"Envío y retiro desde la tienda más cercana: el sitio pide tu dirección y muestra qué llega.",
   "nota":"Marca propia muy barata (arroz, avena, atún). Los miércoles 10 % de descuento con Mercado Pago, también online.","fuente":"https://diaonline.supermercadosdia.com.ar/preguntas-frecuentes"},
  {"id":"jumbo","name":"Jumbo","url":"https://www.jumbo.com.ar/","envio":"$ 3.999 por envío (sin Jumbo Prime). Pack de 3 envíos: $ 11.997.","minimo":"Sin mínimo publicado.",
-  "gratis":"Con Jumbo Prime ($ 5.500/mes): envíos ilimitados gratis en compras de $ 60.000 o más.","plazo":"'Envío en el día' / menos de 24 h, sujeto a disponibilidad.","cobertura":"CABA y GBA. Misma plataforma que Disco y Vea (Cencosud).",
+  "gratis":"Con Jumbo Prime ($ 5.500/mes): envíos ilimitados gratis en compras de $ 60.000 o más.","plazo":"'Envío en el día' / menos de 24 h, sujeto a disponibilidad.","cobertura":"Envío en las ciudades con sucursal. Misma plataforma que Disco y Vea (Cencosud).",
   "nota":"El más completo en surtido y marcas premium; precios algo más altos que el promedio.","fuente":"https://jumboprime.com.ar/"},
  {"id":"disco","name":"Disco","url":"https://www.disco.com.ar/","envio":"$ 3.999 por envío (mismo esquema Cencosud que Jumbo).","minimo":"Sin mínimo publicado.",
-  "gratis":"Con Jumbo Prime ($ 5.500/mes) en compras de $ 60.000 o más.","plazo":"Envío en el día / menos de 24 h, sujeto a disponibilidad.","cobertura":"CABA y GBA, muchas sucursales de barrio (Palermo, Belgrano, Caballito…).",
+  "gratis":"Con Jumbo Prime ($ 5.500/mes) en compras de $ 60.000 o más.","plazo":"Envío en el día / menos de 24 h, sujeto a disponibilidad.","cobertura":"Envío en las ciudades con sucursal; en el AMBA tiene muchas tiendas de barrio.",
   "nota":"Mismo catálogo que Jumbo con precios casi idénticos; conviene por cercanía de sucursal.","fuente":"https://www.disco.com.ar/eventos/descuentos-jumbo-prime"},
  {"id":"vea","name":"Vea","url":"https://www.vea.com.ar/","envio":"No publicado; misma plataforma Cencosud (verificar en el checkout).","minimo":"Sin mínimo publicado.",
-  "gratis":"No publicado.","plazo":"Envío en el día según zona; retiro en sucursal.","cobertura":"Más fuerte en GBA e interior que en CABA.",
-  "nota":"Precios parecidos a Jumbo/Disco con menos surtido. En CABA conviene mirar primero Disco.","fuente":"https://www.vea.com.ar/"},
+  "gratis":"No publicado.","plazo":"Envío en el día según zona; retiro en sucursal.","cobertura":"La cadena de Cencosud más extendida en el interior: envío y retiro según la sucursal.",
+  "nota":"Precios parecidos a Jumbo/Disco con menos surtido. Donde hay Disco, conviene mirarlo primero.","fuente":"https://www.vea.com.ar/"},
  {"id":"coto","name":"Coto Digital","url":"https://www.cotodigital.com.ar/","envio":"$ 3.990 (almacén y similares) / $ 5.999 productos voluminosos, según la página de ayuda.","minimo":"$ 30.000 de compra mínima para envío a domicilio (calculado sobre precios antes de descuentos).",
-  "gratis":"No publicado. Retiro en sucursal sin mínimo y sin costo.","plazo":"Se elige franja horaria al comprar; el costo se muestra antes de confirmar.","cobertura":"CABA, GBA, Rosario, Mar del Plata y otras ciudades.",
+  "gratis":"No publicado. Retiro en sucursal sin mínimo y sin costo.","plazo":"Se elige franja horaria al comprar; el costo se muestra antes de confirmar.","cobertura":"Coto Digital envía desde sus sucursales: AMBA, Rosario, Mar del Plata y otras ciudades.",
   "nota":"Muchas promos bancarias y 2x1 en marca propia. Precios de mostrador parecidos a Carrefour.","fuente":"https://www.coto.com.ar/ayuda?s=1"},
  {"id":"changomas","name":"ChangoMás","url":"https://www.masonline.com.ar/","envio":"Se calcula en el checkout según sucursal y zona (no publicado).","minimo":"No publicado.",
-  "gratis":"No publicado. PickUp gratis en sucursal: elegís franja y avisás por WhatsApp al llegar.","plazo":"Según sucursal; retiro en el día.","cobertura":"Hipermercados en GBA (ex Walmart); pocas sucursales en CABA.",
+  "gratis":"No publicado. PickUp gratis en sucursal: elegís franja y avisás por WhatsApp al llegar.","plazo":"Según sucursal; retiro en el día.","cobertura":"Híper y súper en casi todo el país (ex Walmart): envío y PickUp según la sucursal.",
   "nota":"Marca propia 'Check' muy barata (yerba, arroz, avena). Útil si estás cerca de un híper.","fuente":"https://www.masonline.com.ar/metodos-de-entrega"},
+ # cadenas regionales (solo se muestran en su zona)
+ {"id":"toledo","name":"Toledo","url":"https://www.toledodigital.com.ar/","envio":"Se calcula al elegir el método de entrega; hay «Envío ahora» (entrega rápida) en algunas zonas.","minimo":"No publicado.",
+  "gratis":"Envío gratis en compras de más de $ 50.000 (según el sitio, octubre 2026).","plazo":"Envío programado o «Envío ahora»; retiro en sucursal.","cobertura":"Mar del Plata (General Pueyrredón) y la Costa Atlántica: unas 30 sucursales con retiro.",
+  "nota":"La cadena de Mar del Plata: precios en vivo en el comparador de Compras.","fuente":"https://www.toledodigital.com.ar/"},
+ {"id":"cordiez","name":"Cordiez","url":"https://www.cordiez.com.ar/","envio":"$ 4.500 en Córdoba capital; en el interior de la provincia, entre $ 4.000 y $ 18.000 según la localidad.","minimo":"No publicado.",
+  "gratis":"No publicado. Retiro en sucursal sin costo.","plazo":"Retiro Express en el día pidiendo antes de las 15 h (Centro, Villa Allende, Villa Carlos Paz y otras); envío en la franja que elijas.","cobertura":"Córdoba capital e interior de la provincia.",
+  "nota":"La cadena cordobesa: precios en vivo en el comparador de Compras.","fuente":"https://www.cordiez.com.ar/institucionales/preguntas-frecuentes"},
 ]
 apps = [{"name":"Rappi","url":"https://www.rappi.com.ar/","desc":"Coto, Carrefour, Jumbo, Día y Disco con entrega en 30–60 min. Tarifa de envío variable + precios algo más altos que en la web del súper. Ideal para compras chicas o urgentes."},
         {"name":"PedidosYa Market","url":"https://www.pedidosya.com.ar/","desc":"Supermercado propio de PedidosYa con entrega rápida. Buen surtido básico y promos con PedidosYa Plus."},

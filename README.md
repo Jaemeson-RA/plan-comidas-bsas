@@ -1,6 +1,6 @@
-# Menuario · plan de comidas en Buenos Aires
+# Menuario · plan de comidas para toda la Argentina
 
-Sitio estático (HTML + CSS + JS, sin build ni dependencias en el navegador) con un plan de comidas continuo para Buenos Aires (Menuario): 54 recetas con foto y video que rotan solas semana a semana, lista de compras, comparativa de supermercados con envío a domicilio (ARS / USD / EUR) y alertas de precio, productos de estación, análisis nutricional y un espacio con cuenta para armar el propio calendario, crear recetas, cargar ingredientes (escaneando el código de barras), competir con amigos y proponerles platos. Se instala como app en el teléfono y funciona sin conexión.
+Sitio estático (HTML + CSS + JS, sin build ni dependencias en el navegador) con un plan de comidas continuo para toda la Argentina (Menuario): 84 recetas con foto y video, de acá y del mundo, que rotan solas semana a semana, lista de compras, comparativa de supermercados con envío a domicilio (ARS / USD / EUR) y alertas de precio, productos de estación, análisis nutricional y un espacio con cuenta para armar el propio calendario, crear recetas, cargar ingredientes (escaneando el código de barras), competir con amigos y proponerles platos. Se instala como app en el teléfono y funciona sin conexión.
 
 **Sitio:** https://jaemeson-ra.github.io/plan-comidas-bsas/
 
@@ -11,7 +11,7 @@ Sitio estático (HTML + CSS + JS, sin build ni dependencias en el navegador) con
 | `404.html` | Página no encontrada con el menú de hoy y accesos a cada sección |
 | `index.html` | Portada: menú de hoy (pizarrón) y el almuerzo de mañana, entradas a cada sección, cómo se usa, preguntas frecuentes con video |
 | `plan.html` | Plan continuo mes por mes (‹ › y «Hoy»); tocar un plato abre la receta (en escritorio, además, vista previa al pasar por encima); vista por semana. En el teléfono, la vista mes oculta los días de otros meses y arranca en hoy |
-| `recetas.html` | 54 recetas en 6 categorías (también veganas, vegetarianas y sin TACC), para 1 persona (los platos de olla rinden 2 porciones), con nutrición calculada por ingrediente, **utensilios** en íconos chicos, porciones ajustables (½ a 4), **modo cocina** paso a paso a pantalla completa (temporizadores por paso, pantalla siempre encendida, se pasa con el dedo) e impresión. Búsqueda por nombre o ingrediente y filtros (hasta 20 min, vegetarianas, al horno, económicas, proteicas, livianas, sin cocción). Arriba, **«¿Qué hay en tu heladera?»**: cargás lo que tenés y muestra las recetas que más lo aprovechan, con lo que falta comprar |
+| `recetas.html` | 84 recetas en 7 categorías, con cocina del mundo opcional (también veganas, vegetarianas y sin TACC), para 1 persona (los platos de olla rinden 2 porciones), con nutrición calculada por ingrediente, **utensilios** en íconos chicos, porciones ajustables (½ a 4), **modo cocina** paso a paso a pantalla completa (temporizadores por paso, pantalla siempre encendida, se pasa con el dedo) e impresión. Búsqueda por nombre o ingrediente y filtros (hasta 20 min, vegetarianas, al horno, económicas, proteicas, livianas, sin cocción). Arriba, **«¿Qué hay en tu heladera?»**: cargás lo que tenés y muestra las recetas que más lo aprovechan, con lo que falta comprar |
 | `compras.html` | Lista de compras de la semana pasada, esta y las tres que vienen, por góndola, con tildes, «Copiar lista», «Bajar con enlaces» y «Compartir». Arriba, **«¿Dónde conviene comprarla?»**: la lista (o la de Mi plan) en las 7 cadenas, todo en un súper o repartido en 2 o 3, con el ahorro y el recorrido por súper |
 | `compras.html` (detalle) | Arriba, **Lista de: Plan de la casa / Mi calendario / listas que te compartieron** (aparece con la cuenta abierta: `cuenta.js` deja en `miListas` la lista de cada semana del calendario propio, con porciones y colación). **Tu heladera**: lo que tenés (el copo ❄ de cada producto o la tarjeta) sale de la cuenta, del comparador y del texto copiado, y se ve tachado con el copo. Es la misma heladera (`localStorage.heladera`) que «¿Qué hay en tu heladera?» de Recetas |
 | `promos.html` | **Promos de hoy** de las 7 cadenas (se renuevan cada 3 h): primero las de tu lista de la semana, después búsqueda, filtro por cadena y rubro, orden por descuento o precio |
@@ -57,7 +57,7 @@ El plan ya no tiene fecha de fin. `data.js` trae las rotaciones (desayunos, almu
 - **Resumen semanal** (Perfil): días cumplidos, XP ganada, vasos de agua y puesto en la ladder, comparados con la semana pasada. La XP se recalcula con fecha de corte.
 - **Desafío de la semana** (Ranking): tu progreso y el de tus amigos hacia los 5 días.
 - **Amigos**: se agregan por correo (se compara un hash SHA-256, el correo no se publica). La ladder tiene filtro «Mis amigos». **Proponer un plato**: elegís receta, día y comida; a tu amigo le aparece en su calendario para aceptar (se agrega solo) o rechazar, y vos ves la respuesta. Las reglas solo dejan escribir en el buzón de alguien que tenés como amigo.
-- **Personas de ejemplo en la ladder**: 14 porteños con barrio (Flor de Palermo, Nico de Caballito…). No son cuentas ni datos en Firebase: `demoLadder()` en `cuenta.js` los calcula en el navegador, día por día desde su fecha de inicio, con las mismas reglas de puntos y XP, así la tabla avanza sola. No se pueden agregar como amigos. `config.js` → `demoLadder: false` los saca.
+- **Personas de ejemplo en la ladder**: 14 personas de distintas ciudades (Flor de Palermo, Nico de Rosario, Juli de Córdoba…). No son cuentas ni datos en Firebase: `demoLadder()` en `cuenta.js` los calcula en el navegador, día por día desde su fecha de inicio, con las mismas reglas de puntos y XP, así la tabla avanza sola. No se pueden agregar como amigos. `config.js` → `demoLadder: false` los saca.
 - Todo se calcula en el cliente a partir de `calendars/{uid}` (done, libre, agua, friends) y se publica un resumen en `public/{uid}` (incluido el progreso de la semana) y `ladder/{uid}`.
 
 ## Precios: buscador en vivo, lista con enlaces y alertas
@@ -138,6 +138,20 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 - Para recompilar: `python tools/build_android.py --version` (sube la versión, compila, firma y copia el APK a `descargas/`). Los cambios del sitio no necesitan una app nueva: la app siempre muestra el sitio publicado.
 - `docs/play-store.md` y `tools/build_store.py` quedan listos por si algún día se publica en Google Play.
 
+## Toda la Argentina (`ZONA` en `app.js`, `tools/zonas.py`)
+
+- Cada persona elige su **zona** (las 23 provincias y CABA; Buenos Aires se divide en GBA y La Plata, Mar del Plata y la Costa, e interior) en el panel «¿Dónde vivís?» (Súper, Compras, Promos, Estación, «Más» de la app y el tutorial), o con «Usar mi ubicación», que calcula la zona más cercana sin mandar la ubicación a ningún servidor. Se guarda en `localStorage.zona` y, con cuenta, en `calendars/{uid}/profile/zona`.
+- **Qué cadenas hay en cada zona** lo calcula `tools/zonas.py`: una cadena está si tiene al menos 2 sucursales a menos de 60 km de alguna ciudad de la zona, según OpenStreetMap (Overpass, caché en `tools/zonas_osm.json`) o los puntos de retiro de la propia cadena (VTEX). El script reescribe el bloque `/*ZONAS*/` de `app.js`.
+- Con la zona elegida, el comparador de Compras, el buscador del Súper y las alertas consultan solo esas cadenas (`/search?q=…&c=Carrefour,Día,…` en el Worker); el changuito, el veredicto y las fichas de la página Súper muestran solo las de la zona (si hay menos de dos, el changuito queda como referencia nacional); las promos, solo esas cadenas; el mapa arranca en la ciudad de la zona.
+- **Cadenas regionales** con la misma plataforma VTEX: Toledo (Mar del Plata y la Costa) y Cordiez (Córdoba). Entran en el comparador en vivo y en el mapa; no tienen promos ni changuito.
+- **Direcciones con sugerencias**: al escribir, una lista de lugares que coinciden. Calle y altura salen de Georef (`apis.datos.gob.ar`, el normalizador de direcciones del Estado, que interpola la altura en todo el país), filtrado por la provincia de la zona y ordenado por distancia; lugares, barrios y calles sin altura, de Photon (komoot, datos de OpenStreetMap). Nominatim se usa solo si se aprieta «Buscar» sin elegir (su política no permite autocompletar).
+- **Estación**: el calendario es el de la zona central; en el Noroeste, el Noreste, Cuyo y la Patagonia una nota explica cómo se corren las fechas y qué es local de la región.
+
+## Cocina del mundo
+
+- 30 recetas de Europa y Asia (Italia, España, Francia, Grecia, Hungría, Rusia, Suiza, Japón, China, India, Corea, Tailandia, Indonesia) y una de Medio Oriente, adaptadas a lo que se consigue en el súper. Llevan `origen` (`ORIGEN` en `build.py`) y el tag «cocina del mundo»; en Recetas tienen su categoría y el país en la tarjeta y en la ficha.
+- Son **opcionales**: en Preferencias, «Cocina del mundo» = Solo cocina de acá (por defecto) · Un par por semana · Seguido. Con la opción, el plan de la casa cambia 2 o 4 almuerzos o cenas por semana (y el desayuno del domingo) por platos del mundo aptos para el perfil (`mundoDay()`), y el mes a medida y el tutorial también los usan. Sin la opción, quedan para mirar y agregar a mano.
+
 ## Casa, heladera y compañía
 
 - **Cambiar un plato** (⇄ en Hoy, en el plan y en la receta): propone platos del mismo momento del día que respetan las preferencias; el cambio queda en `localStorage.cambiosPlan` y `houseDay()` lo aplica sobre el plan base (`houseDayBase`), así se actualizan la lista y los totales.
@@ -176,7 +190,7 @@ Para cambiar el plan, editar las rotaciones `BREAK`, `LUNCH`, `DINNER`, `SAT`, `
 ## Recordatorios (Web Push, `tools/worker/push.js`)
 
 - El navegador se suscribe con la clave pública VAPID de `config.js` y manda la dirección de la suscripción y las preferencias a `POST /push/sub` del Worker. Se guardan en KV (`PROMOS`, claves `sub:<hash>`, todo en la metadata) y vencen a los 120 días si no se vuelve a abrir el sitio (cada visita las renueva una vez por día).
-- Un cron del Worker corre cada 15 minutos (hora de Buenos Aires, UTC−3) y manda un push **vacío** a quien le toca: no hace falta cifrar contenido. Los horarios se eligen de media hora en media hora. El plan gratis de Workers deja ~45 envíos por cuarto de hora.
+- Un cron del Worker corre cada 15 minutos (hora de Argentina, UTC−3) y manda un push **vacío** a quien le toca: no hace falta cifrar contenido. Los horarios se eligen de media hora en media hora. El plan gratis de Workers deja ~45 envíos por cuarto de hora.
 - El service worker arma el texto con lo que dejó la página en la caché `menuario-notif`: el menú de los próximos 14 días (el calendario propio si hay cuenta, si no el de la casa) y cuántos productos tiene la lista de esta semana y la siguiente. Tocar la notificación abre la lista, la receta del día (`index.html?rec=<id>`) o Mi plan. Un push sin recordatorio pendiente es la prueba del panel.
 - Funciona en Chrome / Edge / Firefox (Android y compu), en la app de Android (TWA con `enableNotifications`, desde la versión 1.0.2) y en iPhone solo con Menuario agregada al inicio (iOS 16.4+).
 - Rutas: `POST /push/sub`, `POST /push/unsub`, `POST /push/test`. La clave privada es el secreto `VAPID_JWK` del Worker (copia en `../plan-comidas-android/vapid-private.json`, fuera del repo).

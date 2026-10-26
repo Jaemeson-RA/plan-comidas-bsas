@@ -134,7 +134,7 @@ onAuthStateChanged(auth, (u) => {
   if (unsubInbox) { unsubInbox(); unsubInbox = null; } inbox = {};
   if (authBox) authBox.hidden = !!u;
   if (u) {
-    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); syncPesos(); shWatch(); renderShareBox(); setTimeout(maybeTuto, 600); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
+    unsubCal = onValue(ref(db, `calendars/${u.uid}`), (snap) => { cal = snap.val() || {}; render(); saveNotifMine(); saveMyLists(); syncPasos(); syncPrefs(); syncZona(); syncPesos(); shWatch(); renderShareBox(); setTimeout(maybeTuto, 600); }, (e) => { toast(errMsg(e)); cal = {}; render(); });
     if (page === "miplan") unsubInbox = onValue(ref(db, `inbox/${u.uid}`), (snap) => { inbox = snap.val() || {}; renderInbox(); }, () => { inbox = {}; });
     if (u.email && u.email.toLowerCase() === ADMIN && $("#adminBox")) loadAdmin();
   } else { cal = null; render(); }
@@ -168,6 +168,14 @@ window.addEventListener("pesos-guardado", () => {
 });
 // preferencias alimentarias: viajan con la cuenta (calendars/{uid}/profile/prefs)
 let prefsPulled = false;
+let zonaPulled = false;
+function syncZona() {
+  if (!user || zonaPulled || !window.ZONA) return; zonaPulled = true;
+  const rem = cal?.profile?.zona, loc = window.ZONA.get();
+  if (rem && !loc && window.ZONA.info(rem)) window.ZONA.set(rem);
+  else if (loc && rem !== loc) update(ref(db, `calendars/${user.uid}/profile`), { zona: loc }).catch(() => {});
+}
+window.addEventListener("zona", () => { if (user && window.ZONA) update(ref(db, `calendars/${user.uid}/profile`), { zona: window.ZONA.get() || null }).catch(() => {}); });
 function syncPrefs() {
   if (!user || prefsPulled) return; prefsPulled = true;
   const rem = cal?.profile?.prefs, loc = localStorage.getItem("prefsComida");
@@ -1136,17 +1144,17 @@ $("#shareBox")?.addEventListener("click", async (e) => {
 });
 
 // =====================================================================
-// LADDER · personas de ejemplo (porteños). No son cuentas: se calculan acá, día por día, con las mismas reglas
+// LADDER · personas de ejemplo (de distintas ciudades del país). No son cuentas: se calculan acá, día por día, con las mismas reglas
 // de puntos y XP que los usuarios reales, así la tabla avanza sola. CONFIG.demoLadder = false las saca.
 // =====================================================================
 const DEMO = [
-  ["Flor Gutiérrez", "Palermo", 0.9, "2026-09-28", 21, 0.8, 2], ["Nico Ferreyra", "Caballito", 0.78, "2026-10-01", 22, 0.5, 1],
-  ["Juli Benítez", "Villa Crespo", 0.86, "2026-10-04", 20, 0.7, 3], ["Tomi Acosta", "Belgrano", 0.6, "2026-09-30", 23, 0.3, 0],
-  ["Cami Ruiz", "Almagro", 0.93, "2026-10-07", 21, 0.9, 1], ["Lucho Romero", "San Telmo", 0.52, "2026-10-02", 23, 0.2, 0],
-  ["Agus Medina", "Núñez", 0.72, "2026-10-09", 22, 0.6, 1], ["Sofi Álvarez", "Recoleta", 0.83, "2026-10-11", 20, 0.75, 2],
-  ["Martu Domínguez", "Villa Urquiza", 0.66, "2026-10-13", 21, 0.55, 0], ["Facu Sosa", "Boedo", 0.45, "2026-10-05", 23, 0.25, 0],
-  ["Mica Herrera", "Colegiales", 0.88, "2026-10-15", 21, 0.85, 1], ["Santi Molina", "Flores", 0.5, "2026-10-17", 22, 0.35, 0],
-  ["Belu Castro", "Chacarita", 0.76, "2026-10-18", 20, 0.65, 1], ["Gonza Ríos", "Saavedra", 0.42, "2026-10-19", 23, 0.2, 0],
+  ["Flor Gutiérrez", "Palermo", 0.9, "2026-09-28", 21, 0.8, 2], ["Nico Ferreyra", "Rosario", 0.78, "2026-10-01", 22, 0.5, 1],
+  ["Juli Benítez", "Córdoba", 0.86, "2026-10-04", 20, 0.7, 3], ["Tomi Acosta", "Mendoza", 0.6, "2026-09-30", 23, 0.3, 0],
+  ["Cami Ruiz", "La Plata", 0.93, "2026-10-07", 21, 0.9, 1], ["Lucho Romero", "Tucumán", 0.52, "2026-10-02", 23, 0.2, 0],
+  ["Agus Medina", "Mar del Plata", 0.72, "2026-10-09", 22, 0.6, 1], ["Sofi Álvarez", "Salta", 0.83, "2026-10-11", 20, 0.75, 2],
+  ["Martu Domínguez", "Neuquén", 0.66, "2026-10-13", 21, 0.55, 0], ["Facu Sosa", "Santa Fe", 0.45, "2026-10-05", 23, 0.25, 0],
+  ["Mica Herrera", "Bahía Blanca", 0.88, "2026-10-15", 21, 0.85, 1], ["Santi Molina", "Corrientes", 0.5, "2026-10-17", 22, 0.35, 0],
+  ["Belu Castro", "Bariloche", 0.76, "2026-10-18", 20, 0.65, 1], ["Gonza Ríos", "San Juan", 0.42, "2026-10-19", 23, 0.2, 0],
 ];
 let demoCache = null;
 function demoLadder() {
@@ -1248,7 +1256,8 @@ function renderTuto() {
       <label><span>Edad</span><input id="tuE" type="number" min="14" max="99" value="${p.edad || ""}" placeholder="años" required></label>
       <label><span>Altura</span><input id="tuA" type="number" min="130" max="220" value="${p.altura || ""}" placeholder="cm" required></label>
       <label><span>Peso</span><input id="tuP" type="number" min="35" max="200" step="0.5" value="${p.peso || ""}" placeholder="kg" required></label>
-      <label class="wide"><span>Actividad</span><select id="tuAct">${[["1.3", "Sedentaria"], ["1.45", "Ligera: caminás, 1–2 entrenamientos"], ["1.6", "Moderada: 3–4 entrenamientos"], ["1.75", "Alta: casi todos los días"]].map(([v, l]) => `<option value="${v}"${String(p.act || "1.45") === v ? " selected" : ""}>${l}</option>`).join("")}</select></label></form>
+      <label class="wide"><span>Actividad</span><select id="tuAct">${[["1.3", "Sedentaria"], ["1.45", "Ligera: caminás, 1–2 entrenamientos"], ["1.6", "Moderada: 3–4 entrenamientos"], ["1.75", "Alta: casi todos los días"]].map(([v, l]) => `<option value="${v}"${String(p.act || "1.45") === v ? " selected" : ""}>${l}</option>`).join("")}</select></label>
+      <label class="wide"><span>Dónde vivís</span><select id="tuZ"><option value="">Elegí tu provincia</option>${(window.ZONA?.list || []).map((z) => `<option value="${z[0]}"${z[0] === (window.ZONA?.get() || "") ? " selected" : ""}>${esc(z[1])}</option>`).join("")}</select></label></form>
     <p class="auth-err" id="tuErr" hidden></p>` + nav("Siguiente");
   if (s === 2) body = `<h3>${ic("leaf")} Lo que comés</h3><p class="muted small">Si sos vegetariano/a, vegano/a, celíaco/a o tenés alguna alergia, marcalo: las recetas y tu semana van a usar solo lo que podés comer.</p><div data-prefs></div>` + nav("Siguiente", { skip: true });
   if (s === 3) { const hel = window.Heladera?.list() || [];
@@ -1285,6 +1294,7 @@ document.addEventListener("click", async (e) => {
   const s = tuto.step;
   if (s === 0) { if (!user) { closeTuto(); try { localStorage.setItem("tutorialPend", "1"); } catch (x) {} $("#authSeg button:last-child")?.click(); $("#authBox")?.scrollIntoView({ behavior: "smooth", block: "start" }); toast("Creá tu cuenta (o ingresá) y seguimos con los primeros pasos."); return; } tuto.step = 1; renderTuto(); return; }
   if (s === 1) {
+    if ($("#tuZ")?.value && $("#tuZ").value !== window.ZONA?.get()) window.ZONA?.set($("#tuZ").value);  // la provincia queda guardada (y en la cuenta, por el evento «zona»)
     const p = { ...(loadProfile() || {}), sexo: $("#tuS").value, edad: +$("#tuE").value, altura: +$("#tuA").value, peso: +$("#tuP").value, act: +$("#tuAct").value };
     if (!(p.edad >= 14 && p.altura >= 130 && p.peso >= 35)) { const er = $("#tuErr"); er.textContent = "Completá edad, altura y peso."; er.hidden = false; return; }
     localStorage.setItem(PROF_KEY, JSON.stringify(p)); update(ref(db, `calendars/${user.uid}/profile`), { nut: p }).catch(() => {});
@@ -1319,7 +1329,7 @@ function mdDates(per) {
 function buildMonth(p, opts) {
   const T = targets(p), M = D.meriendaNut, rnd = mulberry(opts.seed);
   const all = Object.values(R).filter((r) => !r.custom && r.nut && r.nut.kcal), D0 = window.DIET;
-  const apt = D0 ? all.filter((r) => D0.ok(r)) : all;
+  const apt = D0 ? all.filter((r) => D0.ok(r) && (!D0.mundoOk || D0.mundoOk(r))) : all;  // perfil + cocina del mundo solo si se eligió
   // solo recetas que van con el perfil; si no alcanzan para variar (menos de 2 desayunos o 4 platos), se completa con el resto y se avisa
   const enough = apt.filter((r) => r.tipo === "desayuno").length >= 2 && apt.filter((r) => r.tipo !== "desayuno").length >= 4;
   const base = enough ? apt : all; buildMonth.dietFallback = !enough && apt.length < all.length;
@@ -1433,7 +1443,7 @@ if (page === "nutricion" && $("#medida")) {
 // MI PLAN · PROGRESO: semana a semana y gastos por supermercado
 // =====================================================================
 let progN = 8;
-const G_STORES = ["Coto", "Día", "Carrefour", "Jumbo", "Disco", "Vea", "ChangoMás", "Verdulería o almacén", "Otro"];
+const G_STORES = ["Coto", "Día", "Carrefour", "Jumbo", "Disco", "Vea", "ChangoMás", "Toledo", "Cordiez", "La Anónima", "La Coope", "Libertad", "Verdulería o almacén", "Otro"];
 const G_COL = { Carrefour: "#2A6FB8", "Día": "#D93A2B", Coto: "#8E2C48", Jumbo: "#3E9B4F", Disco: "#E58A1F", Vea: "#C99A1E", "ChangoMás": "#5B6BBF", "Verdulería o almacén": "#2F8F5B", Otro: "#8A948F" };
 const ars = (n) => `<span data-ars="${Math.round(n)}"></span>`;
 function renderProg() {

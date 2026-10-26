@@ -1798,5 +1798,605 @@
     "channel": "Enrico Rapalin"
    }
   ]
+ },
+ "risotto": {
+  "title": "Risotto de hongos",
+  "img": {
+   "file": "img/risotto.jpg",
+   "title": "File:Risotto Champignons.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Risotto_Champignons.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "PixelBrûlé",
+   "q": "Risotto de hongos",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "9Wi6jY6LmHQ",
+    "title": "RISOTTO de HONGOS | Receta clásica italiana - CUKit!",
+    "channel": "Cuk-it!"
+   }
+  ]
+ },
+ "pastapesto": {
+  "title": "Fideos al pesto genovés",
+  "img": {
+   "file": "img/pastapesto.jpg",
+   "title": "File:Pasta with pesto.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pasta_with_pesto.jpg",
+   "license": "CC BY-SA 2.0",
+   "artist": "Paul Goyette",
+   "q": "Fideos al pesto genovés",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "_GmvhHHUZAM",
+    "title": "Fettuccine al Pesto Genovese por Donato De Santis | PASTALINDA",
+    "channel": "PASTALINDA"
+   }
+  ]
+ },
+ "minestrone": {
+  "title": "Minestrone",
+  "img": {
+   "file": "img/minestrone.jpg",
+   "title": "File:Minestrone soup.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Minestrone_soup.jpg",
+   "license": "CC BY-SA 2.0",
+   "artist": "Katrin Morenz from Aachen, Deutschland",
+   "q": "Minestrone",
+   "w": 1600,
+   "h": 1068
+  },
+  "yt": [
+   {
+    "id": "SjDSh7jKkrE",
+    "title": "Cómo hacer SOPA MINESTRONE italiana (receta casera) 🍲",
+    "channel": "El cuaderno de mis recetas"
+   }
+  ]
+ },
+ "lasagna": {
+  "title": "Lasaña de carne y verduras",
+  "img": {
+   "file": "img/lasagna.jpg",
+   "title": "File:Lasagna with minced meat, Brisbane.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Lasagna_with_minced_meat,_Brisbane.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Chris Olszewski",
+   "q": "Lasaña de carne y verduras",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "VuPL4RZ2LOY",
+    "title": "Lasaña de Carne fácil en 4 PASOS (lo que sí y lo que no tenés que hacer)",
+    "channel": "Paulina Cocina"
+   }
+  ]
+ },
+ "arrabbiata": {
+  "title": "Penne all'arrabbiata",
+  "img": {
+   "file": "img/arrabbiata.jpg",
+   "title": "File:Penne Arrabbiata.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Penne_Arrabbiata.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Petar Milošević",
+   "q": "Penne all'arrabbiata",
+   "w": 1600,
+   "h": 1375
+  },
+  "yt": [
+   {
+    "id": "RzDQLQL2rXc",
+    "title": "🇮🇹 PENNE ALL' ARRABBIATA. La pasta que te hará llorar. ¡Con gusto!",
+    "channel": "Papá Felice - Sabor de Italia"
+   }
+  ]
+ },
+ "paella": {
+  "title": "Paella de pollo y verduras",
+  "img": {
+   "file": "img/paella.jpg",
+   "title": "File:01 Paella Valenciana original.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:01_Paella_Valenciana_original.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Jan Harenburg",
+   "q": "Paella de pollo y verduras",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "kVBSO93_Zcs",
+    "title": "Cómo hacer PAELLA de pollo y verduras",
+    "channel": "La Cocina de Carbón"
+   }
+  ]
+ },
+ "gazpacho": {
+  "title": "Gazpacho con huevo duro y tostadas",
+  "img": {
+   "file": "img/gazpacho.jpg",
+   "title": "File:Gazpacho andaluz.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Gazpacho_andaluz.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Juan Emilio Prades Bel",
+   "q": "Gazpacho con huevo duro y tostadas",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "cdQ50R0ZSEk",
+    "title": "GAZPACHO andaluz, ¡la receta ORIGINAL de Karlos Arguiñano! - Cocina Abierta",
+    "channel": "Hogarmania"
+   }
+  ]
+ },
+ "ratatouille": {
+  "title": "Ratatouille con arroz y huevo",
+  "img": {
+   "file": "img/ratatouille.jpg",
+   "title": "File:Plate with Ratatouille and Rice-1129.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Plate_with_Ratatouille_and_Rice-1129.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Raimond Spekking",
+   "q": "Ratatouille con arroz y huevo",
+   "w": 1600,
+   "h": 1250
+  },
+  "yt": [
+   {
+    "id": "Dpbq9b4bWdI",
+    "title": "Ratatouille auténtica: la receta tradicional nizarda",
+    "channel": "Las Recetas de MJ"
+   }
+  ]
+ },
+ "quiche": {
+  "title": "Quiche de puerro y queso",
+  "img": {
+   "file": "img/quiche.jpg",
+   "title": "File:Quiche with Potatoes, Leek, Bacon & Wine (4876357842).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Quiche_with_Potatoes,_Leek,_Bacon_%26_Wine_(4876357842).jpg",
+   "license": "CC BY-SA 2.0",
+   "artist": "Katrin Gilger",
+   "q": "Quiche de puerro y queso",
+   "w": 1600,
+   "h": 1068
+  },
+  "yt": [
+   {
+    "id": "ICHrXbX-kzI",
+    "title": "Quiche de puerros",
+    "channel": "Pasión por la repostería y mucho más..."
+   }
+  ]
+ },
+ "crepes": {
+  "title": "Crêpes con fruta y yogur",
+  "img": {
+   "file": "img/crepes.jpg",
+   "title": "File:Banana + Chocolate crêpe @ Breakfast @ Le Resto du Village @ Montréal (30461563936).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Banana_%2B_Chocolate_cr%C3%AApe_@_Breakfast_@_Le_Resto_du_Village_@_Montr%C3%A9al_(30461563936).jpg",
+   "license": "CC BY 2.0",
+   "artist": "Guilhem Vellut from Annecy, France",
+   "q": "Crêpes con fruta y yogur",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "H_k_QutlKoE",
+    "title": "Cómo hacer crepes caseros finos y tiernos",
+    "channel": "Recetas de Esbieta"
+   }
+  ]
+ },
+ "musaka": {
+  "title": "Musaka de berenjena",
+  "img": {
+   "file": "img/musaka.jpg",
+   "title": "File:Moussaka 12.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Moussaka_12.jpg",
+   "license": "CC BY 2.0",
+   "artist": "Key West Wedding Photography",
+   "q": "Musaka de berenjena",
+   "w": 1600,
+   "h": 1007
+  },
+  "yt": [
+   {
+    "id": "9wA5xHjZtyA",
+    "title": "Haz musaka como si fueras de Grecia | EL COMIDISTA",
+    "channel": "El Comidista en EL PAÍS"
+   }
+  ]
+ },
+ "souvlaki": {
+  "title": "Souvlaki de pollo con tzatziki",
+  "img": {
+   "file": "img/souvlaki.jpg",
+   "title": "File:DFC 4715 Sizzling skewers of grilled pork served with crispy fries and a cool tzatziki dip - comfort food done right.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:DFC_4715_Sizzling_skewers_of_grilled_pork_served_with_crispy_fries_and_a_cool_tzatziki_dip_-_comfort_food_done_right.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "PattayaPatrol",
+   "q": "Souvlaki de pollo con tzatziki",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "_XaxcXzD2hw",
+    "title": "Souvlaki de Pollo - Recetas Griegas",
+    "channel": "COCIMEL"
+   }
+  ]
+ },
+ "gulash": {
+  "title": "Gulash húngaro con papas",
+  "img": {
+   "file": "img/gulash.jpg",
+   "title": "File:Goulash hungarian.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Goulash_hungarian.jpg",
+   "license": "CC0",
+   "artist": "RitaE",
+   "q": "Gulash húngaro con papas",
+   "w": 960,
+   "h": 608
+  },
+  "yt": [
+   {
+    "id": "xFuzjsbLxWk",
+    "title": "RECETA DE GOULASH CON SPATZLE",
+    "channel": "Cocineros Argentinos"
+   }
+  ]
+ },
+ "strogonoff": {
+  "title": "Strogonoff de carne con arroz",
+  "img": {
+   "file": "img/strogonoff.jpg",
+   "title": "File:Beef Stroganoff 2.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Beef_Stroganoff_2.jpg",
+   "license": "CC BY 2.0",
+   "artist": "Naotake Murayama",
+   "q": "Strogonoff de carne con arroz",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "GPyaY9BzMHg",
+    "title": "Stroganoff ORIGINAL en 10 min",
+    "channel": "Recetas de Esbieta"
+   }
+  ]
+ },
+ "bircher": {
+  "title": "Bircher muesli (avena remojada con manzana)",
+  "img": {
+   "file": "img/bircher.jpg",
+   "title": "File:-2019-02-07 Overnight Oats, Cromer.JPG",
+   "page": "https://commons.wikimedia.org/wiki/File:-2019-02-07_Overnight_Oats,_Cromer.JPG",
+   "license": "CC BY-SA 4.0",
+   "artist": "Kolforn",
+   "q": "Bircher muesli (avena remojada con manzana)",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "LmNcAWJqQrc",
+    "title": "Pablito Martín en Utilísima. Receta  Bircher Muesli.",
+    "channel": "Pablo Martin Chef"
+   }
+  ]
+ },
+ "shakshuka": {
+  "title": "Shakshuka (huevos en salsa de tomate y morrón)",
+  "img": {
+   "file": "img/shakshuka.jpg",
+   "title": "File:Shakshuka by Calliopejen1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Shakshuka_by_Calliopejen1.jpg",
+   "license": "CC BY-SA 3.0",
+   "artist": "Calliopejen1",
+   "q": "Shakshuka (huevos en salsa de tomate y morrón)",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "mu3wV0sg1mw",
+    "title": "Shakshuka auténtica, uno de los desayunos más famosos del mundo",
+    "channel": "Las Recetas de MJ"
+   }
+  ]
+ },
+ "teriyaki": {
+  "title": "Pollo teriyaki con arroz",
+  "img": {
+   "file": "img/teriyaki.jpg",
+   "title": "File:Teriyaki Chicken (3284699052).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Teriyaki_Chicken_(3284699052).jpg",
+   "license": "CC BY 2.0",
+   "artist": "David Pursehouse from Kawasaki, Japan",
+   "q": "Pollo teriyaki con arroz",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "mNTVWIeis_o",
+    "title": "POLLO TERIYAKI: dejá de comer siempre lo mismo y probá algo diferente.",
+    "channel": "Marcos Di Cesare"
+   }
+  ]
+ },
+ "oyakodon": {
+  "title": "Oyakodon (bowl de arroz con pollo y huevo)",
+  "img": {
+   "file": "img/oyakodon.jpg",
+   "title": "File:Oyakodon 003.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Oyakodon_003.jpg",
+   "license": "CC0",
+   "artist": "Ocdp",
+   "q": "Oyakodon (bowl de arroz con pollo y huevo)",
+   "w": 1600,
+   "h": 1068
+  },
+  "yt": [
+   {
+    "id": "0EbXcYYDuaY",
+    "title": "Comida japonesa básica \"OYAKO-DON\"｜Cocina Japonesa",
+    "channel": "Cocina Japonesa con Yuta"
+   }
+  ]
+ },
+ "yakisoba": {
+  "title": "Yakisoba de pollo y verduras",
+  "img": {
+   "file": "img/yakisoba.jpg",
+   "title": "File:Yakisoba - 01.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Yakisoba_-_01.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Quercus acuta",
+   "q": "Yakisoba de pollo y verduras",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "hQTGGHT9VB8",
+    "title": "YAKISOBA 🍜 SALTEADO DE ORIGEN JAPONÉS por Iwao Komiyama | El Gourmet",
+    "channel": "elGourmet"
+   }
+  ]
+ },
+ "okonomiyaki": {
+  "title": "Okonomiyaki (tortilla japonesa de repollo)",
+  "img": {
+   "file": "img/okonomiyaki.jpg",
+   "title": "File:Okonomiyaki 001.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Okonomiyaki_001.jpg",
+   "license": "CC BY 2.0",
+   "artist": "ume-y",
+   "q": "Okonomiyaki (tortilla japonesa de repollo)",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "-WPxguSgYWs",
+    "title": "Prepara OKONOMIYAKI con Ingredientes Fáciles｜Cocina Japonesa Con Yuta",
+    "channel": "Cocina Japonesa con Yuta"
+   }
+  ]
+ },
+ "padthai": {
+  "title": "Pad thai de pollo",
+  "img": {
+   "file": "img/padthai.jpg",
+   "title": "File:Chicken Pad Thai dish served at Indooroopilly Shopping Centre, Brisbane.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Chicken_Pad_Thai_dish_served_at_Indooroopilly_Shopping_Centre,_Brisbane.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "Chris Olszewski",
+   "q": "Pad thai de pollo",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "ajwDf0q89k4",
+    "title": "Pad thai de pollo",
+    "channel": "Allrecipes Argentina"
+   }
+  ]
+ },
+ "arrozfrito": {
+  "title": "Arroz frito chino con huevo y verduras",
+  "img": {
+   "file": "img/arrozfrito.jpg",
+   "title": "File:Cantonese Rice @ Porte du Bonheur @ Montparnasse @ Paris (33894665242).jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Cantonese_Rice_@_Porte_du_Bonheur_@_Montparnasse_@_Paris_(33894665242).jpg",
+   "license": "CC BY 2.0",
+   "artist": "Guilhem Vellut from Paris, France",
+   "q": "Arroz frito chino con huevo y verduras",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "2axMjM4P0cA",
+    "title": "CHOW FAN 🍚 (ARROZ CHINO) CLASICA COMIDA CHINA | El Gourmet",
+    "channel": "elGourmet"
+   }
+  ]
+ },
+ "agridulce": {
+  "title": "Pollo agridulce con arroz",
+  "img": {
+   "file": "img/agridulce.jpg",
+   "title": "File:Sweet and sour chicken 5.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Sweet_and_sour_chicken_5.jpg",
+   "license": "CC BY-SA 2.5",
+   "artist": "Mark Pellegrini",
+   "q": "Pollo agridulce con arroz",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "FT5Q2RFNiDA",
+    "title": "COMO HACER POLLO AGRIDULCE CON ANANA (o piña)",
+    "channel": "Walter Lui"
+   }
+  ]
+ },
+ "chowmein": {
+  "title": "Chow mein de pollo (tallarines salteados)",
+  "img": {
+   "file": "img/chowmein.jpg",
+   "title": "File:Chow Mein with pork - Unithai 2025-07-30.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Chow_Mein_with_pork_-_Unithai_2025-07-30.jpg",
+   "license": "CC0",
+   "artist": "Andy Li",
+   "q": "Chow mein de pollo (tallarines salteados)",
+   "w": 1600,
+   "h": 1205
+  },
+  "yt": [
+   {
+    "id": "afj8-vLI94g",
+    "title": "Chow Mein de Pollo - Fideos Chinos fritos con pollo l Kwan Homsai",
+    "channel": "Kwan Homsai"
+   }
+  ]
+ },
+ "dal": {
+  "title": "Dal de lentejas con arroz",
+  "img": {
+   "file": "img/dal.jpg",
+   "title": "File:Dal Tadka-Delhi.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Dal_Tadka-Delhi.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "AugustineKajur",
+   "q": "Dal de lentejas con arroz",
+   "w": 1600,
+   "h": 1067
+  },
+  "yt": [
+   {
+    "id": "WAGtxmnqel0",
+    "title": "DAL: Lentejas Guisadas al Estilo Indio. Cremosas como en un restaurante",
+    "channel": "Recetas de Esbieta"
+   }
+  ]
+ },
+ "tikka": {
+  "title": "Pollo tikka masala con arroz",
+  "img": {
+   "file": "img/tikka.jpg",
+   "title": "File:Chicken tikka masala red.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Chicken_tikka_masala_red.jpg",
+   "license": "CC BY-SA 4.0",
+   "artist": "CNEcija12345",
+   "q": "Pollo tikka masala con arroz",
+   "w": 1600,
+   "h": 1094
+  },
+  "yt": [
+   {
+    "id": "DZtHqd-RLiA",
+    "title": "La receta de Tikka Masala definitiva",
+    "channel": "Diegodoal"
+   }
+  ]
+ },
+ "chana": {
+  "title": "Chana masala (garbanzos al estilo indio) con arroz",
+  "img": {
+   "file": "img/chana.jpg",
+   "title": "File:Chana masala.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Chana_masala.jpg",
+   "license": "CC BY-SA 2.0",
+   "artist": "Simon Law (sfllaw) from Montréal, QC, Canada",
+   "q": "Chana masala (garbanzos al estilo indio) con arroz",
+   "w": 1600,
+   "h": 1200
+  },
+  "yt": [
+   {
+    "id": "Fyr2A9fApzk",
+    "title": "Garbanzos estilo hindú Chana Masala (cocina India)",
+    "channel": "Cocina con Woody"
+   }
+  ]
+ },
+ "bibimbap": {
+  "title": "Bibimbap (bowl coreano de arroz, verduras y huevo)",
+  "img": {
+   "file": "img/bibimbap.jpg",
+   "title": "File:Dolsot-bibimbap.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Dolsot-bibimbap.jpg",
+   "license": "CC BY 2.0",
+   "artist": "Sous Chef",
+   "q": "Bibimbap (bowl coreano de arroz, verduras y huevo)",
+   "w": 1600,
+   "h": 1068
+  },
+  "yt": [
+   {
+    "id": "JaBFHCes-AQ",
+    "title": "BIBIMBAP",
+    "channel": "Cocineros Argentinos"
+   }
+  ]
+ },
+ "nasigoreng": {
+  "title": "Nasi goreng (arroz frito indonesio)",
+  "img": {
+   "file": "img/nasigoreng.jpg",
+   "title": "File:Nasi Goreng (with added egg) - Roti King 2026-02-21.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Nasi_Goreng_(with_added_egg)_-_Roti_King_2026-02-21.jpg",
+   "license": "CC0",
+   "artist": "Andy Li",
+   "q": "Nasi goreng (arroz frito indonesio)",
+   "w": 1600,
+   "h": 1205
+  },
+  "yt": [
+   {
+    "id": "6SZl0S31dBM",
+    "title": "Nasi goreng, el plato nacional indonesio de arroz y huevo frito  | EL COMIDISTA",
+    "channel": "El Comidista en EL PAÍS"
+   }
+  ]
+ },
+ "satay": {
+  "title": "Pollo satay con salsa de maní y arroz",
+  "img": {
+   "file": "img/satay.jpg",
+   "title": "File:Satay chicken 2.JPG",
+   "page": "https://commons.wikimedia.org/wiki/File:Satay_chicken_2.JPG",
+   "license": "CC BY-SA 3.0",
+   "artist": "BrokenSphere",
+   "q": "Pollo satay con salsa de maní y arroz",
+   "w": 1600,
+   "h": 899
+  },
+  "yt": [
+   {
+    "id": "1FJtwO9hGUY",
+    "title": "Pollo satay con salsa de cacahuete, una receta típica de Java",
+    "channel": "Siempre hambrientos"
+   }
+  ]
  }
 }

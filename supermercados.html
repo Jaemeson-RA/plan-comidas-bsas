@@ -6,13 +6,13 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Supermercados · Menuario</title>
-<meta name="description" content="Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR.">
+<meta name="description" content="Comparativa de supermercados con envío a domicilio en tu provincia: cadenas nacionales y regionales, condiciones y precios en ARS, USD y EUR.">
 <link rel="canonical" href="https://jaemeson-ra.github.io/plan-comidas-bsas/supermercados.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_AR">
 <meta property="og:site_name" content="Menuario">
 <meta property="og:title" content="Supermercados · Menuario">
-<meta property="og:description" content="Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR.">
+<meta property="og:description" content="Comparativa de supermercados con envío a domicilio en tu provincia: cadenas nacionales y regionales, condiciones y precios en ARS, USD y EUR.">
 <meta property="og:url" content="https://jaemeson-ra.github.io/plan-comidas-bsas/supermercados.html">
 <meta property="og:image" content="https://jaemeson-ra.github.io/plan-comidas-bsas/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -141,8 +141,9 @@
 <section class="page-head">
   <p class="kicker">Supermercados con envío a domicilio</p>
   <h1>Dónde <mark>conviene</mark> pedir</h1>
-  <p class="lead">Comparamos siete cadenas que entregan en CABA y GBA. Primero la respuesta corta; después las condiciones de envío de cada una, por tipo de tienda; y al final, para quien quiera el detalle, el precio producto por producto.</p>
+  <p class="lead">Comparamos las cadenas con tienda online que hay donde vivís: las siete nacionales y, según tu provincia, las de tu región. Primero la respuesta corta; después las condiciones de envío de cada una, por tipo de tienda; y al final, para quien quiera el detalle, el precio producto por producto.</p>
 </section>
+<div class="zona-wrap" id="zonaBar"></div>
 
 <div class="rates-row card" data-web>
   <div><h3>Cotización usada para convertir</h3><p class="muted small" id="ratesNote">Cargando…</p></div>
@@ -152,7 +153,7 @@
 
 <section class="sec buscador" id="buscar">
   <h2><span class="num">1</span>Buscar y comparar</h2>
-  <p class="muted">Escribí un producto y lo buscamos en vivo en las siete cadenas: precio, presentación y enlace directo para comprarlo donde está más barato. Tocá la campanita para seguir un precio y enterarte si baja.</p>
+  <p class="muted">Escribí un producto y lo buscamos en vivo en las cadenas de tu zona: precio, presentación y enlace directo para comprarlo donde está más barato. Tocá la campanita para seguir un precio y enterarte si baja.</p>
   <form class="buscar-form" id="buscarForm"><input id="buscarQ" placeholder="Ej.: aceite de girasol 1,5 L, yerba, suprema de pollo…" autocomplete="off"><button class="btn" type="submit"><svg class="ic"><use href="#i-external"/></svg> Comparar</button></form>
   <div id="buscarRes" class="buscar-res"></div>
   <div id="alertasBox"></div>
@@ -160,10 +161,10 @@
 
 <section class="sec mapa" id="mapa">
   <h2><span class="num">2</span>Sucursales cerca tuyo</h2>
-  <p class="muted">Compartí tu ubicación o escribí una dirección y te mostramos las sucursales de las siete cadenas a la vuelta, con cómo llegar a pie. Tu ubicación no se guarda en ningún servidor.</p>
+  <p class="muted">Compartí tu ubicación o escribí una dirección y te mostramos las sucursales de los súper de tu zona a la vuelta, con cómo llegar a pie. Tu ubicación no se guarda en ningún servidor.</p>
   <div class="map-tools">
     <button class="btn" type="button" id="mapLocate"><svg class="ic"><use href="#i-pin"/></svg> Usar mi ubicación</button>
-    <form class="map-form" id="mapForm"><input id="mapAddr" placeholder="Calle y altura, barrio (ej.: Av. Corrientes 1500)" autocomplete="street-address" aria-label="Dirección"><button class="mini-btn" type="submit">Buscar</button></form>
+    <form class="map-form" id="mapForm"><input id="mapAddr" placeholder="Calle y altura, ciudad (ej.: Córdoba 1500, Rosario)" autocomplete="street-address" aria-label="Dirección"><button class="mini-btn" type="submit">Buscar</button></form>
     <label class="map-r">Radio <select id="mapRadius"><option value="500">500 m</option><option value="1000">1 km</option><option value="1500">1,5 km</option><option value="2500">2,5 km</option><option value="5000">5 km</option></select></label>
   </div>
   <div class="chips" id="mapChains"></div>
@@ -208,7 +209,7 @@
 <footer class="foot" data-web>
   <nav class="foot-nav"><a href="index.html">Inicio</a><a href="plan.html">Plan</a><a href="recetas.html">Recetas</a><a href="compras.html">Compras</a><a href="supermercados.html">Supermercados</a><a href="promos.html">Promos</a><a href="temporada.html">Estación</a><a href="nutricion.html">Nutrición</a><a href="mi-plan.html">Mi plan</a></nav>
   <p class="foot-legal"><a href="terminos.html">Términos de uso</a> · <a href="privacidad.html">Privacidad</a> · © 2026 Jaemeson Dieu, todos los derechos reservados</p>
-  <p>Hecho en casa, Buenos Aires · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a> <button type="button" class="mini-btn install-btn" hidden>Instalar la app</button></p>
+  <p>Hecho en casa en Buenos Aires, para todo el país · octubre 2026 · <a href="https://github.com/Jaemeson-RA/plan-comidas-bsas">código en GitHub</a> <button type="button" class="mini-btn install-btn" hidden>Instalar la app</button></p>
 </footer>
 <nav class="tabbar" aria-label="Secciones">
   <a href="index.html" data-nav="inicio"><svg class="ic duo"><use href="#i-home" class="sh"/><use href="#i-home"/></svg>Inicio</a>

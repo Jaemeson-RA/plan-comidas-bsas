@@ -6,6 +6,10 @@
  * Los sitios de los súper no permiten llamadas directas desde el navegador (sin CORS); este worker las hace por el sitio.
  */
 const VTEX = { Jumbo: "www.jumbo.com.ar", Disco: "www.disco.com.ar", Vea: "www.vea.com.ar", Carrefour: "www.carrefour.com.ar", "Día": "diaonline.supermercadosdia.com.ar", "ChangoMás": "www.masonline.com.ar" };
+// cadenas regionales (misma plataforma VTEX): solo se consultan si la página las pide (?c=), según la zona de quien busca
+const REGIONAL = { Toledo: "www.toledodigital.com.ar", Cordiez: "www.cordiez.com.ar" };
+const HOST = { ...VTEX, ...REGIONAL };
+const ALL_CHAINS = [...Object.keys(HOST), "Coto"];
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36";
 import { pushRoute, pushCron, promoAlerts } from "./push.js";
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Cache-Control": "public, max-age=600" };
@@ -146,15 +150,15 @@ async function promos(env, ctx, force) {
 }
 
 // ---------- SUCURSALES: puntos de retiro de las cadenas VTEX que los publican (Carrefour, Día, ChangoMás) cerca de un punto ----------
-const PICKUP = ["Carrefour", "Día", "ChangoMás"];
+const PICKUP = ["Carrefour", "Día", "ChangoMás", "Toledo", "Cordiez"];
 async function sucursales(url) {
   const H = { ...CORS, "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=86400" };
   const lat = +url.searchParams.get("lat"), lon = +url.searchParams.get("lon");
-  if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat + 34.6) > 1.5 || Math.abs(lon + 58.5) > 1.5) return new Response(JSON.stringify({ error: "fuera del AMBA" }), { status: 400, headers: H });
+  if (!isFinite(lat) || !isFinite(lon) || lat > -21 || lat < -56 || lon < -74 || lon > -53) return new Response(JSON.stringify({ error: "fuera de Argentina" }), { status: 400, headers: H });
   const out = [], seen = new Set();
   await Promise.all(PICKUP.map(async (store) => {
     try {
-      const r = await fetch(`https://${VTEX[store]}/api/checkout/pub/pickup-points?geoCoordinates=${lon.toFixed(5)};${lat.toFixed(5)}`, { headers: { "User-Agent": UA, Accept: "application/json" } });
+      const r = await fetch(`https://${HOST[store]}/api/checkout/pub/pickup-points?geoCoordinates=${lon.toFixed(5)};${lat.toFixed(5)}`, { headers: { "User-Agent": UA, Accept: "application/json" } });
       if (!r.ok) return;
       for (const it of (await r.json()).items || []) {
         const p = it.pickupPoint || {}, a = p.address || {}, g = a.geoCoordinates || [];
@@ -178,7 +182,10 @@ export default {
     if (url.pathname !== "/search") return new Response("Menuario · proxy de precios. Usar /search?q=producto, /promos o /push/*", { headers: CORS });
     const q = (url.searchParams.get("q") || "").trim().slice(0, 60);
     if (q.length < 2) return new Response(JSON.stringify({ error: "q muy corto" }), { status: 400, headers: { ...CORS, "Content-Type": "application/json" } });
-    const jobs = [...Object.entries(VTEX).map(([s, h]) => vtex(s, h, q).catch(() => [])), coto(q).catch(() => [])];
+    // ?c=Carrefour,Día,Toledo… = solo las cadenas de la zona; sin c, las siete nacionales de siempre
+    const want = (url.searchParams.get("c") || "").split(",").map((x) => x.trim()).filter((x) => ALL_CHAINS.includes(x));
+    const pick = want.length ? want : [...Object.keys(VTEX), "Coto"];
+    const jobs = pick.map((s) => (s === "Coto" ? coto(q) : vtex(s, HOST[s], q)).catch(() => []));
     const results = (await Promise.all(jobs)).flat();
     return new Response(JSON.stringify({ q, at: new Date().toISOString(), results }), { headers: { ...CORS, "Content-Type": "application/json; charset=utf-8" } });
   },

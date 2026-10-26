@@ -1353,3 +1353,31 @@ button,input,select,textarea{font-family:inherit}
 @media (max-width:520px){
   .dc .row small{flex:none;width:64px;font-size:.64rem;letter-spacing:.04em}
 }
+
+/* ===== zona (provincia) ===== */
+.zona-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;background:var(--crema);border:1.5px solid var(--border);border-radius:14px;padding:.6rem .8rem;margin:0 0 1rem;font-size:.92rem}
+.zona-bar > .ic{width:20px;height:20px;color:var(--verde);flex:none}
+.zona-bar > span{flex:1 1 180px;min-width:0}
+.zona-bar.off{background:var(--ok2);border-color:#BFE0CB}
+.zona-bar .btn,.zona-bar .mini-btn{margin:0}
+.zona-wrap:empty{display:none}
+#cmpZona .zona-bar,#prZona .zona-bar{margin-bottom:.6rem}
+.zona-sel{display:flex;flex-direction:column;gap:.3rem;font-weight:700;font-size:.85rem;color:var(--muted);margin:.6rem 0}
+.zona-sel select{font:inherit;font-weight:600;color:var(--ink);padding:.6rem .7rem;border:1.5px solid var(--border);border-radius:12px;background:#fff}
+.zona-geo{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.2rem 0 .4rem}
+.est-nota{display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;background:var(--ok2);border:1.5px solid #BFE0CB;border-radius:14px;padding:.7rem .85rem;font-size:.9rem;margin:0 0 1rem}
+.est-nota:empty{display:none}
+.est-nota > .ic{width:18px;height:18px;color:var(--verde);flex:none;margin-top:.15rem}
+.est-nota > span{flex:1 1 220px;min-width:0}
+/* sugerencias de dirección */
+.addr-sug{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;list-style:none;margin:0;padding:.3rem;background:#fff;border:1.5px solid var(--border);border-radius:14px;box-shadow:0 14px 34px rgba(31,45,42,.16);max-height:300px;overflow:auto}
+.addr-sug li{display:flex;gap:.55rem;align-items:flex-start;padding:.55rem .6rem;border-radius:10px;cursor:pointer}
+.addr-sug li .ic{width:16px;height:16px;flex:none;margin-top:.2rem;color:var(--muted)}
+.addr-sug li b{display:block;font-weight:700;font-size:.92rem}
+.addr-sug li small{display:block;color:var(--muted);font-size:.8rem}
+.addr-sug li:hover,.addr-sug li[aria-selected="true"]{background:var(--ok2)}
+
+/* ===== cocina del mundo ===== */
+.rc{position:relative}
+.rc-orig{position:absolute;top:.55rem;left:.55rem;z-index:2;background:rgba(255,255,255,.92);color:var(--ink);font-size:.72rem;font-weight:700;border-radius:999px;padding:.18rem .55rem;box-shadow:0 2px 8px rgba(31,45,42,.15)}
+.rm-orig{margin:0 0 .2rem}

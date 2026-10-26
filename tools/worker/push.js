@@ -127,7 +127,7 @@ async function eachSub(env, fn) {
   } while (cursor);
 }
 
-// cron cada 15 minutos: ¿a quién le toca en este cuarto de hora (hora de Buenos Aires)?
+// cron cada 15 minutos: ¿a quién le toca en este cuarto de hora (hora de Argentina, UTC−3)?
 export async function pushCron(env, scheduledTime) {
   if (!env.PROMOS || !env.VAPID_JWK) return { sent: 0 };
   const local = localNow(scheduledTime);

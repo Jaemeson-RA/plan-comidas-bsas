@@ -2,8 +2,9 @@
 <section class="page-head">
   <p class="kicker">Supermercados con envío a domicilio</p>
   <h1>Dónde <mark>conviene</mark> pedir</h1>
-  <p class="lead">Comparamos siete cadenas que entregan en CABA y GBA. Primero la respuesta corta; después las condiciones de envío de cada una, por tipo de tienda; y al final, para quien quiera el detalle, el precio producto por producto.</p>
+  <p class="lead">Comparamos las cadenas con tienda online que hay donde vivís: las siete nacionales y, según tu provincia, las de tu región. Primero la respuesta corta; después las condiciones de envío de cada una, por tipo de tienda; y al final, para quien quiera el detalle, el precio producto por producto.</p>
 </section>
+<div class="zona-wrap" id="zonaBar"></div>
 
 <div class="rates-row card" data-web>
   <div><h3>Cotización usada para convertir</h3><p class="muted small" id="ratesNote">Cargando…</p></div>
@@ -13,7 +14,7 @@
 
 <section class="sec buscador" id="buscar">
   <h2><span class="num">1</span>Buscar y comparar</h2>
-  <p class="muted">Escribí un producto y lo buscamos en vivo en las siete cadenas: precio, presentación y enlace directo para comprarlo donde está más barato. Tocá la campanita para seguir un precio y enterarte si baja.</p>
+  <p class="muted">Escribí un producto y lo buscamos en vivo en las cadenas de tu zona: precio, presentación y enlace directo para comprarlo donde está más barato. Tocá la campanita para seguir un precio y enterarte si baja.</p>
   <form class="buscar-form" id="buscarForm"><input id="buscarQ" placeholder="Ej.: aceite de girasol 1,5 L, yerba, suprema de pollo…" autocomplete="off"><button class="btn" type="submit"><svg class="ic"><use href="#i-external"/></svg> Comparar</button></form>
   <div id="buscarRes" class="buscar-res"></div>
   <div id="alertasBox"></div>
@@ -21,10 +22,10 @@
 
 <section class="sec mapa" id="mapa">
   <h2><span class="num">2</span>Sucursales cerca tuyo</h2>
-  <p class="muted">Compartí tu ubicación o escribí una dirección y te mostramos las sucursales de las siete cadenas a la vuelta, con cómo llegar a pie. Tu ubicación no se guarda en ningún servidor.</p>
+  <p class="muted">Compartí tu ubicación o escribí una dirección y te mostramos las sucursales de los súper de tu zona a la vuelta, con cómo llegar a pie. Tu ubicación no se guarda en ningún servidor.</p>
   <div class="map-tools">
     <button class="btn" type="button" id="mapLocate"><svg class="ic"><use href="#i-pin"/></svg> Usar mi ubicación</button>
-    <form class="map-form" id="mapForm"><input id="mapAddr" placeholder="Calle y altura, barrio (ej.: Av. Corrientes 1500)" autocomplete="street-address" aria-label="Dirección"><button class="mini-btn" type="submit">Buscar</button></form>
+    <form class="map-form" id="mapForm"><input id="mapAddr" placeholder="Calle y altura, ciudad (ej.: Córdoba 1500, Rosario)" autocomplete="street-address" aria-label="Dirección"><button class="mini-btn" type="submit">Buscar</button></form>
     <label class="map-r">Radio <select id="mapRadius"><option value="500">500 m</option><option value="1000">1 km</option><option value="1500">1,5 km</option><option value="2500">2,5 km</option><option value="5000">5 km</option></select></label>
   </div>
   <div class="chips" id="mapChains"></div>

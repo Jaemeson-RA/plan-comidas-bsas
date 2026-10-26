@@ -6,11 +6,11 @@ head = open(os.path.join(root, "icons.svg"), encoding="utf-8").read() + "\n" + o
 FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%232F8F5B'/%3E%3Cg fill='none' stroke='%23FFF9EE' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 10.5h13'/%3E%3Cpath d='M6.5 10.5v4.5a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-4.5'/%3E%3Cpath d='M12 7.5v3M10.2 7.5h3.6'/%3E%3Cpath d='M9.8 5c0-1 .9-1 .9-2M13.3 5c0-1 .9-1 .9-2'/%3E%3C/g%3E%3C/svg%3E"
 foot = open(os.path.join(root, "_foot.html"), encoding="utf-8").read()
 META = {
- "index": ("Menuario · Plan de comidas en Buenos Aires", "Menuario: plan de comidas continuo para Buenos Aires: recetas fáciles, lista de compras, precios de supermercados con envío y alertas. Se instala como app."),
+ "index": ("Menuario · Plan de comidas para toda la Argentina", "Menuario: plan de comidas continuo para toda la Argentina: recetas fáciles, lista de compras, precios de supermercados con envío y alertas. Se instala como app."),
  "plan": ("Calendario · Menuario", "Qué se come cada día: plan continuo mes por mes, con recetas, fotos y videos."),
  "recetas": ("Recetas · Menuario", "54 recetas fáciles para una persona (también veganas, vegetarianas y sin TACC), con foto, video, nutrición y costo, y un buscador por lo que hay en tu heladera."),
  "compras": ("Lista de compras · Menuario", "Lista de compras semanal armada por góndola a partir de las recetas del plan."),
- "supermercados": ("Supermercados · Menuario", "Comparativa de 7 supermercados de Buenos Aires con envío a domicilio: condiciones y precios en ARS, USD y EUR."),
+ "supermercados": ("Supermercados · Menuario", "Comparativa de supermercados con envío a domicilio en tu provincia: cadenas nacionales y regionales, condiciones y precios en ARS, USD y EUR."),
  "temporada": ("Productos de estación · Menuario", "Frutas y verduras de estación en Argentina, mes por mes, y los platos del plan que las aprovechan."),
  "nutricion": ("Nutrición · Menuario", "Calorías, proteínas, fibra y sal de tu calendario por semana y por mes, con aportes recomendados y nota sobre 10."),
  "promos": ("Promos de hoy · Menuario", "Ofertas en góndola de Coto, Día, Carrefour, Jumbo, Disco, Vea y ChangoMás, actualizadas cada 3 horas."),

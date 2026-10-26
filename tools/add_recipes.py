@@ -51,6 +51,7 @@ def add_dict_entries(s, name, entries):
     new = "".join(f',\n "{k}":{v}' for k, v in entries if f'"{k}":' not in s[m.start():end])
     return s[:end] + new + s[end:]
 s = add_dict_entries(s, "YT", [(r["id"], J(r["yt"])) for r in recs])
+s = add_dict_entries(s, "ORIGEN", [(r["id"], J([r["origen"], r.get("region", "")])) for r in recs if r.get("origen")])
 s = add_dict_entries(s, "NUT", [(r["id"], "(" + ",".join(str(round(x, 1)) for x in r["nut"]) + ")") for r in recs])
 s = add_dict_entries(s, "OLD_PORC", [(r["id"], "2") for r in recs if r["id"] in BATCH])
 s = add_dict_entries(s, "PORCIONES", [(r["id"], "2") for r in recs if r["id"] in BATCH])

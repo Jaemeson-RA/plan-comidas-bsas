@@ -35,7 +35,7 @@ def render_icons():
 
 MANIFEST = {
     "name": "Menuario · Plan de comidas", "short_name": "Menuario", "lang": "es-AR",
-    "description": "Tu plan de comidas, recetas, lista de compras y precios de supermercados de Buenos Aires.",
+    "description": "Tu plan de comidas, recetas, lista de compras y precios de los supermercados de tu zona, en toda la Argentina.",
     "start_url": "./index.html?app=1", "scope": "./", "display": "standalone", "orientation": "portrait",
     "background_color": "#FBF7F0", "theme_color": "#2F8F5B",
     "icons": [{"src": "img/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},

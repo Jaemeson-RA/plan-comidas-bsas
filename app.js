@@ -139,13 +139,14 @@
       if (!r.custom) cache.set(r.id, f);
       return f;
     };
-    const prefs = () => { try { return Object.assign({ dieta: "todo", sin: [], alergias: [] }, JSON.parse(localStorage.getItem("prefsComida") || "{}")); } catch (e) { return { dieta: "todo", sin: [], alergias: [] }; } };
+    const prefs = () => { try { return Object.assign({ dieta: "todo", sin: [], alergias: [], mundo: 0 }, JSON.parse(localStorage.getItem("prefsComida") || "{}")); } catch (e) { return { dieta: "todo", sin: [], alergias: [], mundo: 0 }; } };
+    const mundoOk = (r, P = prefs()) => !r.origen || (P.mundo || 0) > 0;  // los platos del mundo entran al plan solo si se eligieron
     const banned = (P = prefs()) => { const b = new Set(BY_DIET[P.dieta] || []); if (P.sin.includes("gluten")) b.add("gluten"); if (P.sin.includes("lactosa")) b.add("lacteos"); P.alergias.forEach((a) => b.add(a)); return b; };
     const why = (r, P) => { const b = banned(P); return [...flags(r)].filter((k) => b.has(k)).map((k) => LBL[k]); };
     const ok = (r, P) => why(r, P).length === 0;
     const active = (P = prefs()) => banned(P).size > 0;
     const summary = (P = prefs()) => [P.dieta !== "todo" && P.dieta, P.sin.includes("gluten") && "sin TACC", P.sin.includes("lactosa") && "sin lactosa", ...P.alergias.map((a) => "sin " + LBL[a])].filter(Boolean).join(" · ");
-    return { flags, prefs, why, ok, active, summary, LBL };
+    return { flags, prefs, why, ok, active, summary, LBL, mundoOk };
   })();
   window.DIET = DIET;
   const andList = (l) => (l.length > 1 ? l.slice(0, -1).join(", ") + " y " + l[l.length - 1] : l[0] || "");
@@ -181,15 +182,17 @@
     return `<div class="pref-g"><h4>Cómo comés</h4><div class="chips">${DIETAS.map(([v, l]) => chip("data-dieta", v, l, P.dieta === v)).join("")}</div></div>
       <div class="pref-g"><h4>Sin…</h4><div class="chips">${chip("data-sin", "gluten", "Sin TACC (celiaquía)", P.sin.includes("gluten"))}${chip("data-sin", "lactosa", "Sin lactosa", P.sin.includes("lactosa"))}</div></div>
       <div class="pref-g"><h4>Alergias</h4><div class="chips">${ALERG.map(([v, l]) => chip("data-alerg", v, l, P.alergias.includes(v))).join("")}</div></div>
+      <div class="pref-g"><h4>Cocina del mundo</h4><div class="chips">${[[0, "Solo cocina de acá"], [2, "Un par por semana"], [4, "Seguido"]].map(([v, l]) => chip("data-mundo", v, l, (P.mundo || 0) === v)).join("")}</div><p class="muted small">${Object.values(R).filter((r) => r.origen).length} platos de Italia, España, Francia, Grecia, Japón, China, India, Tailandia y más, con ingredientes que se consiguen acá. Entran en tu plan, en el mes a medida y al cambiar un plato.</p></div>
       <p class="pref-sum small">${DIET.active() ? `${ic("check")} <b>${nOk} de ${n} recetas</b> van con tu perfil. Recetas, Mi plan y el mes a medida usan solo esas.` : "Sin restricciones: se muestran todas las recetas."}</p>`;
   }
   function bindPrefs(box) {
     box.innerHTML = prefsHTML();
     box.onclick = (e) => {
-      const b = e.target.closest("[data-dieta],[data-sin],[data-alerg]"); if (!b) return;
+      const b = e.target.closest("[data-dieta],[data-sin],[data-alerg],[data-mundo]"); if (!b) return;
       const P = DIET.prefs();
       if (b.dataset.dieta) P.dieta = b.dataset.dieta;
       if (b.dataset.sin) P.sin = P.sin.includes(b.dataset.sin) ? P.sin.filter((x) => x !== b.dataset.sin) : [...P.sin, b.dataset.sin];
+      if (b.dataset.mundo !== undefined) P.mundo = +b.dataset.mundo;
       if (b.dataset.alerg) P.alergias = P.alergias.includes(b.dataset.alerg) ? P.alergias.filter((x) => x !== b.dataset.alerg) : [...P.alergias, b.dataset.alerg];
       try { localStorage.setItem("prefsComida", JSON.stringify(P)); } catch (x) {}
       $$("[data-prefs]").forEach(bindPrefs); window.dispatchEvent(new Event("prefs"));
@@ -205,6 +208,50 @@
     sh.onclick = (e) => { if (e.target.closest("[data-shx]")) { sh.hidden = true; document.body.classList.remove("no-scroll"); } };
   }
   document.addEventListener("click", (e) => { if (e.target.closest("[data-open-prefs]")) { e.preventDefault(); $("#appMore") && ($("#appMore").hidden = true); openPrefs(); } });
+
+  // ---------- ZONA: provincia (o región de Buenos Aires) de quien usa Menuario ----------
+  // Qué cadenas hay en cada zona lo calcula tools/zonas.py (OpenStreetMap + puntos de retiro de cada súper). Sin zona: las siete cadenas nacionales.
+  /*ZONAS*/
+  const ZONAS = [["caba", "Ciudad de Buenos Aires", "centro", -34.6037, -58.3816, "02"], ["gba", "Gran Buenos Aires y La Plata", "centro", -34.76, -58.4, "06"], ["costa", "Mar del Plata y la Costa", "centro", -38.0055, -57.5426, "06"], ["bsas", "Interior de Buenos Aires", "centro", -38.7183, -62.2663, "06"], ["cba", "Córdoba", "centro", -31.4201, -64.1888, "14"], ["sfe", "Santa Fe y Rosario", "centro", -32.9442, -60.6505, "82"], ["er", "Entre Ríos", "centro", -31.7319, -60.5238, "30"], ["lp", "La Pampa", "centro", -36.6203, -64.2906, "42"], ["mza", "Mendoza", "cuyo", -32.8895, -68.8458, "50"], ["sj", "San Juan", "cuyo", -31.5375, -68.5364, "70"], ["sl", "San Luis", "cuyo", -33.3017, -66.3378, "74"], ["tuc", "Tucumán", "noa", -26.8083, -65.2176, "90"], ["sal", "Salta", "noa", -24.7821, -65.4232, "66"], ["juj", "Jujuy", "noa", -24.1858, -65.2995, "38"], ["sde", "Santiago del Estero", "noa", -27.7834, -64.2642, "86"], ["cat", "Catamarca", "noa", -28.4696, -65.7795, "10"], ["lr", "La Rioja", "noa", -29.4131, -66.8558, "46"], ["cha", "Chaco", "nea", -27.4512, -58.9866, "22"], ["ctes", "Corrientes", "nea", -27.4692, -58.8306, "18"], ["mis", "Misiones", "nea", -27.3671, -55.8961, "54"], ["for", "Formosa", "nea", -26.1849, -58.1731, "34"], ["nqn", "Neuquén", "pat", -38.9516, -68.0591, "58"], ["rn", "Río Negro", "pat", -41.1335, -71.3103, "62"], ["chu", "Chubut", "pat", -45.8641, -67.4966, "26"], ["sc", "Santa Cruz", "pat", -51.623, -69.2168, "78"], ["tdf", "Tierra del Fuego", "pat", -54.8019, -68.303, "94"]];
+  const ZCH = {"caba": ["Carrefour", "Día", "Coto", "Jumbo", "Disco", "Vea", "ChangoMás"], "gba": ["Carrefour", "Día", "Coto", "Jumbo", "Disco", "Vea", "ChangoMás"], "costa": ["Carrefour", "Día", "Coto", "Disco", "Vea", "Toledo"], "bsas": ["Carrefour", "Día", "Vea", "ChangoMás"], "cba": ["Carrefour", "Día", "Disco", "Vea", "ChangoMás", "Cordiez"], "sfe": ["Carrefour", "Día", "Coto", "Vea", "ChangoMás"], "er": ["Carrefour", "Día", "Coto", "Vea", "ChangoMás"], "lp": ["Carrefour", "ChangoMás"], "mza": ["Carrefour", "Día", "Jumbo", "Vea", "ChangoMás"], "sj": ["Carrefour", "Día", "Vea", "ChangoMás"], "sl": ["Carrefour", "Vea", "ChangoMás"], "tuc": ["Carrefour", "Día", "Vea", "ChangoMás"], "sal": ["Carrefour", "Día", "Vea", "ChangoMás"], "juj": ["Carrefour", "Día", "Vea", "ChangoMás"], "sde": ["ChangoMás"], "cat": ["Carrefour", "Día", "Vea", "ChangoMás"], "lr": ["Carrefour", "Vea", "ChangoMás"], "cha": ["Carrefour", "Día", "ChangoMás"], "ctes": ["Carrefour", "Día", "ChangoMás"], "mis": ["ChangoMás"], "for": ["Carrefour", "ChangoMás"], "nqn": ["Carrefour", "Vea", "ChangoMás"], "rn": ["Carrefour", "Vea", "ChangoMás"], "chu": ["Carrefour", "Vea", "ChangoMás"], "sc": ["Carrefour"], "tdf": ["Carrefour"]};
+  /*/ZONAS*/
+  const NAC = ["Carrefour", "Día", "Coto", "Jumbo", "Disco", "Vea", "ChangoMás"];
+  const zGet = () => { try { return localStorage.getItem("zona") || ""; } catch (e) { return ""; } };
+  const ZONA = window.ZONA = {
+    list: ZONAS, nac: NAC, get: zGet,
+    info(id) { const z = ZONAS.find((x) => x[0] === (id ?? zGet())); return z ? { id: z[0], name: z[1], reg: z[2], c: [z[3], z[4]], prov: z[5] } : null; },
+    chains(id) { return ZCH[id ?? zGet()] || NAC; },
+    q() { return zGet() && ZCH[zGet()] ? "&c=" + encodeURIComponent(ZONA.chains().join(",")) : ""; },
+    set(id) { try { if (id) localStorage.setItem("zona", id); else localStorage.removeItem("zona"); } catch (e) {} window.dispatchEvent(new Event("zona")); },
+    near(lat, lon) { let best = "", bd = Infinity; ZONAS.forEach((z) => { const d = (z[3] - lat) ** 2 + ((z[4] - lon) * Math.cos(lat * Math.PI / 180)) ** 2; if (d < bd) { bd = d; best = z[0]; } }); return best; },
+  };
+  const REGN = { centro: "Centro", cuyo: "Cuyo", noa: "Noroeste", nea: "Noreste", pat: "Patagonia" };
+  window.zonaBar = (what) => { const z = ZONA.info(); return z ? `<div class="zona-bar">${ic("pin")}<span>${esc(what)}: <b>${esc(z.name)}</b></span><button type="button" class="mini-btn" data-open-zona>Cambiar</button></div>`
+    : `<div class="zona-bar off">${ic("pin")}<span><b>¿Dónde vivís?</b> Elegí tu provincia y te mostramos los súper que tenés cerca.</span><button type="button" class="btn small-btn" data-open-zona>Elegir</button></div>`; };
+  function openZona() {
+    let sh = $("#zonaSheet"); if (!sh) { sh = document.createElement("div"); sh.id = "zonaSheet"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
+    const cur = zGet();
+    sh.innerHTML = `<div class="sh-bg" data-shx></div><div class="sh-box as-box zona-box" role="dialog" aria-modal="true" aria-labelledby="zT"><button class="as-x" type="button" data-shx aria-label="Cerrar">×</button>
+      <h3 id="zT">¿Dónde vivís?</h3><p class="muted small">Con tu provincia te mostramos los supermercados que hay donde vivís, sus precios y promos, el mapa y lo que está en temporada en tu región.</p>
+      <label class="zona-sel"><span>Provincia o zona</span><select id="zSel"><option value="">Todo el país (cadenas nacionales)</option>${Object.entries(REGN).map(([g, t]) => `<optgroup label="${t}">${ZONAS.filter((z) => z[2] === g).map((z) => `<option value="${z[0]}"${z[0] === cur ? " selected" : ""}>${esc(z[1])}</option>`).join("")}</optgroup>`).join("")}</select></label>
+      <p class="zona-geo"><button type="button" class="mini-btn" id="zGeo">${ic("pin")} Usar mi ubicación</button> <small class="muted" id="zMsg"></small></p>
+      <p class="small" id="zCh"></p>
+      <div class="as-act"><button class="btn" type="button" id="zOk">Listo</button></div></div>`;
+    const show = () => { const v = $("#zSel").value; $("#zCh").innerHTML = v ? `Comparamos: <b>${ZONA.chains(v).map(esc).join(", ")}</b>.` : "Sin elegir, comparamos las siete cadenas nacionales."; };
+    show(); $("#zSel").onchange = show;
+    $("#zGeo").onclick = () => {
+      if (!navigator.geolocation) { $("#zMsg").textContent = "Tu navegador no comparte la ubicación."; return; }
+      $("#zMsg").textContent = "Buscando…";
+      navigator.geolocation.getCurrentPosition((g) => { $("#zSel").value = ZONA.near(g.coords.latitude, g.coords.longitude); $("#zMsg").textContent = "Listo (la ubicación no sale de tu teléfono)."; show(); },
+        () => { $("#zMsg").textContent = "No pudimos leer la ubicación: elegila de la lista."; }, { timeout: 10000, maximumAge: 6e5 });
+    };
+    const close = () => { sh.hidden = true; document.body.classList.remove("no-scroll"); };
+    $("#zOk").onclick = () => { const v = $("#zSel").value; close(); if (v !== zGet()) { ZONA.set(v); toastG(v ? `Listo: súper y precios de ${ZONA.info(v).name}.` : "Listo: todo el país."); } };
+    sh.onclick = (e) => { if (e.target.closest("[data-shx]")) close(); };
+    sh.hidden = false; document.body.classList.add("no-scroll");
+  }
+  window.openZona = openZona;
+  document.addEventListener("click", (e) => { if (e.target.closest("[data-open-zona]")) { e.preventDefault(); $("#appMore") && ($("#appMore").hidden = true); openZona(); } });
   const ICON = { desayuno: ic("desayuno"), almuerzo: ic("almuerzo"), merienda: ic("merienda"), cena: ic("cena") };
 
   // ---------- modal ----------
@@ -225,7 +272,7 @@
     $("#modalContent").innerHTML = `
       <img class="rm-img" src="${r.img}"${r.srcset ? ` srcset="${r.srcset}" sizes="(max-width:720px) 100vw, 640px"` : ""} alt="${esc(r.name)}">
       <div class="rm">
-        <h2>${esc(r.name)}</h2>
+        ${r.origen ? `<p class="kicker rm-orig">Cocina del mundo · ${esc(r.origen[0])}</p>` : ""}<h2>${esc(r.name)}</h2>
         ${dietNote(r)}
         ${r.custom ? `<p class="muted small">Receta de la comunidad, creada por <b>${esc(r.ownerName)}</b>.</p>` : ""}
         <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("plate")}<b>${r.porciones} ${r.porciones === 1 ? "porción" : "porciones"}</b></span>${r.cost ? `<span>${ic("tag")}<b data-ars="${r.cost}"></b> aprox./porción</span>` : ""}</div>
@@ -237,7 +284,7 @@
           <div><h3>Preparación</h3>${r.pasos.length ? `<ol>${r.pasos.map((p) => `<li>${esc(p)}</li>`).join("")}</ol>` : `<p class="muted">Sin pasos cargados.</p>`}${r.tip ? `<div class="tip">${ic("bulb")} ${esc(r.tip)}</div>` : ""}</div>
         </div>
         ${r.yt ? `<div class="yt"><h3>Video</h3><button class="yt-thumb" data-yt="${r.yt}" aria-label="Reproducir video"><img src="https://i.ytimg.com/vi/${r.yt}/hqdefault.jpg" alt="" loading="lazy"></button></div>` : ""}
-        ${r.credit ? `<p class="credit">Foto: <a href="${r.credit.page}" target="_blank" rel="noopener">${esc(r.credit.title)}</a> · ${esc(r.credit.artist || "Wikimedia Commons")} · ${esc(r.credit.license)} (Wikimedia Commons). El costo se calcula con precios de supermercados online de Buenos Aires de octubre 2026 y es orientativo.</p>` : ""}
+        ${r.credit ? `<p class="credit">Foto: <a href="${r.credit.page}" target="_blank" rel="noopener">${esc(r.credit.title)}</a> · ${esc(r.credit.artist || "Wikimedia Commons")} · ${esc(r.credit.license)} (Wikimedia Commons). El costo se calcula con precios online de las cadenas nacionales (octubre 2026) y es orientativo: en tu ciudad puede variar.</p>` : ""}
       </div>`;
     curRec = r; curPorc = r.porciones * HOG(); modal.classList.remove("closing");
     modal.hidden = false; document.body.style.overflow = "hidden"; $(".modal-box").scrollTop = 0; hidePop(); renderMoney();
@@ -340,7 +387,7 @@
     const day = houseDay(date), base = houseDayBase(date)[slot], cur = day[slot], rc = R[cur];
     const pool = Object.values(R).filter((r) => !r.custom && r.id !== cur && ((slot === "desayuno") === (r.tipo === "desayuno")));
     const finde = ["Sábado", "Domingo"].includes(day.dow);
-    const score = (r) => (DIET.ok(r) ? 0 : 100) + Math.abs((r.tiempo || 30) - (rc?.tiempo || 30)) / 10 + (!finde && r.tiempo > 45 ? 3 : 0);
+    const score = (r) => (DIET.ok(r) ? 0 : 100) + (DIET.mundoOk(r) ? 0 : 20) + Math.abs((r.tiempo || 30) - (rc?.tiempo || 30)) / 10 + (!finde && r.tiempo > 45 ? 3 : 0);
     const list = pool.sort((a, b) => score(a) - score(b));
     let sh = $("#swapSheet"); if (!sh) { sh = document.createElement("div"); sh.id = "swapSheet"; sh.className = "share-sheet app-sheet"; document.body.appendChild(sh); }
     const dt = new Date(date + "T12:00");
@@ -418,7 +465,20 @@
     if (d >= 5) [lunch, dinner] = (d === 5 ? ROT.sat : ROT.sun)[mod(w, ROT.sat.length)];
     else { const k = w * 5 + d; lunch = ROT.lunch[mod(k, ROT.lunch.length)]; dinner = ROT.dinner[mod(k, ROT.dinner.length)]; }
     if (iso.slice(8) === "29") { if (dinner === "noquis") dinner = "sopa"; lunch = "noquis"; }  // ñoquis del 29
-    return { date: iso, dow: DOWS[d], label: `${DOWS[d]} ${lab(iso)}`, desayuno: ROT.break[mod(d + w, 7)], almuerzo: lunch, merienda: ROT.merienda[mod(d + w, 7)], cena: dinner };
+    return mundoDay({ date: iso, dow: DOWS[d], label: `${DOWS[d]} ${lab(iso)}`, desayuno: ROT.break[mod(d + w, 7)], almuerzo: lunch, merienda: ROT.merienda[mod(d + w, 7)], cena: dinner }, w, d);
+  }
+  let mpKey = null, mpPool = null;
+  const mundoPool = () => {  // platos del mundo aptos para el perfil (se recalcula solo si cambian las preferencias)
+    const k = (() => { try { return localStorage.getItem("prefsComida") || ""; } catch (e) { return ""; } })();
+    if (k !== mpKey) { mpKey = k; const W = Object.values(R).filter((r) => r.origen && !r.custom && DIET.ok(r)).sort((a, b) => a.id.localeCompare(b.id)); mpPool = { pl: W.filter((r) => r.tipo !== "desayuno"), bk: W.filter((r) => r.tipo === "desayuno") }; }
+    return mpPool;
+  };
+  function mundoDay(o, w, d) {
+    const n = DIET.prefs().mundo || 0; if (!n) return o;
+    const P = mundoPool(), slots = n >= 4 ? [[0, "cena"], [2, "cena"], [4, "almuerzo"], [5, "almuerzo"]] : [[2, "cena"], [5, "almuerzo"]];
+    slots.forEach(([dd, k], j) => { if (dd === d && P.pl.length && !(k === "almuerzo" && o.date.slice(8) === "29")) o[k] = P.pl[mod(w * slots.length + j, P.pl.length)].id; });
+    if (d === 6 && P.bk.length) o.desayuno = P.bk[mod(w, P.bk.length)].id;
+    return o;
   }
   function weekAt(monday) { const days = Array.from({ length: 7 }, (_, i) => houseDay(addDays(monday, i))); return { start: monday, end: days[6].date, label: `${lab(monday)} → ${lab(days[6].date)}`, days }; }
   function monthWeeks(ym) { const out = []; let m = mondayOf(ym + "-01"); while (m.slice(0, 7) <= ym && out.length < 6) { out.push(weekAt(m)); m = addDays(m, 7); } return out; }
@@ -443,7 +503,7 @@
   // ---------- inicio ----------
   if ((page === "inicio" || page === "404") && $("#today")) {
     const vid = $("#introVideo");
-    if (vid && !document.documentElement.classList.contains("is-app")) { const v = window.matchMedia("(max-width: 720px)").matches; vid.poster = v ? "media/intro-vertical-poster.jpg?v=3" : "media/intro-poster.jpg?v=3"; if (v) { vid.querySelector("source").src = "media/intro-vertical.mp4?v=3"; vid.classList.add("vertical"); vid.load(); } }
+    if (vid && !document.documentElement.classList.contains("is-app")) { const v = window.matchMedia("(max-width: 720px)").matches; vid.poster = v ? "media/intro-vertical-poster.jpg?v=4" : "media/intro-poster.jpg?v=4"; if (v) { vid.querySelector("source").src = "media/intro-vertical.mp4?v=4"; vid.classList.add("vertical"); vid.load(); } }
     const d = houseDay(todayISO);
     $("#today").innerHTML = `<div class="t-head"><p class="kicker">Menú de hoy</p><h3>${"Hoy, " + longDate(d.date)}</h3></div>
       ${["desayuno", "almuerzo", "cena"].map((m) => `<div class="t-row"><small>${ICON[m]} ${m}</small>${mealBtn(d[m])}</div>`).join("")}
@@ -562,15 +622,16 @@
     { id: "horno", t: "Al horno, una sola fuente", d: "Se arman en 10 minutos y el horno hace el resto. Conviene hacer el doble: lo que sobra es la vianda del día siguiente.", ids: ["pollohorno", "milanesas", "tarta", "salmon", "pescadohorno", "berenjenas", "hamburguesas", "pizzacasera", "cerdobatata", "milanesasberenjena", "falafel", "empanadaslentejas"] },
     { id: "ollas", t: "Ollas, guisos y arroces", d: "Las más económicas, las que mejor rinden y las que mejor se congelan en porciones.", ids: ["sopa", "lentejas", "curry", "arrozpollo", "albondigas", "guisofideos", "pollodisco", "locrovegano", "currylentejas", "chiliporotos"] },
     { id: "clasicos", t: "Clásicos argentinos y pastas del finde", d: "Llevan más tiempo y más mesa: quedan para sábado y domingo (y los ñoquis, para el 29).", ids: ["empanadas", "bife", "zapallitos", "pastel", "noquis", "tortilla", "carbonara", "bifecriolla"] },
+    { id: "mundo", t: "Cocina del mundo", d: "Platos de Italia, España, Francia, Grecia, Japón, China, India, Tailandia y más, con ingredientes que se consiguen acá. Para que entren en tu plan, activalos en Preferencias.", ids: Object.values(R).filter((r) => r.origen && !r.custom).sort((a, b) => a.origen[0].localeCompare(b.origen[0]) || a.name.localeCompare(b.name)).map((r) => r.id) },
     { id: "verdes", t: "Verdes y de legumbres", d: "Sin carne y con legumbres, verduras o polenta: veganas o vegetarianas, económicas y que llenan.", ids: ["polenta", "hamblentejas", "garbanzosespinaca", "pastabrocoli", "bunuelosacelga"] },
   ];
   function card(r) {
-    return `<button class="rc" data-rec="${r.id}"><img src="${r.img}"${srcs(r)} alt="${esc(r.name)}" loading="lazy"><div class="b"><h4>${esc(r.name)}</h4>
+    return `<button class="rc" data-rec="${r.id}"><img src="${r.img}"${srcs(r)} alt="${esc(r.name)}" loading="lazy">${r.origen ? `<span class="rc-orig">${esc(r.origen[0])}</span>` : ""}<div class="b"><h4>${esc(r.name)}</h4>
       <div class="meta"><span>${ic("clock")}<b>${r.tiempo} min</b></span><span>${ic("flame")}<b>${r.kcal}</b> kcal</span><span>${ic("tag")}<b data-ars="${r.cost}"></b>/porción</span></div>
       <div>${r.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div></div></button>`;
   }
   if (page === "recetas") {
-    const h1 = $(".page-head h1"); if (h1) h1.innerHTML = `${Object.values(R).filter((r) => !r.custom).length} recetas, <mark>${CATS.length === 6 ? "seis" : CATS.length} categorías</mark>`;
+    const h1 = $(".page-head h1"); if (h1) h1.innerHTML = `${Object.values(R).filter((r) => !r.custom).length} recetas, <mark>${["", "una", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"][CATS.length] || CATS.length} categorías</mark>`;
     $("#catNav").innerHTML = CATS.map((c) => `<a href="#${c.id}">${esc(c.t)} <small>${c.ids.length}</small></a>`).join("");
     // ---------- «¿qué hay en tu heladera?»: recetas que aprovechan lo que tenés ----------
     const normH = (s) => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\(.*?\)/g, " ").replace(/[,.]/g, " ").replace(/\s+/g, " ").trim();
@@ -856,30 +917,37 @@
   }
 
   // ---------- supermercados ----------
-  if (page === "supermercados") {
-    const B = D.basket, names = Object.keys(B.sites);
+  if (page === "supermercados") { const renderSuper = () => {
+    // solo las cadenas de la zona (si hay menos de dos en el changuito, se muestran las siete como referencia)
+    const B = D.basket, zc = window.ZONA.chains(), zi = window.ZONA.info(); let names = Object.keys(B.sites).filter((s) => zc.includes(s)); const ref = names.length < 2; if (ref) names = Object.keys(B.sites);
+    const regio = zc.filter((c) => !window.ZONA.nac.includes(c)), inZone = Object.keys(B.sites).filter((s) => zc.includes(s));
+    if ($("#zonaBar")) $("#zonaBar").innerHTML = window.zonaBar("Supermercados de");
     const totals = names.map((s) => ({ s, t: B.totals[s] })).sort((a, b) => a.t - b.t);
     const max = totals[totals.length - 1].t, min = totals[0].t;
-    $("#ranking").innerHTML = `<h3>Mismo changuito semanal, siete cadenas</h3><p class="muted small">Sin contar el envío. Entre la más barata y la más cara hay <b data-ars="${max - min}"></b> de diferencia (${Math.round((max / min - 1) * 100)} %).</p>
+    const NUM = ["", "una", "dos", "tres", "cuatro", "cinco", "seis", "siete"];
+    $("#ranking").innerHTML = `<h3>${ref ? "Referencia: el changuito en las siete cadenas nacionales" : `Mismo changuito semanal, ${NUM[names.length]} cadenas${zi ? " de " + esc(zi.name) : ""}`}</h3>${ref && zi ? `<p class="small">En ${esc(zi.name)} ${inZone.length ? "de estas siete cadenas solo está " + esc(inZone.join(" y ")) : "no hay ninguna de estas siete cadenas"}: tomalo como referencia${regio.length ? ` y compará tu lista en vivo en ${esc(regio.join(" y "))} desde <a href="compras.html#comparar">Compras</a>` : ""}.</p>` : ""}<p class="muted small">Sin contar el envío. Entre la más barata y la más cara hay <b data-ars="${max - min}"></b> de diferencia (${Math.round((max / min - 1) * 100)} %).</p>
       ${totals.map((x, i) => `<div class="rank-row${i === 0 ? " best" : ""}"><span class="n">${i + 1}. ${esc(x.s)}</span><div class="bar"><i style="width:${Math.round(x.t / max * 100)}%"></i></div><span class="v"><span data-ars="${x.t}"></span><small>${i === 0 ? "la más barata" : "+" + Math.round((x.t / min - 1) * 100) + " %"}</small></span></div>`).join("")}`;
     const byName = Object.fromEntries(D.stores.map((s) => [s.name.replace(" Digital", ""), s]));
     const cheapest = totals[0].s, second = totals[1].s;
+    const has = (c) => names.includes(c) && !ref;
     $("#verdict").innerHTML = `<h3>En pocas palabras</h3>
       <ul class="v-list">
-        <li><b>Compra grande del mes:</b> ${esc(cheapest)}. Es la más barata del changuito y, como el envío se paga una sola vez, conviene concentrar ahí lo pesado (aceite, arroz, yerba, carne para congelar).</li>
-        <li><b>Reposición de la semana:</b> Día (mínimo bajo, $ 12.000, y marca propia barata) o el Disco / Coto que tengas a dos cuadras, para frescos y verdura.</li>
-        <li><b>Si pedís seguido en Jumbo o Disco:</b> Jumbo Prime ($ 5.500/mes) se paga solo con dos pedidos de más de $ 60.000, porque cada envío sale $ 3.999.</li>
-        <li><b>Coto</b> pide $ 30.000 de mínimo para enviar: sirve para la compra grande, no para reponer. ${esc(second)} es la segunda opción en precio.</li>
+        <li><b>Compra grande del mes:</b> ${esc(cheapest)}${ref ? " (entre las cadenas nacionales)" : ""}. Es la más barata del changuito y, como el envío se paga una sola vez, conviene concentrar ahí lo pesado (aceite, arroz, yerba, carne para congelar).</li>
+        <li><b>Reposición de la semana:</b> ${has("Día") ? "Día (mínimo bajo, $ 12.000, y marca propia barata) o " : ""}el súper que tengas a dos cuadras, para frescos y verdura.</li>
+        ${has("Jumbo") || has("Disco") ? `<li><b>Si pedís seguido en Jumbo o Disco:</b> Jumbo Prime ($ 5.500/mes) se paga solo con dos pedidos de más de $ 60.000, porque cada envío sale $ 3.999.</li>` : ""}
+        ${has("Coto") ? `<li><b>Coto</b> pide $ 30.000 de mínimo para enviar: sirve para la compra grande, no para reponer. ${esc(second)} es la segunda opción en precio.</li>` : names.length > 1 ? `<li><b>${esc(second)}</b> es la segunda opción en precio.</li>` : ""}
+        ${regio.length ? `<li><b>${esc(regio.join(" y "))}:</b> ${regio.length > 1 ? "son cadenas" : "es una cadena"} de tu región. No ${regio.length > 1 ? "están" : "está"} en este changuito, pero ${regio.length > 1 ? "las" : "la"} comparamos en vivo con tu lista en <a href="compras.html#comparar">Compras</a>.</li>` : ""}
         <li><b>Frescos:</b> verdura, fruta y carne salen más baratos y mejores en la verdulería y la carnicería del barrio que en cualquier súper online.</li>
       </ul>`;
     const pos = Object.fromEntries(totals.map((x, i) => [x.s, i + 1]));
-    const nameMap = { carrefour: "Carrefour", dia: "Día", jumbo: "Jumbo", disco: "Disco", vea: "Vea", coto: "Coto", changomas: "ChangoMás" };
+    const nameMap = { carrefour: "Carrefour", dia: "Día", jumbo: "Jumbo", disco: "Disco", vea: "Vea", coto: "Coto", changomas: "ChangoMás", toledo: "Toledo", cordiez: "Cordiez" };
     const GROUPS = [
       { t: "Hipermercados: para la compra grande", d: "Mucho surtido y precios bajos en almacén; el envío conviene cuando el pedido es grande.", ids: ["carrefour", "coto", "jumbo", "changomas"] },
       { t: "Súper de barrio: para reponer en la semana", d: "Mínimos más bajos, sucursal cerca, entrega rápida. Ideales para frescos y lo que falta.", ids: ["dia", "disco", "vea"] },
-    ];
+      { t: "Cadenas de tu región", d: "Súper regionales con tienda online: sus precios entran en el comparador de Compras.", ids: ["toledo", "cordiez"] },
+    ].map((g) => ({ ...g, ids: g.ids.filter((id) => zc.includes(nameMap[id]) && D.stores.some((x) => x.id === id)) })).filter((g) => g.ids.length);
     const storeCard = (s) => { const p = pos[nameMap[s.id]]; return `<article class="store"><header><h4>${esc(s.name)} ${p ? `<span class="pos">#${p} en precio</span>` : ""}</h4><a href="${s.url}" target="_blank" rel="noopener">ir al sitio ↗</a></header>
-      <dl><div><dt>Costo de envío</dt><dd>${esc(s.envio)}</dd></div><div><dt>Compra mínima</dt><dd>${esc(s.minimo)}</dd></div><div><dt>Envío gratis</dt><dd>${esc(s.gratis)}</dd></div><div><dt>Plazo</dt><dd>${esc(s.plazo)}</dd></div><div><dt>Cobertura</dt><dd>${esc(s.cobertura)}</dd></div></dl>
+      <dl><div><dt>Sucursales</dt><dd>${(() => { const zz = window.ZONA.list.filter((z) => window.ZONA.chains(z[0]).includes(nameMap[s.id])).map((z) => z[1]); return zz.length > 12 ? `En casi todo el país (${zz.length} de ${window.ZONA.list.length} zonas)` : esc(zz.join(", ")); })()}</dd></div><div><dt>Costo de envío</dt><dd>${esc(s.envio)}</dd></div><div><dt>Compra mínima</dt><dd>${esc(s.minimo)}</dd></div><div><dt>Envío gratis</dt><dd>${esc(s.gratis)}</dd></div><div><dt>Plazo</dt><dd>${esc(s.plazo)}</dd></div><div><dt>Cobertura</dt><dd>${esc(s.cobertura)}</dd></div></dl>
       <p class="nota">${esc(s.nota)} <a class="small" href="${s.fuente}" target="_blank" rel="noopener">fuente</a></p></article>`; };
     $("#storeGroups").innerHTML = GROUPS.map((g) => `<div class="sgroup"><h3>${esc(g.t)}</h3><p class="muted small">${esc(g.d)}</p><div class="stores">${g.ids.map((id) => storeCard(D.stores.find((s) => s.id === id))).join("")}</div></div>`).join("");
     $("#apps").innerHTML = D.apps.map((a) => `<article class="app"><h4><a href="${a.url}" target="_blank" rel="noopener">${esc(a.name)} ↗</a></h4><p>${esc(a.desc)}</p></article>`).join("");
@@ -905,7 +973,8 @@
     html += `</tbody><tfoot><tr><td>Total changuito semanal</td>${cols.map((c, i) => `<td class="${i === 0 ? "best" : ""}"><span data-ars="${B.totals[c]}"></span></td>`).join("")}</tr></tfoot>`;
     $("#basketTable").innerHTML = html;
     $("#sources").innerHTML = D.sources.map((s) => `<li>${s.u ? `<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a>` : esc(s.t)}</li>`).join("");
-  }
+    window.renderMoney && window.renderMoney();
+  }; renderSuper(); window.addEventListener("zona", renderSuper); }
 
   // ---------- sugerencias de platos (botón flotante) ----------
   const CFG = window.CONFIG || {};
@@ -973,7 +1042,7 @@
       if (!CFG.priceApi) { res.innerHTML = `<p class="muted">El buscador en vivo todavía no está activado (falta la URL del proxy de precios en config.js). Mientras tanto, abrí la búsqueda en cada cadena: ${Object.keys(STORE_SEARCH).map((s) => `<a href="${STORE_SEARCH[s](q)}" target="_blank" rel="noopener">${esc(s)}</a>`).join(" · ")}.</p>`; return; }
       res.innerHTML = `<p class="muted">Buscando «${esc(q)}» en las siete cadenas…</p>`;
       try {
-        const j = await (await fetch(`${CFG.priceApi.replace(/\/$/, "")}/search?q=${encodeURIComponent(q)}`)).json();
+        const j = await (await fetch(`${CFG.priceApi.replace(/\/$/, "")}/search?q=${encodeURIComponent(q)}${window.ZONA.q()}`)).json();
         const normS = (s) => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
         const qn = normS(q).split(/\s+/).map((w) => w.replace(/[,.]/g, "")).filter((w) => w.length > 2 && !/^\d+$/.test(w));
         // cada palabra de la búsqueda tiene que estar en el nombre del producto (saca "barra proteica" cuando buscás "aceite de girasol")
@@ -1000,6 +1069,16 @@
 
   // ---------- productos de estación ----------
   if (page === "temporada" && D.temporada) {
+    const EST = {
+      centro: "Calendario de la zona central del país (Buenos Aires, Santa Fe, Córdoba, Entre Ríos y La Pampa), según el Mercado Central de Buenos Aires y el INTA.",
+      noa: "En el Noroeste la temporada se adelanta: las primicias de tomate, morrón, zapallito y chaucha llegan unas semanas antes que en el centro, y los cítricos de Tucumán, Salta y Jujuy están en su mejor momento de abril a septiembre.",
+      nea: "En el Noreste el calor adelanta varias semanas las verduras de verano (tomate, morrón, zapallito). Los cítricos de Corrientes, Entre Ríos y Misiones, la mandioca y la banana de Formosa son de la región.",
+      cuyo: "En Cuyo la fruta de carozo (durazno, ciruela, damasco) y la uva son locales de diciembre a marzo, y el ajo de Mendoza y San Juan sale a fin de la primavera. Las verduras de hoja sufren con el calor del verano.",
+      pat: "En la Patagonia la temporada local llega unas semanas más tarde que en el centro. Del Alto Valle de Río Negro y Neuquén salen peras y manzanas (se cosechan de enero a abril y se guardan todo el año) y las frutas finas, como la cereza y la frambuesa, son de diciembre a febrero.",
+    };
+    const estNota = () => { const el = $("#estNota"); if (!el) return; const z = window.ZONA.info(), reg = z?.reg || "centro";
+      el.innerHTML = `${ic("pin")} <span>${z ? `<b>${esc(z.name)}</b> · ` : ""}${EST[reg]}${reg !== "centro" ? " El calendario de abajo es el de la zona central: corré las fechas según esta nota." : ""}</span> <button type="button" class="mini-btn" data-open-zona>${z ? "Cambiar" : "Elegí tu provincia"}</button>`; };
+    estNota(); window.addEventListener("zona", estNota);
     const nowM = new Date().getMonth() + 1;
     const order = [...D.temporada].sort((a, b) => ((a.m - nowM + 12) % 12) - ((b.m - nowM + 12) % 12));
     const normS = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -1229,7 +1308,7 @@
     const tb = $(".tabbar a[data-nav='inicio']"); if (tb) tb.lastChild.textContent = "Hoy";
     // todas las funciones, por categoría
     const CATS_APP = [
-      ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "settings", "Mes a medida"], ["temporada.html", "leaf", "Estación"], ["plan.html#batch", "pot", "Batch del domingo"]]],
+      ["Cocinar", "c1", [["plan.html", "calendar", "Plan del mes"], ["recetas.html", "recetas", "Recetas"], ["nutricion.html#medida", "settings", "Mes a medida"], ["temporada.html", "leaf", "Estación"], ["recetas.html#mundo", "plate", "Del mundo"], ["plan.html#batch", "pot", "Batch del domingo"]]],
       ["Comprar", "c2", [["compras.html", "compras", "Lista"], ["compras.html#comparar", "coin", "Comparar precios"], ["promos.html", "tag", "Promos"], ["supermercados.html#mapa", "pin", "Sucursales"]]],
       ["Vos", "c3", [["mi-plan.html", "users", "Mi plan"], ["mi-plan.html#prog", "chart", "Progreso"], ["nutricion.html", "flame", "Nutrición"], ["mi-plan.html#rank", "trophy", "Ranking"], ["pasos.html", "bolt", "Pasos"], ["mi-plan.html#rank", "target", "Desafíos"]]],
     ];
@@ -1274,6 +1353,7 @@
         <div class="ap-set">
           <button type="button" class="ap-row notif-btn">${ic("bell")}<span>Recordatorios</span>${ic("arrow")}</button>
           <button type="button" class="ap-row" data-open-prefs>${ic("leaf")}<span>Preferencias y alergias</span>${ic("arrow")}</button>
+          <button type="button" class="ap-row" data-open-zona>${ic("pin")}<span>Tu provincia${window.ZONA?.info() ? " · " + esc(window.ZONA.info().name) : ""}</span>${ic("arrow")}</button>
           <div class="ap-row"><span class="ap-ri">${ic("users")}</span><span>Cuántos comen</span><div class="ap-cur">${hogHTML()}</div></div>
           <div class="ap-row"><span class="ap-ri">${ic("coin")}</span><span>Moneda</span><div class="seg ap-cur">${["ARS", "USD", "EUR"].map((c) => `<button type="button" data-apcur="${c}" class="${c === cur ? "on" : ""}">${c}</button>`).join("")}</div></div>
           <button type="button" class="ap-row" data-apsug>${ic("plus")}<span>Sugerir un plato</span>${ic("arrow")}</button>
@@ -1484,7 +1564,7 @@
     const bajas = [];
     for (const q of [...new Set(list.map((a) => a.q))].slice(0, 8)) {
       try {
-        const rs = (await (await fetch(`${CFG.priceApi.replace(/\/$/, "")}/search?q=${encodeURIComponent(q)}`)).json()).results || [];
+        const rs = (await (await fetch(`${CFG.priceApi.replace(/\/$/, "")}/search?q=${encodeURIComponent(q)}${window.ZONA.q()}`)).json()).results || [];
         list.filter((a) => a.q === q).forEach((a) => {
           const same = rs.find((r) => r.link === a.link) || rs.find((r) => r.store === a.store && normA(r.name) === normA(a.name));
           a.miss = !same; if (same) { if (same.price < (a.cur ?? a.price) * 0.97 && same.price < a.price * 0.97) bajas.push(a); a.cur = same.price; a.curAt = new Date().toISOString(); }

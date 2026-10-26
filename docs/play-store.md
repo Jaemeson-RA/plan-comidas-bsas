@@ -7,10 +7,10 @@ Textos listos para pegar en Play Console (español de Argentina). Donde dice Men
 **Nombre (máx. 30):** Menuario: plan de comidas
 
 **Descripción breve (máx. 80):**
-Menú semanal, lista de compras y el súper más barato de Buenos Aires.
+Menú semanal, lista de compras y el súper más barato de tu zona.
 
 **Descripción completa:**
-Menuario arma tu menú de la semana y te dice dónde conviene comprar en Buenos Aires.
+Menuario arma tu menú de la semana y te dice dónde conviene comprar, en cualquier provincia de la Argentina.
 
 • Un plan de comidas para una persona que se renueva solo: desayuno, almuerzo, merienda y cena, todos los días.
 • 30 recetas fáciles con foto, video, utensilios y modo cocina paso a paso con temporizadores.
