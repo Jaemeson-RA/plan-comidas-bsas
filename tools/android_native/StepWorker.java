@@ -21,10 +21,12 @@ public class StepWorker extends Worker {
     static void schedule(Context c) {
         PeriodicWorkRequest req = new PeriodicWorkRequest.Builder(StepWorker.class, 15, TimeUnit.MINUTES).build();
         WorkManager.getInstance(c.getApplicationContext()).enqueueUniquePeriodicWork("pasos", ExistingPeriodicWorkPolicy.KEEP, req);
+        MidnightReceiver.schedule(c.getApplicationContext());
     }
 
     @NonNull @Override
     public Result doWork() {
+        MidnightReceiver.schedule(getApplicationContext());   // las alarmas se borran al reiniciar el teléfono: se vuelve a poner
         HandlerThread ht = new HandlerThread("pasos");
         ht.start();
         final CountDownLatch latch = new CountDownLatch(1);

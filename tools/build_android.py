@@ -75,6 +75,13 @@ ACT = """        <activity android:name=".PasosActivity" android:exported="true"
             </intent-filter>
         </activity>
 """
+# lectura fija a las 23:59 (MidnightReceiver): alarma exacta, que en Android 13+ da USE_EXACT_ALARM sin preguntar
+# (OJO si algún día va a Google Play: ahí USE_EXACT_ALARM solo se acepta para apps de alarma o calendario)
+PERM2 = """    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32"/>
+"""
+RCV = """        <receiver android:name=".MidnightReceiver" android:exported="false"/>
+"""
 def apply_native():
     for f in os.listdir(NAT):
         if f.endswith(".java"): shutil.copyfile(os.path.join(NAT, f), os.path.join(JAVA, f))
@@ -86,7 +93,10 @@ def apply_native():
     if "ACTIVITY_RECOGNITION" not in s:
         s = s.replace("    <application", PERM + "    <application", 1).replace("    </application>", ACT + "    </application>", 1)
         open(mf, "w", encoding="utf-8").write(s)
-    bg = os.path.join(AND, "app", "build.gradle"); s = open(bg, encoding="utf-8").read()
+    if "MidnightReceiver" not in s:
+        s = s.replace("    <application", PERM2 + "    <application", 1).replace("    </application>", RCV + "    </application>", 1)
+        open(mf, "w", encoding="utf-8").write(s)
+    bg =os.path.join(AND, "app", "build.gradle"); s = open(bg, encoding="utf-8").read()
     if "androidx.work" not in s:
         s = s.replace("implementation 'com.google.androidbrowserhelper:androidbrowserhelper:", "implementation 'androidx.work:work-runtime:2.9.1'\n        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:", 1)
         open(bg, "w", encoding="utf-8").write(s)
