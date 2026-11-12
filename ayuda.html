@@ -4,7 +4,12 @@
 <link rel="canonical" href="https://menuario.com/">
 <noscript><meta http-equiv="refresh" content="0;url=https://menuario.com/"></noscript>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#FBF7F0;color:#1F2D2A;font:17px/1.5 system-ui,sans-serif;text-align:center;padding:16px}a{color:#2F8F5B;font-weight:600}</style>
-</head><body><p>Menuario se mudó a <a id="go" href="https://menuario.com/">menuario.com</a>. Te llevamos con tus datos…</p>
+</head><body><div><p id="msg">Menuario se mudó a <a id="go" href="https://menuario.com/">menuario.com</a>. Te llevamos con tus datos…</p>
+<div id="ico" hidden style="max-width:30rem;text-align:left"><p><b>Menuario se mudó a menuario.com.</b> Este ícono es el de la dirección vieja: por eso la app se abre con barra de navegador y no en pantalla completa.</p>
+<ol style="padding-left:1.2rem;line-height:1.6"><li>Tocá <b>Seguir a menuario.com</b> (abajo) y entrá a tu cuenta, si tenés una: tus datos vuelven solos.</li>
+<li>En iPhone, abrí <b>menuario.com en Safari</b>, tocá <b>Compartir</b> y <b>Agregar a inicio</b>. En Android, entrá a <b>menuario.com/app</b> y bajá la app.</li>
+<li>Borrá este ícono viejo: mantenelo apretado y elegí <b>Eliminar</b>.</li></ol>
+<p><a id="go2" href="https://menuario.com/" style="display:inline-block;background:#2F8F5B;color:#fff;padding:.7rem 1.2rem;border-radius:999px;text-decoration:none">Seguir a menuario.com</a></p></div></div>
 <script>
 (function () {
   var p = location.pathname.replace(/^\/plan-comidas-bsas\/?/, "");
@@ -20,6 +25,9 @@
   dest += n ? "#migrar=" + encodeURIComponent(JSON.stringify(data)) : location.hash;
   document.getElementById("go").href = dest;
   var done = false, go = function () { if (!done) { done = true; location.replace(dest); } };
+  // abierto desde el ícono viejo de la pantalla de inicio: se explica cómo poner el nuevo (no se redirige solo)
+  var app = navigator.standalone || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+  if (app) { document.getElementById("msg").hidden = true; document.getElementById("ico").hidden = false; document.getElementById("go2").href = dest; done = true; }
   try {
     if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }).then(go, go);
     else go();
