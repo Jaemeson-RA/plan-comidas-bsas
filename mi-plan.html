@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es-AR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Menuario se mudó a menuario.com</title>
+<link rel="canonical" href="https://menuario.com/">
+<noscript><meta http-equiv="refresh" content="0;url=https://menuario.com/"></noscript>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#FBF7F0;color:#1F2D2A;font:17px/1.5 system-ui,sans-serif;text-align:center;padding:16px}a{color:#2F8F5B;font-weight:600}</style>
+</head><body><p>Menuario se mudó a <a id="go" href="https://menuario.com/">menuario.com</a>. Te llevamos con tus datos…</p>
+<script>
+(function () {
+  var p = location.pathname.replace(/^\/plan-comidas-bsas\/?/, "");
+  if (p === "index.html") p = "";
+  var dest = "https://menuario.com/" + p + location.search, data = {}, n = 0;
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (/^(px|busq|acct|migrado)/.test(k)) continue;  // cachés de precios y la marca de sesión: no se llevan
+      data[k] = localStorage.getItem(k); n++;
+    }
+  } catch (e) {}
+  dest += n ? "#migrar=" + encodeURIComponent(JSON.stringify(data)) : location.hash;
+  document.getElementById("go").href = dest;
+  var done = false, go = function () { if (!done) { done = true; location.replace(dest); } };
+  try {
+    if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }).then(go, go);
+    else go();
+  } catch (e) { go(); }
+  setTimeout(go, 1500);
+})();
+</script></body></html>
